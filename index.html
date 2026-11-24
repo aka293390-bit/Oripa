@@ -13556,7 +13556,7 @@ document.addEventListener('DOMContentLoaded', function () {
         playInner.querySelector('[data-sim-stage-sub]').textContent = '結果はランキングで確かめられます。明日またルーレットから遊べます。';
         return;
       }
-      if (wallet.level && wallet.level.max_price && g.pr > wallet.level.max_price && !current.local) {
+      if (play === 'game' && wallet.level && wallet.level.max_price && g.pr > wallet.level.max_price) {
         var lk = levelFor(g.pr), sl = playInner.querySelector('[data-sim-stage]');
         sl.className = 'sim-stage'; sl.hidden = false; stageImg(null);
         playInner.querySelector('[data-sim-stage-text]').textContent = 'このガチャは' + (lk ? lvLabel(lk) : '上のレベル') + 'で解放';
@@ -15127,7 +15127,7 @@ document.addEventListener('DOMContentLoaded', function () {
       level: sw.level || null, next: sw.next || null, best: sw.best || sw.pt || 0, survive: sw.survive || 0, title: sw.title || 'beginner', login: sw.login || null };
     renderStatus();
     if (!sw.rolled) { inv = []; invSave(); } // 今日まだ回していない＝前の日の獲得商品は持ち越さない
-    walletSave(); walletRender(); markStarted();
+    walletSave(); walletRender(); renderStatus(); markStarted();
   }
 
   var play = (function () { try { var v = localStorage.getItem(PLAY_KEY); return v === 'game' || v === 'analyze' ? v : ''; } catch (e) { return ''; } }());
