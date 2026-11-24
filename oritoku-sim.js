@@ -48,9 +48,43 @@
       revived: !!w.rev, done: !!w.done, level: level || w.level || null, next: next || w.next || null, best: score,
       survive: w.survive || 0, title: w.title || 'beginner', login: w.login || null };
   }
+  var LOCAL_GACHAS_PROMISE = fetch('local-gachas.json').then(function (r) { return r.json(); });
+  var LOCAL_MISSION_TARGETS = [100, 200, 300, 400, 500, 1000, 5000, 10000];
+  var LOCAL_MISSION_REWARDS = [500, 600, 700, 800, 900, 1000, 2000, 5000];
+  function localPullCount() { try { return parseInt(localStorage.getItem('ot_sim_pull_count') || '0', 10) || 0; } catch (e) { return 0; } }
+  function localClaims() { try { return JSON.parse(localStorage.getItem('ot_sim_mission_claims') || '{}') || {}; } catch (e) { return {}; } }
+  function localMissions() {
+    var count = localPullCount(), claims = localClaims();
+    return LOCAL_MISSION_TARGETS.map(function (n, i) {
+      var id = 'pull-' + n, done = count >= n;
+      return { id: id, label: n.toLocaleString('ja-JP') + '回以上オリパを引く', kind: 'pull', progress: Math.min(count, n).toLocaleString('ja-JP') + ' / ' + n.toLocaleString('ja-JP') + '回', coins: LOCAL_MISSION_REWARDS[i], done: done, claimed: !!claims[id] };
+    });
+  }
+  function localMissionClaim(id) {
+    var claims = localClaims(), m = localMissions().filter(function (x) { return x.id === id; })[0];
+    if (!m || !m.done || claims[id]) { var e = new Error('mission_not_done'); e.code = 'mission_not_done'; throw e; }
+    claims[id] = true; try { localStorage.setItem('ot_sim_mission_claims', JSON.stringify(claims)); } catch (e) {}
+    return m;
+  }
+  function localGachaResponse(id, map) {
+    var g = map && map[id];
+    if (!g) { var e = new Error('not_found'); e.code = 'not_found'; throw e; }
+    var counts = (g.tiers || []).map(function (t) { return +t.q || 0; }); counts.push(g.hz ? (+g.hz.q || 0) : 0);
+    return { ok: true, gacha: g, box: { round: 1, left: +g.tot || 0, pulls: 0, counts: counts }, stats: { n: 0, cost: 0, pt: 0, mkt: 0, players: 0 } };
+  }
   function api(action, data) {
+    if (LOCAL_GAME && action === 'gacha') {
+      return LOCAL_GACHAS_PROMISE.then(function (map) { return localGachaResponse(data && data.id, map); });
+    }
+    if (LOCAL_GAME && action === 'mission') {
+      try {
+        var mm = localMissionClaim(data && data.m);
+        var mw = localWalletSnapshot(); mw.pt += mm.coins;
+        return Promise.resolve({ ok: true, wallet: mw, missions: localMissions() });
+      } catch (e) { return Promise.reject(e); }
+    }
     if (LOCAL_GAME && action === 'state') {
-      return Promise.resolve({ ok: true, boxes: {}, recent: [], ranking: [], ranking_month: [], missions: [], wallet: localWalletSnapshot() });
+      return Promise.resolve({ ok: true, boxes: {}, recent: [], ranking: [], ranking_month: [], missions: localMissions(), wallet: localWalletSnapshot() });
     }
     if (LOCAL_GAME && action === 'roll') {
       var pi = pickPlan();
@@ -1491,6 +1525,8 @@
 
   // サーバーの OritokuSimRepository::pull と同じ形の結果を返す
   function localPull(g, box, n) {
+    try { localStorage.setItem('ot_sim_pull_count', String(localPullCount() + n)); } catch (e) {}
+    if (typeof renderMissions === 'function') renderMissions(localMissions());
     var b = { round: box.round, left: box.left, pulls: box.pulls, counts: box.counts.slice() };
     var T = g.tiers.length, hits = {}, pt = 0, ptUnknown = 0, bestIdx = -1, bestPt = -1, soldOut = false, drawn = 0, opened = 0;
     while (drawn < n) {
@@ -2514,7 +2550,7 @@
       closeRpop(); pull(an);
     });
   }
-  // ---- オリ得ミッション（達成はサーバーが記録から数える。受け取るとコインが増える）----
+  // ---- オリ得ミッション（端末内の抽選回数で進捗を数える）----
   var missionEl = root.querySelector('[data-sim-missions]');
   function renderMissions(list) {
     if (!missionEl || !list.length) return;
