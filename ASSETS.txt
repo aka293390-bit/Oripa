@@ -1,0 +1,46 @@
+https://tcgpro.co.jp/favicon.ico	favicon.ico	image/vnd.microsoft.icon	5430
+https://tcgpro.co.jp/favicon.svg	favicon.svg	image/svg+xml	669
+https://tcgpro.co.jp/favicon-32x32.png	favicon-32x32.png	image/png	1566
+https://tcgpro.co.jp/favicon-16x16.png	favicon-16x16.png	image/png	646
+https://tcgpro.co.jp/apple-touch-icon.png	apple-touch-icon.png	image/png	11632
+https://tcgpro.co.jp/site.webmanifest	site.webmanifest		346
+https://www.clarity.ms	www.clarity.ms		2
+https://tcgpro.co.jp/oritoku/simulator/	simulator	text/html; charset=UTF-8	77629
+https://tcgpro.co.jp/public/css/fonts/noto-sans-jp.css?v=1795486706	noto-sans-jp.css	text/css	409547
+https://tcgpro.co.jp/public/css/tokens.css?v=1795486706	tokens.css	text/css	27720
+https://tcgpro.co.jp/public/css/style.css?v=1795486706	style.css	text/css	213670
+https://tcgpro.co.jp/public/css/blog-parts.css?v=1795486706	blog-parts.css	text/css	57950
+https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@800;900&amp;display=swap	css2	text/css; charset=utf-8	376
+https://tcgpro.co.jp/public/css/oritoku.css?v=1795486706	oritoku.css	text/css	19102
+https://tcgpro.co.jp/public/css/oritoku-sim.css?v=1795486706	oritoku-sim.css	text/css	206915
+https://www.googletagmanager.com/gtag/js?id=G-TLTSVVLCGM	js	application/javascript; charset=UTF-8	598970
+https://tcgpro.co.jp/public/js/app.js?v=1795486707	app.js	application/javascript	54406
+https://tcgpro.co.jp/public/js/oritoku-sim.js?v=1795486707	oritoku-sim.js	application/javascript	207923
+https://statics.a8.net/a8link/a8media-ad.js	a8media-ad.js	application/javascript	10816
+https://tcgpro.co.jp/public/images/oritoku/oritoku-simulator-logo.webp?v=1795486707	oritoku-simulator-logo.webp	image/webp	46460
+https://tcgpro.co.jp/public/images/oritoku/rank-point.webp?v=1795486707	rank-point.webp	image/webp	9584
+https://tcgpro.co.jp/public/images/oritoku/sim-rank-banner.webp?v=1795486707	sim-rank-banner.webp	image/webp	76940
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-20-m-p.webp?v=1795486707	c-20-m-p.webp	image/webp	9650
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-105-78.webp?v=1795486707	c-105-78.webp	image/webp	12814
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-110-98.webp?v=1795486707	c-110-98.webp	image/webp	12766
+https://tcgpro.co.jp/public/images/oritoku/sim-box/storm-emeralda.webp?v=1795486707	storm-emeralda.webp	image/webp	45714
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-171-151.webp?v=1795486707	c-171-151.webp	image/webp	11470
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-7-32.webp?v=1795486707	c-7-32.webp	image/webp	13678
+https://tcgpro.co.jp/public/images/oritoku/sim-thumbs/orikuji-ga0011_202610_799.webp?v=1795486707	orikuji-ga0011_202610_799.webp	image/webp	19100
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/k-0d999a1473be.webp?v=1795486707	k-0d999a1473be.webp	image/webp	9388
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-94-87.webp?v=1795486707	c-94-87.webp	image/webp	13658
+https://tcgpro.co.jp/public/images/oritoku/sim-box/30th-celebration.webp?v=1795486707	30th-celebration.webp	image/webp	49252
+https://tcgpro.co.jp/public/images/oritoku/sim-thumbs/dopa-369782.webp?v=1795486707	dopa-369782.webp	image/webp	16614
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/k-8478e6b71db1.webp?v=1795486707	k-8478e6b71db1.webp	image/webp	13618
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-79-69.webp?v=1795486707	c-79-69.webp	image/webp	14130
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-186-s-p.webp?v=1795486707	c-186-s-p.webp	image/webp	13976
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-95-69.webp?v=1795486707	c-95-69.webp	image/webp	14480
+https://tcgpro.co.jp/public/images/oritoku/sim-prizes/c-279-xy-p.webp?v=1795486707	c-279-xy-p.webp	image/webp	14292
+https://tcgpro.co.jp/public/images/oritoku/sim-prize-box.webp?v=1795486707	sim-prize-box.webp	image/webp	119164
+https://tcgpro.co.jp/public/images/oritoku/sim-tut/roulette.webp?v=1795486707	roulette.webp	image/webp	18328
+https://tcgpro.co.jp/public/images/oritoku/sim-tut/gacha.webp?v=1795486707	gacha.webp	image/webp	91740
+https://tcgpro.co.jp/public/images/oritoku/sim-tut/inventory.webp?v=1795486707	inventory.webp	image/webp	20632
+https://tcgpro.co.jp/public/images/oritoku/oritoku-logo-nav.webp?v=1795486707	oritoku-logo-nav.webp	image/webp	40310
+https://tcgpro.co.jp/public/images/oritoku/sim-view/oritoku-top.webp?v=1795486707	oritoku-top.webp	image/webp	107702
+https://tcgpro.co.jp/public/images/oritoku/sim-view/tier-mosaic.webp?v=1795486707	tier-mosaic.webp	image/webp	27578
+https://tcgpro.co.jp/oritoku/simulator/#mfooter-holo	simulator-1	text/html; charset=UTF-8	77629

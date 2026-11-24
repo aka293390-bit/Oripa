@@ -1,0 +1,1582 @@
+/* ============================================================
+ * blog-parts.css — 記事共通パーツ（tcgpro-blogparts-proposals 採用案）
+ *
+ * Markdown.php の独自記法が出力するパーツと、/oritoku/oripa/shop 等の
+ * テンプレが共有するコンポーネント層。値は必ず --ds-* 経由。
+ *
+ * 採用案の出典（デザイン案カタログ）:
+ *   結論       = point.html 案04（ダーク帯見出し型）/ 案06（結論⇒理由の2段構成）
+ *   ステップ   = steps.html 案05（チェックリスト進行型）
+ *   記事埋め込み = blogcard.html 案09 をライト化（白地＋枠＋丸矢印。抽選ブロックと同じ面）
+ *   採点・評価 = score.html 案01（大数字+星の総合サマリー）
+ *   トグル     = accordion.html 案02（淡グレー塗りフラット）
+ *   吹き出し   = say.html 案02（左アバター+しっぽ吹き出し）
+ *   引用       = quote.html 案02（大型クォートマーク型）
+ * ============================================================ */
+
+/* ===== 結論 :::point — 格子の表と同じ型 =====
+   黒い太枠と黒帯をやめ、記事の表（media.css .article-table-wrap）と同じ細い灰の外枠＋
+   薄灰の見出し行にそろえる。見出しの文字は黒。 */
+.article-point {
+    background: var(--ds-color-bg);
+    border: var(--ds-border-width) solid var(--ds-color-table-grid-line);
+    border-radius: var(--ds-radius-card);
+    overflow: hidden;
+    margin: 0 0 var(--ds-space-stack-md);
+}
+.article-point__head {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-inline-sm);
+    background: var(--ds-color-bg-subtle);
+    color: var(--ds-color-text);
+    border-bottom: var(--ds-border-width) solid var(--ds-color-table-grid-line);
+    font-size: var(--ds-text-body-sm-size);
+    font-weight: var(--ds-text-h3-weight);
+    line-height: var(--ds-text-body-sm-lh);
+    padding: var(--ds-space-stack-xs) var(--ds-space-stack-sm);
+}
+.article-point__head svg { flex: none; }
+.article-point__body {
+    background: var(--ds-color-bg);
+    padding: var(--ds-space-stack-sm) var(--ds-space-stack-md);
+}
+.article-point__body p { margin: 0 0 var(--ds-space-stack-xs); }
+.article-point__body > :last-child { margin-bottom: 0; }
+/* 箇条書き対応（.article__body ul/li の本文既定に詳細度で勝たせる） */
+/* 箇条書きの点を出す（style.css の ul リセットで消えているため明示する） */
+.article__body .article-point__body ul,
+.article-point__body ul {
+    margin: 0;
+    padding-left: var(--ds-space-stack-md);
+    list-style: disc;
+}
+.article__body .article-point__body ol,
+.article-point__body ol {
+    margin: 0;
+    padding-left: var(--ds-space-stack-md);
+    list-style: decimal;
+}
+.article__body .article-point__body li,
+.article-point__body li { margin-bottom: var(--ds-space-stack-xs); }
+.article__body .article-point__body li:last-child,
+.article-point__body li:last-child { margin-bottom: 0; }
+/* チェックリスト変種（:::point[...]{check}）— 緑チェックの箇条書き */
+.article__body .article-point--check .article-point__body ul,
+.article-point--check .article-point__body ul {
+    list-style: none;
+    padding-left: 0;
+}
+.article__body .article-point--check .article-point__body li,
+.article-point--check .article-point__body li {
+    position: relative;
+    padding-left: 32px;
+}
+/* 線は3px。2pxだと本文のウエイトに負けて頼りなく見える。
+   ✓ と本文の間は 32 - (4 + 14) = 14px 確保する。 */
+/* 行頭マーカーの縦位置は 1行目の行ボックスの中央に合わせる。
+   .article__body の line-height は 1.9（media.css）なので半分は 0.95em。
+   そこからマーカー自身の高さの半分を引いた値を top に使う。
+   px 固定にすると本文が 17px になるブレークポイントでずれる。 */
+.article-point--check .article-point__body li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: calc(0.95em - 5px);   /* マーク高さ 7+3=10px の半分 */
+    width: 14px;
+    height: 7px;
+    border-left: 3px solid var(--ds-color-positive);
+    border-bottom: 3px solid var(--ds-color-positive);
+    transform: rotate(-45deg);
+}
+
+/* ===== 結論 :::point（理由あり）— 結論⇒理由の2段構成 ===== */
+.article-point--prep {
+    background: var(--ds-color-bg-subtle);
+    border: 0;   /* 枠線は「要点」ボックスだけに当てる。こちらは淡グレーの平らな箱 */
+    border-radius: var(--ds-radius-card);
+    overflow: visible;
+    padding: var(--ds-space-inline-xs) var(--ds-space-stack-md);
+}
+.article-point__row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ds-space-inline-md);
+    padding: var(--ds-space-stack-sm) 0;
+}
+.article-point__row + .article-point__row {
+    border-top: var(--ds-border-width) solid var(--ds-color-border);
+}
+.article-point__chip {
+    flex: none;
+    font-size: var(--ds-text-body-sm-size);   /* バッジの文字を大きく */
+    font-weight: var(--ds-text-h3-weight);
+    line-height: var(--ds-text-body-sm-lh);
+    border-radius: var(--ds-radius-chip);
+    padding: 5px 12px;
+    margin-top: 2px;
+}
+.article-point__chip--main {
+    background: var(--ds-color-bg-inverse);
+    color: var(--ds-color-text-inverse);
+}
+/* 理由バッジは白抜き（白背景+黒枠+黒文字） */
+.article-point__chip--why {
+    background: var(--ds-color-bg);
+    color: var(--ds-color-text);
+    border: var(--ds-border-width) solid var(--ds-color-text);
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.article-point__row p { margin: 0; }
+.article-point__row--main p { font-weight: var(--ds-text-h3-weight); }
+.article-point__row--why p {
+    font-size: var(--ds-text-body-sm-size);
+    line-height: var(--ds-text-body-lh);
+    color: var(--ds-color-text);   /* 理由の本文は黒文字 */
+}
+/* 理由がチェックリストのときはラベルを上、箇条書きを下の行に積む */
+.article-point__row--stack {
+    flex-direction: column;
+    gap: var(--ds-space-stack-xs);
+}
+/* SPでは結論チップの右に本文を並べると1行あたりの文字数が稼げないため、
+   理由の行（--stack）と同じくチップを上・本文を下に積む。 */
+@media (max-width: 639px) {
+    .article-point__row--main {
+        flex-direction: column;
+        gap: var(--ds-space-stack-xs);
+    }
+}
+
+/* 理由部分の ✓ チェックリスト（結論⇒理由の2段構成） */
+.article-point__checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+/* media.css の `.article__body ul { padding-left: 24px }` が本文リストとして効いてしまい、
+   ✓ が結論テキストより右に押し出されていた。結論ボックス内は 6px に揃える。 */
+.article-point .article-point__row .article-point__checklist {
+    padding-left: 6px;
+    margin-bottom: var(--ds-space-stack-sm);
+}
+.article-point__checklist li {
+    position: relative;
+    padding-left: 26px;
+    margin-bottom: var(--ds-space-stack-xs);
+    font-size: var(--ds-text-body-sm-size);
+    line-height: var(--ds-text-body-lh);
+    color: var(--ds-color-text);   /* 理由チェックリストの本文は黒文字 */
+}
+.article-point__checklist li:last-child { margin-bottom: 0; }
+/* iOS風の丸チェック（緑丸+白いチェックマーク） */
+.article-point__checklist li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: calc(0.9em - 9px);   /* このリストだけ 14px / lh 1.8 なので半分は 0.9em。丸 18px の半分を引く */
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--ds-color-positive);
+}
+.article-point__checklist li::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: calc(0.9em - 4px);   /* 緑丸の中心に載せる */
+    width: 10px;
+    height: 5px;
+    border-left: 2px solid var(--ds-color-bg);
+    border-bottom: 2px solid var(--ds-color-bg);
+    transform: rotate(-45deg);
+}
+
+/* ===== ステップ :::steps — チェックリスト進行型 ===== */
+.article-steps {
+    list-style: none;
+    margin: 0 0 var(--ds-space-stack-md);
+    padding: 0;
+}
+.article__body .article-steps { padding-left: 0; }
+.article-steps__item {
+    position: relative;
+    display: flex;
+    gap: var(--ds-space-inline-md);
+    padding-bottom: var(--ds-space-stack-md);
+    margin: 0;
+}
+.article-steps__item:last-child { padding-bottom: 0; }
+.article-steps__item::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 30px;
+    bottom: 4px;
+    width: 0;
+    border-left: 2px dotted var(--ds-color-border-strong);
+}
+.article-steps__item:last-child::before { display: none; }
+.article-steps__icon {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    color: var(--ds-color-text-subtle);
+}
+.article-steps__icon svg { display: block; }
+.article-steps__item--done .article-steps__icon { color: var(--ds-color-positive); }
+.article-steps__item--done .article-steps__icon .ring { fill: var(--ds-color-positive); stroke: none; }
+.article-steps__item--done .article-steps__icon .tick { stroke: var(--ds-color-bg); }
+.article-steps__body { min-width: 0; }
+.article-steps__ttl {
+    margin: 0 0 2px;
+    font-weight: var(--ds-text-h3-weight);
+    line-height: 1.5;
+}
+.article-steps__desc {
+    margin: 0;
+    font-size: var(--ds-text-body-sm-size);
+    line-height: 1.7;
+    color: var(--ds-color-text-muted);
+}
+
+/* ===== トグル :::accordion — 淡グレー塗りフラット ===== */
+.article-accordion {
+    background: var(--ds-color-bg-subtle);
+    border-radius: var(--ds-radius-card);
+    /* 直後の本文が箱に貼り付いて見えるので、段落と同じだけ下を空ける（.article__body p と同値） */
+    margin: 0 0 var(--ds-space-stack-md);
+}
+.article-accordion__summary {
+    position: relative;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: var(--ds-touch-target-min);
+    /* 左右は「本文余白 + シェブロン16px + すき間」。シェブロンを絶対配置で右端に逃がしたぶん、
+       同じ幅を左にも取って見出しを箱の真ん中に置く */
+    /* 見出しではなく補足の扱い。本文の流れを切らないよう、高さを詰めて小さく・細く・薄くする */
+    padding: var(--ds-space-stack-xs)
+             calc(var(--ds-space-stack-sm) + 16px + var(--ds-space-inline-md));
+    font-weight: var(--fw-medium);
+    font-size: var(--ds-text-body-sm-size);
+    color: var(--ds-color-text-muted);
+}
+.article-accordion__summary::-webkit-details-marker { display: none; }
+.article-accordion__title { flex: 0 1 auto; }
+/* 前置き＋「引用」の題は、引用をかたまりにして前置きの直後で改行させる */
+.article-accordion__quote { display: inline-block; }
+.article-accordion__chev {
+    position: absolute;
+    right: var(--ds-space-stack-sm);
+    flex: none;
+    color: var(--ds-color-text-subtle);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.article-accordion[open] .article-accordion__chev { transform: rotate(180deg); }
+.article-accordion__body {
+    margin: 0 var(--ds-space-stack-sm);
+    padding: var(--ds-space-stack-sm) 0;
+    border-top: var(--ds-border-width) solid var(--ds-color-border);
+    color: var(--ds-color-text-muted);
+    font-size: var(--ds-text-body-sm-size);
+    line-height: var(--ds-text-body-lh);
+}
+.article-accordion__body p { margin: 0 0 var(--ds-space-stack-xs); }
+/* トグル内の表は本文と同じ見た目のまま、余白だけトグルの詰まりに合わせる */
+.article-accordion__body .article-table-wrap { margin: 0 0 var(--ds-space-stack-xs); }
+.article-accordion__body > :last-child { margin-bottom: 0; }
+/* 開閉をぬるっと（FAQ と同じ ::details-content + interpolate-size。
+ * 未対応ブラウザは即時開閉でフォールバック） */
+@supports (interpolate-size: allow-keywords) {
+    .article-accordion { interpolate-size: allow-keywords; }
+    .article-accordion::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition: block-size 0.4s cubic-bezier(0.22, 1, 0.36, 1), content-visibility 0.4s;
+        transition-behavior: allow-discrete;
+    }
+    .article-accordion[open]::details-content { block-size: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .article-accordion__chev { transition: none; }
+    .article-accordion::details-content { transition: none; }
+}
+/* SPは本文の段落間が1.5行分（48px）なので、トグルの下も同じだけ空ける */
+@media (max-width: 639px) {
+    .article-accordion { margin-bottom: var(--ds-space-stack-1_5line-sp); }
+}
+
+/* ===== 吹き出し :::say — 左アバター+しっぽ吹き出し（PC）===== */
+.article-say {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--ds-space-inline-md);
+    margin: 28px 0 var(--ds-space-stack-md);
+}
+.article-say__speaker {
+    flex: none;
+    width: 88px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.article-say__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--ds-radius-avatar);
+    background: var(--ds-color-bg-subtle);
+    color: var(--ds-color-text-disabled);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    object-fit: cover;
+}
+.article-say__avatar svg { width: 100%; height: 100%; display: block; }
+/* アバターがプロフィールページへのリンクのとき（中の <img> で枠を埋める） */
+a.article-say__avatar > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* トレカプロ編集部のカード型マーク：切り抜かずにカード全体を丸枠の中へ収める */
+/* img に border-radius を付けると、中身が padding の内側の小さい円で切られてカードの上下が欠ける。
+   角丸は外し、丸い地は背景の円で描く */
+.article-say__avatar--mark {
+    object-fit: contain;
+    padding: var(--ds-space-inline-sm);
+    border-radius: 0;
+    background: radial-gradient(circle closest-side, var(--ds-color-bg-subtle) 100%, transparent 100%);
+}
+.article-say__name {
+    margin-top: var(--ds-space-inline-sm);
+    font-size: var(--ds-text-body-sm-size);
+    line-height: var(--ds-text-body-sm-lh);
+    font-weight: var(--ds-text-h3-weight);
+    color: var(--ds-color-text);
+}
+/* 本文リンクの既定（.article__body a = アクセント色+下線）に勝たせて、話者名は地の文の色のまま出す */
+.article-say a.article-say__name-link,
+.article-say a.article-say__avatar {
+    color: inherit;
+    text-decoration: none;
+}
+.article-say a.article-say__name-link:hover,
+.article-say a.article-say__name-link:focus-visible { text-decoration: underline; }
+.article-say__role {
+    margin-top: 2px;
+    font-size: var(--ds-text-micro-size);
+    line-height: var(--ds-text-micro-lh);
+    color: var(--ds-color-text-subtle);
+}
+.article-say__bubble {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    background: var(--ds-color-bg-subtle);
+    border-radius: var(--ds-radius-card);
+    padding: var(--ds-space-stack-sm) var(--ds-space-stack-md);
+}
+.article-say__bubble::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: -9px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 10px solid var(--ds-color-bg-subtle);
+}
+.article-say__bubble p { margin: 0 0 var(--ds-space-stack-xs); }
+.article-say__bubble > :last-child { margin-bottom: 0; }
+
+/* SPでは横に並べると吹き出しの幅が足りないため縦積みにする。
+   アイコンを上・吹き出しを下（DOM順どおり）にし、しっぽは上向きでアイコン側を指す。 */
+@media (max-width: 639px) {
+    .article-say {
+        flex-direction: column;
+        gap: var(--ds-space-inline-sm);
+    }
+    .article-say__bubble {
+        width: 100%;
+    }
+    .article-say__bubble::before {
+        top: -9px;
+        bottom: auto;
+        left: 24px;
+        border-top: 0;
+        border-right: 8px solid transparent;
+        border-bottom: 10px solid var(--ds-color-bg-subtle);
+        border-left: 8px solid transparent;
+    }
+    .article-say__speaker {
+        flex-direction: row;
+        width: auto;
+        align-items: center;
+        justify-content: flex-start;
+        gap: var(--ds-space-inline-sm);
+        text-align: left;
+    }
+    .article-say__name { margin-top: 0; }
+    .article-say__role { margin-top: 0; margin-left: var(--ds-space-inline-xs); }
+}
+
+/* 右から話す吹き出し（frontmatter say_right）：アバターを右、しっぽを右向きにする */
+.article-say--right { flex-direction: row-reverse; }
+.article-say--right .article-say__bubble::before {
+    left: auto;
+    right: -9px;
+    border-right: 0;
+    border-left: 10px solid var(--ds-color-bg-subtle);
+}
+@media (max-width: 639px) {
+    .article-say--right { flex-direction: column; }
+    .article-say--right .article-say__speaker {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+    .article-say--right .article-say__bubble::before {
+        left: auto;
+        right: 24px;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+    }
+}
+
+/* ===== 引用 — 大型クォートマーク型 ===== */
+.article-quote { margin: 0 0 var(--ds-space-stack-md); }
+.article-quote blockquote {
+    position: relative;
+    margin: 0;
+    padding: var(--ds-space-stack-md) 0 0 56px;
+    border: 0;
+    background: none;
+}
+.article-quote blockquote::before {
+    content: "\201C";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-size: 84px;
+    line-height: 1;
+    font-weight: var(--ds-text-h1-weight);
+    color: var(--ds-color-border);
+}
+.article-quote blockquote p {
+    margin: 0;
+    color: var(--ds-color-text);
+    line-height: var(--ds-text-body-lh);
+}
+.article-quote figcaption {
+    margin-top: var(--ds-space-stack-xs);
+    text-align: right;
+    font-size: var(--ds-text-caption-size);
+    line-height: var(--ds-text-caption-lh);
+    color: var(--ds-color-text-subtle);
+}
+.article-quote figcaption a { color: var(--ds-color-link); }
+@media (max-width: 639px) {
+    .article-quote blockquote { padding-left: 44px; }
+    .article-quote blockquote::before { font-size: 64px; }
+}
+
+/* ===== 記事埋め込み :::card — ライトカード =====
+   記事内の抽選ブロック（.chusen-embed）と同じ読み方に揃える:
+   白地＋1pxの枠＋角丸、サムネは左、上にラベル、太字の見出し、右端に丸い矢印。
+   カード全体がリンクなのでドメイン表記は出さない。
+   以前はダーク反転（黒地）だったが、本文の流れの中で黒い塊が浮いて読みづらく、
+   同じ「次に見るもの」を指す抽選カードと見た目が揃わないため明るい面に変更した。 */
+.article-blogcard-wrap { margin: 0 0 var(--ds-space-stack-md); }
+.article-blogcard {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-inline-md);
+    background: var(--ds-color-bg-elevated);
+    border: var(--ds-border-width) solid var(--ds-color-border);
+    border-radius: var(--ds-radius-card);
+    padding: var(--ds-space-stack-sm);
+    color: var(--ds-color-text);
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+/* .article__body a の下線を打ち消す */
+.article__body a.article-blogcard { text-decoration: none; color: var(--ds-color-text); }
+.article__body a.article-blogcard:hover { border-color: var(--ds-color-border-strong); }
+.article-blogcard__body { flex: 1; min-width: 0; }
+.article-blogcard__label {
+    display: block;
+    font-size: var(--ds-text-micro-size);
+    line-height: var(--ds-text-micro-lh);
+    font-weight: var(--ds-text-h3-weight);
+    letter-spacing: 0.08em;
+    color: var(--ds-color-text-subtle);
+    margin-bottom: var(--ds-space-inline-xs);
+}
+.article-blogcard__title {
+    display: block;
+    font-size: var(--ds-text-body-size);
+    line-height: var(--ds-text-body-sm-lh);
+    font-weight: var(--ds-text-h3-weight);
+    color: var(--ds-color-text-link-accent);
+}
+.article-blogcard:hover .article-blogcard__title {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+.article-blogcard__arrow {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: var(--ds-border-width) solid var(--ds-color-border-strong);
+    border-radius: var(--ds-radius-chip);
+    color: var(--ds-color-text-muted);
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.article-blogcard:hover .article-blogcard__arrow {
+    background: var(--ds-color-text);
+    border-color: var(--ds-color-text);
+    color: var(--ds-color-text-inverse);
+}
+/* img: 行付きカードのサムネイル（左側・16:9 トリミング） */
+.article-blogcard__thumb {
+    flex: none;
+    width: 148px;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--ds-radius-card);
+    background: var(--ds-color-bg-subtle);
+    overflow: hidden;
+}
+.article-blogcard__thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+@media (max-width: 559px) {
+    .article-blogcard--thumb { flex-wrap: wrap; }
+    .article-blogcard__thumb { width: 100%; }
+}
+
+/* ===== 採点・評価 :::score — 大数字+星の総合サマリー ===== */
+.article-score {
+    display: flex;
+    align-items: stretch;
+    gap: var(--ds-space-stack-md);
+    background: var(--ds-color-bg-paper);
+    border-radius: var(--ds-radius-lg);
+    padding: var(--ds-space-stack-md);
+    margin: 0 0 var(--ds-space-stack-md);
+}
+.article-score__total {
+    flex: none;
+    min-width: 190px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-space-inline-xs);
+    padding-right: var(--ds-space-stack-md);
+    border-right: var(--ds-border-width) solid var(--ds-color-border);
+}
+.article-score__label {
+    font-size: var(--ds-text-caption-size);
+    font-weight: var(--ds-text-h3-weight);
+    color: var(--ds-color-text-muted);
+    letter-spacing: 0.08em;
+}
+.article-score__num {
+    font-size: var(--ds-text-display-size);
+    line-height: var(--ds-text-display-lh);
+    font-weight: var(--ds-text-display-weight);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+.article-score__num small {
+    font-size: var(--ds-text-body-sm-size);
+    font-weight: var(--ds-text-body-sm-weight);
+    color: var(--ds-color-text-subtle);
+    margin-left: 2px;
+}
+.article-stars { position: relative; display: inline-flex; vertical-align: middle; }
+.article-stars__base,
+.article-stars__fill { display: flex; color: var(--ds-color-rating-empty); }
+.article-stars__fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: hidden;
+    color: var(--ds-color-rating);
+}
+.article-stars svg { flex: none; width: 22px; height: 22px; }
+.article-stars--sm svg { width: 15px; height: 15px; }
+.article-score__items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--ds-space-stack-xs);
+}
+.article__body .article-score__items { padding-left: 0; }
+.article-score__items li {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-inline-sm);
+    font-size: var(--ds-text-body-sm-size);
+    line-height: var(--ds-text-body-sm-lh);
+    margin: 0;
+}
+.article-score__item-label { flex: 1; }
+.article-score__item-num {
+    width: 2.4em;
+    text-align: right;
+    font-weight: var(--ds-text-h3-weight);
+    font-variant-numeric: tabular-nums;
+}
+@media (max-width: 639px) {
+    .article-score { flex-direction: column; gap: var(--ds-space-stack-sm); }
+    .article-score__total {
+        min-width: 0;
+        padding-right: 0;
+        padding-bottom: var(--ds-space-stack-sm);
+        border-right: 0;
+        border-bottom: var(--ds-border-width) solid var(--ds-color-border);
+    }
+}
+
+/* ===== 箇条書き — チェック&丸数字バッジ（list.html 案03） =====
+ * 記事本文トップレベルのクラス無し ul/ol のみ対象（:not([class]) で
+ * 詳細度を上げ、後読みの media.css 本文既定にも勝たせる）。
+ * パーツ内部のネストしたリストには適用しない */
+.article__body > ul:not([class]),
+.article__body > ol:not([class]) {
+    list-style: none;
+    margin: 0 0 var(--ds-space-stack-sm);
+    padding: 0;
+}
+.article__body > ul:not([class]) > li,
+.article__body > ol:not([class]) > li {
+    position: relative;
+    padding-left: 32px;
+    margin-bottom: var(--ds-space-stack-xs);
+}
+.article__body > ul:not([class]) > li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: calc(0.95em - 4px);   /* マーク高さ 6+2=8px の半分 */
+    width: 12px;
+    height: 6px;
+    border-left: 2px solid var(--ds-color-text);
+    border-bottom: 2px solid var(--ds-color-text);
+    transform: rotate(-45deg);
+}
+.article__body > ol:not([class]) { counter-reset: bp-oln; }
+.article__body > ol:not([class]) > li { counter-increment: bp-oln; }
+.article__body > ol:not([class]) > li::before {
+    content: counter(bp-oln);
+    position: absolute;
+    left: 0;
+    top: calc(0.95em - 11px);   /* 番号丸 22px の半分 */
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--ds-radius-chip);
+    background: var(--ds-color-bg-inverse);
+    color: var(--ds-color-text-inverse);
+    font-size: var(--ds-text-caption-size);
+    font-weight: var(--ds-text-h3-weight);
+    line-height: 1;
+}
+
+/* ===== FAQ アコーディオン :::faq（Q1/A1 ナンバリング。shop 詳細とも共通） ===== */
+.article-faq {
+    border: var(--ds-border-width) solid var(--ds-color-border);
+    border-radius: var(--ds-radius-card);
+    margin: 0 0 var(--ds-space-stack-sm);
+    background: var(--ds-color-bg-elevated);
+}
+/* 開閉を滑らかに（::details-content / interpolate-size 対応ブラウザのみ。
+ * 未対応ブラウザは従来どおり即時開閉でフォールバックする） */
+@supports (interpolate-size: allow-keywords) {
+    .article-faq { interpolate-size: allow-keywords; }
+    .article-faq::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition: block-size 0.28s ease, content-visibility 0.28s ease;
+        transition-behavior: allow-discrete;
+    }
+    .article-faq[open]::details-content { block-size: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .article-faq::details-content { transition: none; }
+}
+.article-faq__question {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ds-space-inline-sm);
+    padding: var(--ds-space-stack-sm) var(--ds-space-stack-md);
+    font-weight: var(--ds-text-h3-weight);
+    color: var(--ds-color-text);
+}
+.article-faq__question::-webkit-details-marker { display: none; }
+.article-faq__q,
+.article-faq__a {
+    flex: none;
+    color: var(--ds-color-text-inverse);
+    border-radius: var(--ds-radius-chip);
+    width: var(--ds-touch-target-min);
+    min-width: var(--ds-touch-target-min);
+    text-align: center;
+    font-size: var(--ds-text-body-sm-size);
+}
+.article-faq__q { background: var(--ds-color-faq-q-bg); } /* Q は青 */
+.article-faq__a { background: var(--ds-color-faq-a-bg); } /* A は赤 */
+.article-faq__answer {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ds-space-inline-sm);
+    padding: 0 var(--ds-space-stack-md) var(--ds-space-stack-sm);
+    color: var(--ds-color-text-muted);
+}
+.article-faq__answer-body > :last-child { margin-bottom: 0; }
+.article-faq__answer > :last-child { margin-bottom: 0; }
+.article-faq__a-title,
+.article__body .article-faq__a-title {
+    font-weight: var(--ds-text-h3-weight);
+    color: var(--ds-color-text);
+    margin: 0 0 var(--ds-space-stack-xs);
+}
+
+/* ===== 本文既定の打ち消し =====
+ * /media/ では media.css が本ファイルより後に読み込まれ、
+ * .article__body p / li / ol（詳細度 0-1-1）がパーツ内部の余白指定に
+ * 勝ってしまうため、.article__body を前置した高詳細度で再宣言する */
+.article__body .article-steps { margin: 0 0 var(--ds-space-stack-md); }
+.article__body .article-steps__item { margin: 0; }
+.article__body .article-steps__ttl { margin: 0 0 2px; }
+.article__body .article-steps__desc { margin: 0; }
+.article__body .article-point__body p { margin: 0 0 var(--ds-space-stack-xs); }
+.article__body .article-point__body > :last-child { margin-bottom: 0; }
+.article__body .article-point__row p { margin: 0; }
+.article__body .article-say__bubble p { margin: 0 0 var(--ds-space-stack-xs); }
+.article__body .article-say__bubble > :last-child { margin-bottom: 0; }
+.article__body .article-accordion__body p { margin: 0 0 var(--ds-space-stack-xs); }
+.article__body .article-accordion__body > :last-child { margin-bottom: 0; }
+.article__body .article-score__items { margin: 0; }
+.article__body .article-score__items li { margin: 0; }
+
+/* :::tweet フォールバック（widgets.js 読込前・ブロック時）の引用枠。
+ * 旧 .article__body blockquote の見た目を tweet 埋め込みに限定して維持 */
+.article-embed--tweet blockquote {
+    margin: 0 0 var(--ds-space-stack-sm);
+    padding: var(--ds-space-stack-sm) var(--ds-space-stack-md);
+    border-left: var(--ds-border-width-divider) solid var(--ds-color-border-strong);
+    background: var(--ds-color-bg-paper);
+    color: var(--ds-color-text-muted);
+}
+
+/* ===== 目次の折りたたみ — 下側ブラー＋「もっと見る」ピル ===== */
+/* 既存 .article-toc（media.css）に対する追加。閉じている間は
+ * リスト末尾に背景色へのフェードを重ね、続きがあることを示す */
+.article-toc__more { position: relative; }
+.article-toc__more:not([open])::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -72px;
+    height: 72px;
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--ds-color-bg-elevated) 0%, transparent),
+        var(--ds-color-bg-elevated)
+    );
+    pointer-events: none;
+}
+.article-toc__more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-space-inline-md);
+    width: 100%;
+    margin: var(--ds-space-stack-sm) auto 0;
+    padding: 0;
+    border: 0;
+    position: relative;
+}
+.article-toc__more-btn::before,
+.article-toc__more-btn::after {
+    content: "";
+    flex: none;
+    width: 28px;
+    border-top: 3px dotted var(--ds-color-border-strong);
+}
+.article-toc__more-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--ds-touch-target-min);
+    padding: var(--ds-space-inline-xs) var(--ds-space-stack-lg);
+    border: var(--ds-border-width) solid var(--ds-color-text);
+    border-radius: var(--ds-radius-chip);
+    background: var(--ds-color-bg);
+    font-size: var(--ds-text-body-sm-size);
+    font-weight: var(--ds-text-h3-weight);
+    color: var(--ds-color-text);
+}
+
+/* ── 記事内サイトカード（:::sitecard） ──
+   /oritoku/oripa/ のコア6軸カードを記事本文に埋め込むためのラッパー。
+   本文中では外枠がノイズになるため、カード自体の枠線・角丸は落とし、
+   区切りは内側の6軸タイルの罫線だけで表現する。 */
+.article-sitecard .card-block {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* ── 横棒グラフ（:::bars） ──
+   件数・割合の内訳を、表よりも大小関係が一目で分かる形で見せるパーツ。
+   バーの長さは最大値を100%とした相対値。値の大きさで3段階に濃淡をつける。 */
+.article-bars {
+  display: grid;
+  gap: var(--ds-space-stack-xs);
+  margin: var(--ds-space-stack-md) 0;
+}
+.article-bars__title {
+  margin: 0 0 var(--ds-space-inline-sm);
+  font-weight: var(--fw-bold);
+}
+.article-bars__row {
+  display: grid;
+  grid-template-columns: minmax(0, 11em) 1fr auto;
+  align-items: center;
+  gap: var(--ds-space-inline-md);
+}
+.article-bars__label {
+  text-align: right;
+  font-size: var(--ds-text-caption-size);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-normal);
+}
+.article-bars__track {
+  height: 18px;
+  background: var(--ds-color-bg-subtle);
+  border-radius: var(--ds-radius-chip);
+  overflow: hidden;
+}
+.article-bars__fill {
+  display: block;
+  height: 100%;
+  background: var(--ds-color-accent-gold);
+  border-radius: inherit;
+}
+.article-bars__fill--t2 { opacity: 0.72; }
+.article-bars__fill--t3 { opacity: 0.45; }
+.article-bars__value {
+  font-size: var(--ds-text-caption-size);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .article-bars__row {
+    grid-template-columns: 1fr auto;
+    gap: var(--ds-space-inline-xs) var(--ds-space-inline-sm);
+  }
+  .article-bars__label {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+}
+
+/* ── 積み上げ棒グラフ（:::barstack） ──
+   「肯定 / 否定 / どちらもあり」のような内訳の割合を1本で示すパーツ。
+   件数の大小比較（棒が長い＝優れている、と誤読される）には使わない。 */
+.article-barstack { margin: var(--ds-space-stack-md) 0; }
+.article-barstack__title {
+  margin: 0 0 var(--ds-space-stack-xs);
+  font-weight: var(--fw-bold);
+}
+/* barstack直後のテキストリンク（例: 詳細セクションへのアンカー）は右揃えにする */
+.article-barstack + p:has(> a:only-child) {
+  text-align: right;
+}
+.article-barstack__bar {
+  display: flex;
+  height: 34px;
+  overflow: hidden;
+  background: var(--ds-color-bg-subtle);
+}
+.article-barstack__seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.article-barstack__pct {
+  font-size: var(--ds-text-body-size);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-color-text);
+  white-space: nowrap;
+}
+.article-barstack__seg--s1 { background: var(--ds-color-vote-positive); }
+.article-barstack__seg--s2 { background: var(--ds-color-vote-negative); }
+.article-barstack__seg--s3 { background: var(--ds-color-bg-subtle); }
+.article-barstack__seg--s1 .article-barstack__pct,
+.article-barstack__seg--s2 .article-barstack__pct { color: var(--ds-color-text-inverse); }
+.article-barstack__legend {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: var(--ds-space-inline-xs);
+  margin: var(--ds-space-stack-sm) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--ds-text-body-sm-size);
+  font-weight: var(--fw-bold);
+}
+.article-barstack__legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-inline-xs);
+  white-space: nowrap;
+  min-width: 0;
+}
+.article-barstack__legend small {
+  color: var(--ds-color-text-muted);
+  font-size: var(--ds-text-micro-size);
+  font-weight: var(--fw-regular);
+}
+.article-barstack__key {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--ds-radius-chip);
+  flex: none;
+}
+.article-barstack__seg--s3.article-barstack__key { border: var(--ds-border-width) solid var(--ds-color-border-strong); }
+
+/* テーマ別の件数など、本文の主張を補足するだけの数字 */
+.article-note-fine {
+  margin: calc(var(--ds-space-stack-sm) * -1) 0 var(--ds-space-stack-md);
+  font-size: var(--ds-text-caption-size);
+  line-height: var(--lh-normal);
+  color: var(--ds-color-text-muted);
+}
+
+/* サイトカードにキャッチ・評価・CTAが無い場合は、公式トップの画像を幅いっぱいのカバーとして置く */
+.article-sitecard .card-block__cover { margin: 0 0 var(--ds-space-stack-sm); }
+.article-sitecard .card-block__cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--ds-radius-card);
+  border: var(--ds-border-width) solid var(--ds-color-border);
+}
+
+/* /oritoku/oripa/ の記事は実機スクショ（縦長）が多く、等倍だと1枚で画面を占有して記事が間延びする。
+   縦長のときだけ効く max-height を下げて、本文のリズムを保つ（横長図版は幅で決まるため影響なし）。 */
+.oripa-scope .article-figure img { --fig-max-h: 440px; max-height: 440px; }
+/* {sp=...} で差し替えた SP 用の縦長図解は、media.css の `.article-figure picture > img { max-height: none }` で
+   上限を外す前提。上の行のほうが詳細度が高く 440px が勝ち、width:100% のまま高さだけ縮んで縦に潰れていた
+   （攻略の流れ 1.78→1.26、会員ランク 2.09→1.26）。/oritoku/oripa でも SP の <picture> は上限を外す。 */
+@media (max-width: 600px) {
+  .oripa-scope .article-figure picture > img { max-height: none; }
+}
+
+/* ── 長い表の折りたたみ（表の直前に {rows:5}） ──
+   先頭N行だけ見せ、残りは「もっと見る」で開く。JSなしのチェックボックス方式。 */
+.article-table-collapse { position: relative; margin: 0 0 var(--ds-space-stack-md); }
+.article-table-collapse__toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.article-table-collapse .article-table-wrap { margin-bottom: 0; }
+.article-table-collapse tr.is-extra { display: none; }
+.article-table-collapse__toggle:checked ~ .article-table-wrap tr.is-extra { display: table-row; }
+.article-table-collapse__btn {
+  display: block;
+  margin: var(--ds-space-inline-sm) auto 0;
+  padding: var(--ds-space-inline-sm) var(--ds-space-stack-md);
+  width: fit-content;
+  border: var(--ds-border-width) solid var(--ds-color-border-strong);
+  border-radius: var(--ds-radius-chip);
+  font-size: var(--ds-text-caption-size);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  user-select: none;
+}
+.article-table-collapse__btn:hover { background: var(--ds-color-bg-subtle); }
+.article-table-collapse__btn .is-open { display: none; }
+.article-table-collapse__toggle:checked ~ .article-table-collapse__btn .is-closed { display: none; }
+.article-table-collapse__toggle:checked ~ .article-table-collapse__btn .is-open { display: inline; }
+
+/* FAQ の質問文は見出し（H3）だが、見た目は従来のサマリー行のまま保つ */
+.article-faq__heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+.article-faq__heading::before { content: none; }
+
+/* ============================================================
+   目次直下のアイコンボタン（:::navtiles）
+   cardchusen.com のパックページ .packnav を踏襲した2〜3列の均等タイル。
+   アイコンは public/images/media-nav/*.png があればそれ、無ければインライン SVG。
+   ============================================================ */
+.article-navtiles {
+  margin: var(--ds-space-stack-md) 0;
+}
+.article-navtiles__list {
+  display: flex;
+  justify-content: center;
+  gap: var(--ds-space-inline-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* タイル数が 2 でも 3 でも横並びの見え方を変えないため、常に3等分を上限にする */
+.article-navtiles__item {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: calc((100% - var(--ds-space-inline-sm) * 2) / 3);
+  margin: 0;
+  padding: 0;
+}
+.article-navtiles__item::before { content: none; }
+/* 本文リンクの青＋下線を打ち消し、タイルとして読ませる（色は本文と同じ黒） */
+.article__body .article-navtiles__link,
+.article-navtiles__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-inline-xs);
+  text-decoration: none;
+  color: var(--ds-color-text);
+}
+.article-navtiles__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--ds-color-bg-elevated);
+  border: var(--ds-border-width) solid var(--ds-color-border);
+  border-radius: var(--ds-radius-card);
+  box-shadow: var(--ds-shadow-card);
+  color: var(--ds-color-text);
+}
+.article-navtiles__img {
+  display: block;
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+}
+.article-navtiles__thumb > svg {
+  width: 44%;
+  height: auto;  /* viewBox の比率を保つ（高さも指定すると絵が潰れる） */
+}
+.article-navtiles__label {
+  font-size: var(--ds-text-caption-size);
+  font-weight: var(--fw-bold);
+  line-height: 1.3;
+  text-align: center;
+}
+.article__body .article-navtiles__link:hover { text-decoration: none; }
+.article-navtiles__link:hover .article-navtiles__label { text-decoration: underline; }
+
+@media (min-width: 769px) {
+  /* PC では 1 タイルが本文より目立たない実寸に留め、余白は左右に散らす */
+  .article-navtiles__item { max-width: 190px; }
+  .article-navtiles__thumb { aspect-ratio: 3 / 2; }
+}
+
+/* ============================================================
+   最新パックの当たりバナー（:::packs）
+   トレカの地図「最新パックの当たりランキング」の型。濃い帯の見出し＋しっぽ、
+   その下にパックの画像バナーを最大3枚（SP 2列・PC 3列。1〜2枚は左寄せのまま）。
+   ============================================================ */
+.article-packs {
+  margin: var(--ds-space-stack-md) 0;
+}
+.article-packs__heading {
+  position: relative;
+  margin: 0 0 var(--ds-space-inline-md);
+  padding: var(--ds-space-heading-band-y) var(--ds-space-heading-band-x);
+  background: var(--ds-color-bg-inverse);
+  color: var(--ds-color-text-inverse);
+  font-weight: var(--fw-bold);
+  line-height: 1.4;
+}
+.article-packs__heading::after {
+  content: "";
+  position: absolute;
+  left: var(--ds-space-heading-band-x);
+  top: 100%;
+  border: var(--ds-space-inline-sm) solid transparent;
+  border-top-color: var(--ds-color-bg-inverse);
+}
+/* 本文 ul の左インデント・余白を打ち消す */
+.article__body .article-packs__list,
+.article-packs__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-inline-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.article-packs__item {
+  margin: 0;
+  padding: 0;
+}
+.article-packs__item::before { content: none; }
+.article__body .article-packs__link,
+.article-packs__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-inline-xs);
+  height: 100%;
+  text-decoration: none;
+  color: var(--ds-color-text);
+}
+.article-packs__thumb {
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: var(--ds-border-width) solid var(--ds-color-border);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-color-bg-subtle);
+}
+.article-packs__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.article-packs__label {
+  font-size: var(--ds-text-caption-size);
+  font-weight: var(--fw-bold);
+  line-height: 1.4;
+}
+.article-packs__name { color: var(--ds-color-text-link); }
+.article__body .article-packs__link:hover { text-decoration: none; }
+.article-packs__link:hover .article-packs__label { text-decoration: underline; }
+
+@media (min-width: 601px) {
+  .article-packs__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ==========================================================================
+   サービス比較表（:::compare）
+   数値・特徴は data/oripa-compare.json が正本。ここは表示だけを持つ。
+   列構成とグレード表示は /oritoku/oripa/ 冒頭の13サイト比較早見表に合わせている。
+   本文の他の表と同じ .article-table-wrap に載せるので、枠線・ヘッダー配色は
+   .article-table-wrap 側（media.css）を継承し、ここでは差分だけ定義する。
+   ========================================================================== */
+.article-compare { margin: var(--ds-space-stack-md) 0; }
+.article-compare__title {
+  margin: 0 0 var(--ds-space-stack-xs);
+  font-weight: var(--fw-bold);
+}
+/* 1列目（サービス名）は共通ルールで中央揃え＋7em になるが、
+   評価・バッジ・検証記事リンクを縦に積むので左揃えに戻す */
+.article-table-wrap .article-compare__table td:first-child {
+  text-align: left;
+  min-width: 9em;
+}
+.article-compare__cell-name { line-height: 1.4; }
+.article-compare__name {
+  display: block;
+  font-weight: var(--fw-bold);
+}
+.article-compare__flag {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px var(--ds-space-inline-xs);
+  border-radius: var(--ds-radius-chip);
+  background: var(--ds-color-text);
+  color: var(--ds-color-text-inverse);
+  font-size: var(--ds-text-micro-size);
+  font-weight: var(--fw-bold);
+}
+.article-compare__rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 2px;
+  font-size: var(--ds-text-micro-size);
+  font-variant-numeric: tabular-nums;
+}
+.article-compare__link {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--ds-text-micro-size);
+}
+/* この記事のサービスの行だけ、塗りで視線を集める（外線は足さない） */
+.article-compare__row--base > td {
+  background: var(--ds-color-bg-subtle);
+}
+/* 還元率・発送は /oritoku/oripa/ と同じ「グレード文字＋値」。中央寄せで縦に積む */
+.article-compare__cell-rate,
+.article-compare__cell-ship {
+  text-align: center;
+  white-space: nowrap;
+}
+.article-compare__cell-rate .card-block__axis-grade,
+.article-compare__cell-ship .card-block__axis-grade {
+  display: block;
+  font-size: var(--ds-text-h3-size);
+}
+.article-compare__value {
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+.article-compare__note {
+  display: block;
+  font-size: var(--ds-text-micro-size);
+  color: var(--ds-color-text-muted);
+}
+.article-compare__cell-feature { line-height: 1.5; min-width: 13em; }
+
+/* 当選報告（当選報告数）。値は data/oripa-watch/{slug}.json が正本で、観測が無い社は出さない。
+   SNS★ / アプリ★ もここに並べていたが、母数が足りず止めた（src/Markdown.php の注記）。
+   `.article-compare__signal-label` は戻したときのために残してある。 */
+.article-compare__cell-users {
+  /* 折り返さない代わりに、列幅は中身ぴったりまで縮める
+     （ここを広げると隣の「特徴」が1文字ずつ折り返す） */
+  width: 1%;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.article-compare__signal {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-inline-xs);
+}
+.article-compare__signal + .article-compare__signal {
+  margin-top: var(--ds-space-inline-xs);
+}
+.article-compare__signal-label {
+  flex: 0 0 auto;
+  width: 4.5em;
+  font-size: var(--ds-text-micro-size);
+  color: var(--ds-color-text-muted);
+}
+.article-compare__signal b {
+  font-variant-numeric: tabular-nums;
+}
+.article-compare__signal .article-compare__note {
+  display: inline;
+}
+.article-compare__signal-empty { color: var(--ds-color-text-disabled); }
+
+@media (max-width: 639px) {
+  /* SP で4列を押し込むと特徴が1文字ずつ折り返すので、
+     列幅を確保して .article-table-wrap に横スクロールさせる */
+  .article-compare__table { min-width: 800px; }
+  .article-compare__table th { white-space: normal; }
+  .article-table-wrap .article-compare__table td:first-child { width: 8em; min-width: 8em; }
+  .article-compare__cell-rate,
+  .article-compare__cell-ship { width: 6em; }
+  .article-compare__cell-users { width: 13em; min-width: 13em; }
+  /* 特徴は1〜2行に収める前提。列幅を先に確保して、残りをスクロールで見せる */
+  .article-compare__cell-feature { width: 19em; min-width: 19em; }
+}
+
+/* ============================================================
+   オリパPRボックス（:::proripa）
+   記事本文に差し込む広告枠。赤い枠＋ラベルで、本文と広告を見た目で分ける
+   ============================================================ */
+.article-proripa {
+  margin: var(--ds-space-stack-lg) 0;
+  border: 2px solid #22913a; /* 日本トレカセンターのロゴ緑（#2BA23A）を少し暗くして白文字のコントラストを確保 */
+  border-radius: var(--ds-radius-md, 8px);
+  overflow: hidden;
+  background: #fff;
+}
+.article-proripa__label {
+  margin: 0;
+  padding: 0.6em 1em;
+  background: #22913a;
+  color: #fff;
+  font-weight: 700;
+  font-size: var(--ds-text-body-size);
+  text-align: center;
+}
+.article-proripa__body { padding: 1em; }
+.article-proripa__lead {
+  margin: 0 0 1em;
+  color: var(--ds-color-danger);
+  font-weight: 600;
+  line-height: var(--lh-normal);
+}
+.article-proripa__banner { display: block; margin: 0 0 0.8em; }
+.article-proripa__banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--ds-radius-sm, 4px);
+}
+.article-proripa__discount {
+  margin: 0 0 0.45em;
+  text-align: center;
+  color: var(--ds-color-text-strong, #111);
+}
+.article-proripa__discount-main {
+  position: relative;
+  display: inline-block;
+  padding: 0 0.95em;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+/* ＼ ／ の斜め線。文字で入れると環境差が出るので擬似要素で引く */
+.article-proripa__discount-main::before,
+.article-proripa__discount-main::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 1.35em;
+  margin-top: -0.675em;
+  background: #222;
+}
+.article-proripa__discount-main::before { left: 0.25em; transform: rotate(-20deg); }
+.article-proripa__discount-main::after { right: 0.25em; transform: rotate(20deg); }
+.article-proripa__discount-sub {
+  display: block;
+  margin-top: 0.15em;
+  font-size: var(--ds-text-caption-size);
+  font-weight: 600;
+  color: var(--ds-color-text-muted);
+}
+.article-proripa__coupon {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0 0 0.6em;
+  padding: 0.9em 0.6em 0.9em 1em;
+  background: #fafafa;
+  border: 1px solid var(--ds-color-border, #e3e3e3);
+  border-radius: var(--ds-radius-sm, 6px);
+}
+.article-proripa__code {
+  flex: 1;
+  padding-left: 2.2em; /* 右のコピーボタン幅ぶんを打ち消して、コードを枠の中央に見せる */
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.article-proripa__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2em;
+  height: 2.2em;
+  background: #fff;
+  border: 1.5px solid #1c5fd0;
+  border-radius: var(--ds-radius-sm, 6px);
+  color: #1c5fd0;
+  cursor: pointer;
+}
+.article-proripa__copy:hover { background: #f2f6fd; }
+.article-proripa__copy-done {
+  position: absolute;
+  right: 0.4em;
+  bottom: calc(100% + 0.3em);
+  padding: 0.25em 0.6em;
+  background: #1c5fd0;
+  border-radius: 4px;
+  color: #fff;
+  font-size: var(--ds-text-caption-size);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.article-proripa__copy.is-copied .article-proripa__copy-done { opacity: 1; }
+.article-proripa__note {
+  margin: 0.8em 0 0;
+  text-align: center;
+  font-size: var(--ds-text-caption-size);
+}
+.article-proripa__caution {
+  margin: 0.8em 0 0;
+  font-size: var(--ds-text-caption-size);
+  line-height: var(--lh-normal);
+  color: var(--ds-color-text-muted);
+}
+.article-proripa__btn,
+.article__body .article-proripa__btn,
+.article__body .article-proripa__note a,
+.article-proripa__note a {
+  text-decoration: none;
+}
+.article-proripa__btn {
+  display: block;
+  margin: 0 0 0.6em;
+  padding: 0.95em 1em;
+  background: #ffdd3c;
+  color: #3a2a00;
+  border-radius: 999px;
+  box-shadow: 0 2px 0 #e0bb00;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+  text-decoration: none;
+}
+.article-proripa__btn:hover { background: #ffe66b; color: #3a2a00; }
+.article__body .article-proripa__btn { color: #3a2a00; }
+.article__body .article-proripa__btn--ghost { color: #1c5fd0; }
+.article-proripa__btn--ghost {
+  margin: 0;
+  background: #fff;
+  color: #1c5fd0;
+  border: 2px solid #1c5fd0;
+}
+.article-proripa__btn--ghost:hover { background: #f2f6fd; color: #1c5fd0; }
+@media (max-width: 480px) {
+  .article-proripa__body { padding: 0.8em; }
+  .article-proripa__code { font-size: 1rem; }
+}
+
+/* 本文の p 余白（.article__body p）が勝ってしまうので、枠内は明示的に上書きする */
+.article__body .article-proripa__label { margin: 0; }
+.article__body .article-proripa__lead { margin: 0 0 1em; }
+.article__body .article-proripa__discount { margin: 0 0 0.45em; }
+.article__body .article-proripa__note { margin: 0.8em 0 0; }
+.article__body .article-proripa__caution { margin: 0.8em 0 0; }
+.article-proripa__coupon-sub,
+.article__body .article-proripa__coupon-sub {
+  margin: -0.2em 0 0.7em;
+  text-align: center;
+  font-size: var(--ds-text-caption-size);
+  color: var(--ds-color-text-muted);
+}
+
+/* :::box の箇条書きで行頭に「✓ 」を書いたときの緑のチェック（Markdown.php が span に置き換える） */
+.article-box__check {
+    display: inline-block;
+    width: 1.3em;
+    margin-left: -1.3em;
+    color: var(--ds-color-positive);
+    font-weight: 700;
+}
+/* 2行目以降を✓の右に揃える */
+li:has(> .article-box__check) {
+    list-style: none;
+    padding-left: 1.3em;
+}
+
+/* ===== :::app — アプリ紹介カード（アプリーチ型） =====
+   アイコン・アプリ名・開発元を上段に、ストアボタンを下段に並べる。
+   :::card と同じライトカード（白地＋1px枠＋角丸）に揃え、ボタンだけ黒地にしてストアへの導線と分かるようにする。 */
+.article-app {
+    background: var(--ds-color-bg-elevated);
+    border: var(--ds-border-width) solid var(--ds-color-border);
+    border-radius: var(--ds-radius-card);
+    padding: var(--ds-space-stack-sm);
+    margin: 0 0 var(--ds-space-stack-md);
+}
+.article-app__head { display: flex; align-items: center; gap: var(--ds-space-inline-md); }
+.article-app__icon {
+    width: 72px; height: 72px; flex: 0 0 72px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    object-fit: cover;
+    margin: 0;
+}
+.article-app__meta { min-width: 0; }
+.article__body .article-app__name,
+.article-app__name {
+    margin: 0;
+    font-size: var(--ds-text-body-size);
+    line-height: var(--ds-text-body-sm-lh);
+    font-weight: var(--ds-text-h3-weight);
+    color: var(--ds-color-text);
+}
+.article__body .article-app__dev,
+.article-app__dev {
+    margin: 2px 0 0;
+    font-size: var(--ds-text-micro-size);
+    line-height: var(--ds-text-micro-lh);
+    color: var(--ds-color-text-subtle);
+}
+.article-app__stores { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--ds-space-stack-sm); }
+.article__body a.article-app__store,
+.article-app__store {
+    flex: 1 1 140px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 48px;
+    padding: 6px 14px;
+    background: #111; color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+}
+.article__body a.article-app__store:hover { opacity: 0.85; color: #fff; }
+.article-app__store svg { flex: 0 0 auto; }
+.article-app__store-text { display: flex; flex-direction: column; line-height: 1.15; font-size: 16px; font-weight: 700; letter-spacing: 0.01em; }
+.article-app__store-text small { font-size: 10.5px; font-weight: 500; opacity: 0.85; }
+
+/* 2026-11-23 :::simcard オリ得の無料シミュレーターへのカード（評判記事から）。全体が1つのリンク・角丸・影 */
+.article-simcard {
+  display: grid;
+  grid-template-columns: 44% minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  margin: 24px 0;
+  padding: 14px;
+  border: 1px solid #BECCEA;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 2px 10px rgba(29, 57, 148, .16);
+  transition: box-shadow .15s, transform .15s;
+}
+.article-simcard:hover { box-shadow: 0 8px 22px rgba(29, 57, 148, .24); transform: translateY(-2px); text-decoration: none; }
+.article-simcard__img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; object-fit: cover; border-radius: 8px; }
+.article-simcard__body { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.article-simcard__lead { font-size: 19px; font-weight: 700; line-height: 1.45; color: #222; }
+.article-simcard__btn { display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 20px; border-radius: 999px; background: #0065F2; color: #fff; font-size: 15px; font-weight: 700; white-space: nowrap; }
+@media (max-width: 600px) {
+  .article-simcard { grid-template-columns: 1fr; gap: 10px; padding: 12px; }
+  .article-simcard__lead { font-size: 17px; }
+}
+/* 本文のリンク下線（.article-body a 等）をカードの中に持ち込まない */
+a.article-simcard, a.article-simcard:hover, a.article-simcard span { text-decoration: none !important; }
+a.article-simcard .article-simcard__btn { color: #fff; }
+/* ファーストビュー用（記事タイトル直下）: SPでも横並びのまま低く収め、本文の書き出しを押し下げすぎない */
+.article-simcard--fv { margin: 16px 0 20px; }
+@media (max-width: 600px) {
+  .article-simcard--fv { grid-template-columns: 42% minmax(0, 1fr); gap: 10px; padding: 10px; }
+  .article-simcard--fv .article-simcard__body { gap: 8px; }
+  .article-simcard--fv .article-simcard__lead { font-size: 14px; line-height: 1.4; }
+  .article-simcard--fv .article-simcard__btn { height: 36px; padding: 0 10px; font-size: 13px; }
+}
+/* 柱ページ（.area-body）は本文より幅が広いので、記事と同じ幅に収める */
+.area-body .article-simcard { max-width: 760px; margin-left: auto; margin-right: auto; }

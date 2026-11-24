@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script>
+      (function () {
+        // JS が動くときだけ付く目印。カルーセルの2枚目以降を最初の描画から隠す
+        // （public/css/oripa.css の .js .card-block__image--deferred）ために使う。
+        document.documentElement.classList.add('js');
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var source = (params.get('utm_source') || '').toLowerCase();
+          var medium = (params.get('utm_medium') || '').toLowerCase();
+          var values = [source, medium, params.get('utm_campaign'), params.get('campaign_type'), params.get('traffic_source')]
+            .filter(Boolean).join(' ').toLowerCase();
+          // X広告の判定は data/oripa-ad-variants.json の x-ads（utm_source=x|twitter）に合わせる。
+          // utm_medium（cpc / paid / paid-social）が付く入稿URLも同じく該当する。
+          var isXAd = /^(x|twitter)$/.test(source);
+          var isDisplayAd = params.has('xad') || /(^|[\s_-])(xad|xads|x-ad|x-ads|display|display-ad|display-ads|gdn|yda)([\s_-]|$)/.test(values);
+          if (isXAd || isDisplayAd) sessionStorage.setItem('tcgpro_ad_view', 'display');
+          if (sessionStorage.getItem('tcgpro_ad_view') === 'display') {
+            document.documentElement.classList.add('is-display-ad');
+          }
+        } catch (e) {}
+      }());
+    </script>
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <script async src="js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      // 2026-11-24: X広告のリンクには UTM が無く twclid だけが付くため、GA4 では direct に落ちていた（シミュレーターの来訪の約9割）。
+      // twclid があって utm_source が無いときだけ、GA4 に渡す URL に UTM を足して「x / paid」として数える（実際の URL は変えない）
+      (function () {
+        var cfg = {}, u;
+        try {
+          u = new URL(location.href);
+          if (u.searchParams.has('twclid') && !u.searchParams.has('utm_source')) {
+            u.searchParams.set('utm_source', 'x'); u.searchParams.set('utm_medium', 'paid'); u.searchParams.set('utm_campaign', 'x_ads_twclid');
+            cfg.page_location = u.toString();
+          }
+        } catch (e) {}
+        gtag('config', 'G-TLTSVVLCGM', cfg);
+      }());
+    </script>
+    <!-- Microsoft Clarity -->
+    <link rel="preconnect" href="www.clarity.ms" crossorigin>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "x1rl8zca72");
+    </script>
+    <!-- ChatGPT Ads (OpenAI) pixel -->
+    <script>!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"K8Qb4zZLhUBmUE7VJHr2GQ",debug:true});</script>
+    <title>オリパシミュレーター【無料】オリパ依存予防 | トレカプロ</title>
+    <meta name="description" content="お金を使う前に、実在オリパの当たりにくさをタダで体感できるオリパシミュレーター。大手オリパの公開ラインナップを再現したガチャを、毎日1回のルーレットでもらうコインで1連・10連・100連で引けます。課金は一切ありません。11月の月間ランキング1位にはポケカ最新弾「ハドウシーカー」1BOXをプレゼントします（要申請）。">
+        <link rel="canonical" href="simulator">
+    <!-- OGP -->
+    <meta property="og:title" content="オリパシミュレーター【無料】オリパ依存予防 | トレカプロ">
+    <meta property="og:description" content="お金を使う前に、実在オリパの当たりにくさをタダで体感できるオリパシミュレーター。大手オリパの公開ラインナップを再現したガチャを、毎日1回のルーレットでもらうコインで1連・10連・100連で引けます。課金は一切ありません。11月の月間ランキング1位にはポケカ最新弾「ハドウシーカー」1BOXをプレゼントします（要申請）。">
+    <meta property="og:url" content="simulator">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="トレカプロ">
+        <meta property="og:image" content="simulatorcard.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="noto-sans-jp.css?v=1795486706">
+            <link rel="stylesheet" href="tokens.css?v=1795486706">
+    <link rel="stylesheet" href="style.css?v=1795486706">
+    <link rel="stylesheet" href="blog-parts.css?v=1795486706">
+                                    <link rel="stylesheet" href="css2">
+                <link rel="stylesheet" href="oritoku.css?v=1795486706">
+                <link rel="stylesheet" href="oritoku-sim.css?v=1795486706">
+                                                                        <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"simulator","name":"オリパシミュレーター","url":"simulator","description":"お金を使う前に、実在オリパの当たりにくさをタダで体感できるオリパシミュレーター。大手オリパの公開ラインナップを再現したガチャを、毎日1回のルーレットでもらうコインで1連・10連・100連で引けます。課金は一切ありません。11月の月間ランキング1位にはポケカ最新弾「ハドウシーカー」1BOXをプレゼントします（要申請）。","applicationCategory":"GameApplication","operatingSystem":"Web","inLanguage":"ja","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"},"publisher":{"@type":"Organization","name":"トレカプロ","url":"https://tcgpro.co.jp"},"isPartOf":{"@id":"https://tcgpro.co.jp/oritoku/"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"お金はかかりますか？","acceptedAnswer":{"@type":"Answer","text":"かかりません。ポイントの購入も、景品の発送もありません。画面に出る金額やptは、入力した数字や公開価格をそのまま使った架空の数字です。"}},{"@type":"Question","name":"確率は本物と同じですか？","acceptedAnswer":{"@type":"Answer","text":"ラインナップ（景品の名前・枚数・pt）と口数は、各社が公開している数字を取った時点のまま使っています。どの口が当たりになるかはこのサーバーの乱数で決めるので、実在サイトの結果とは関係ありません。"}},{"@type":"Question","name":"残り枚数はなぜ減るのですか？","acceptedAnswer":{"@type":"Answer","text":"本物のガチャと同じように、誰かが引くと減っていくようになっています。"}},{"@type":"Question","name":"還元率はどう計算していますか？","acceptedAnswer":{"@type":"Answer","text":"受け取れるptの合計を、使った金額（1口の価格×口数）で割っています。発送のみでptに換えられない景品は0ptとして数えるため、実際より低めに出ます。ptは各社のサイト内だけで使えるポイントで現金には戻せず、ここでは1pt＝1円として換算しています。"}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"トップ","item":"https://tcgpro.co.jp/"},{"@type":"ListItem","position":2,"name":"オリ得","item":"https://tcgpro.co.jp/oritoku/"},{"@type":"ListItem","position":3,"name":"オリパシミュレーター","item":"simulator"}]}]}</script>        <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://tcgpro.co.jp/#website","name":"トレカプロ","url":"https://tcgpro.co.jp/","inLanguage":"ja","publisher":{"@id":"https://tcgpro.co.jp/company/#organization"}}</script><style>[data-sim-rankbn],#live,#rank-pre,[data-sim-ranking],[data-sim-ranking-month],[data-sim-ranking-pre],[data-sim-entry-form],[data-sim-rank-tab],[data-sim-myrank]{display:none!important}</style></head>
+<body class="oritoku-page oritoku-page--simulator">
+        <header class="header header--oritoku header--sim">
+    <div class="container header__inner">
+        <div class="header__brand">
+        <a href="/oritoku/" class="header__logo header__logo--oritoku header__logo--sim" target="_blank" rel="noopener" aria-label="オリ得（新しいタブで開く）">
+            <img class="header__oritoku-logo header__sim-logo" src="oritoku-simulator-logo.webp?v=1795486707" alt="オリ得シミュレーター" width="1024" height="352" decoding="async">
+        </a>
+        </div>
+        <a href="#inv" class="header__simwallet" aria-label="持ちポイントと発送で現金化した額">
+            <span class="header__simcoin" title="オリ得ポイント" role="button" tabindex="0" data-sim-help="coin"><span class="sim-coin" aria-hidden="true">P</span><span class="header__simcoin-pt" data-sim-wallet-pt>0</span></span>
+            <span class="header__simcoin header__simcash" title="オリ得ランクポイント" role="button" tabindex="0" data-sim-help="rank"><img class="sim-rankpt" src="rank-point.webp?v=1795486707" alt="" width="128" height="128"><span class="header__simcoin-pt" data-sim-wallet-cash>0</span></span>
+        </a>
+        <button class="header__menu-btn" aria-label="メニュー" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+        <nav class="header__nav" aria-label="メインナビゲーション">
+            <a href="#pick" class="header__nav-link">ガチャ</a>
+            <a href="#inv" class="header__nav-link">獲得商品</a>
+            
+        </nav>
+    </div>
+</header>
+    
+    <main class="main">
+        <div class="container">
+            
+            <article class="ot sim" data-sim>
+  <header class="ot-hero sim-hero" id="make">
+        <h1 class="visually-hidden">オリパシミュレーター</h1>
+    <div class="sim-choose" role="group" aria-label="遊び方を選ぶ">
+      <button type="button" class="sim-choose__btn sim-choose__btn--game" data-sim-go="game" data-sim-tutorial aria-pressed="false">
+        <span class="sim-choose__title"><span class="sim-choose__main">ゲームで遊ぶ</span><span class="sim-choose__free">（無料）</span></span>
+      </button>
+                  <button type="button" class="sim-tut__skipbtn sim-choose__how" data-sim-tut-open>遊び方を先に見る</button>
+    </div>
+        <a class="sim-rankbn" href="#rank-pre" data-sim-rankbn style="display:none"><img src="sim-rank-banner.webp?v=1795486707" width="1200" height="450" alt="11月の月間ランキング1位にハドウシーカー1BOXをプレゼント（要申請）" fetchpriority="high" decoding="async"></a>
+
+    <p class="sim-hero__sub" data-sim-only="analyze">気になるオリパの1口の価格・口数・賞ごとのptと枚数を入れると、その場で引けるガチャになります。引く前に「どのくらい戻りそうか」を確かめられます。お金はかかりません。</p>
+
+    <div class="sim-wallet" data-sim-wallet data-sim-only="game">
+      <span class="sim-wallet__bal"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-wallet__label">保有</span><span class="sim-num" data-sim-wallet-pt>0</span><small>pt</small></span>
+      <span class="sim-wallet__spent">今日のチャージ <span class="sim-num" data-sim-wallet-spent>0</span>円</span>
+      <span class="sim-wallet__spent">オリ得ランクポイント <span class="sim-num" data-sim-wallet-cash>0</span></span>
+      <span class="sim-wallet__spent">収支 <span class="sim-num" data-sim-wallet-net>0</span>円</span>
+      <p class="sim-wallet__rule">遊び方: 1日のはじめにルーレットを1回だけ回して持ちポイントが決まります（やり直し・追加チャージはできません）。そのポイントで引き、当たった景品を<strong>「ptに交換」</strong>か<strong>「発送」</strong>から選びます。<strong>発送して現金化した額が多い人が勝ち</strong>です。<button type="button" class="sim-sound" data-sim-sound aria-pressed="true">音あり</button>ポイントが尽きたらゲームオーバー。復活キーを入力するとポイントを復活できます。</p>
+    </div>
+
+    <form class="sim-maker" data-sim-maker data-sim-only="analyze" novalidate>
+      <div class="sim-maker__shot">
+        <div class="sim-drop" data-sim-drop>
+          <input class="sim-drop__input" id="sim-shot-input" type="file" accept="image/*" multiple aria-label="スクショを選ぶ" data-sim-shot-input>
+          <span class="sim-drop__empty" data-sim-drop-empty>
+            <svg class="ot-icon ot-icon--lg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5M3 17l9 5 9-5"/></svg>            <span class="sim-drop__title">スクショを置く（最大6枚）</span>
+            <span class="sim-drop__note">押して選ぶ・ドラッグ・貼り付け</span>
+          </span>
+          <span class="sim-shots" data-sim-shots hidden></span>
+        </div>
+                <div class="sim-shot-guide">
+          <p class="sim-shot-guide__h">撮っておくスクショ</p>
+          <ol class="sim-shot-guide__list">
+            <li><strong>ガチャの上の部分</strong>：1回の価格と「残り ◯ / ◯口」が写っている画面</li>
+            <li><strong>景品の一覧</strong>：賞ごとのptと枚数。長いときは下までスクロールして何枚かに分けて</li>
+            <li><strong>封入率の表</strong>（あれば）：枚数の代わりに％が書いてあるオリパ用</li>
+          </ol>
+          <p class="sim-shot-guide__note">スクショは端末の中だけで使い、送信しません。見ながら右の欄に数字を入れてください。</p>
+        </div>
+        <button type="button" class="sim-link-btn" data-sim-shot-clear hidden>スクショをすべて外す</button>
+      </div>
+
+      <div class="sim-maker__form">
+        <div class="sim-field sim-field--wide">
+          <label class="sim-field__label" for="sim-m-title">ガチャの名前<span class="sim-field__opt">任意</span></label>
+          <input class="sim-input" id="sim-m-title" type="text" maxlength="40" placeholder="例: 30周年記念オリパ" data-sim-m="t">
+        </div>
+        <div class="sim-maker__row3">
+          <div class="sim-field">
+            <label class="sim-field__label" for="sim-m-pr">1口の価格</label>
+            <span class="sim-input-unit"><input class="sim-input" id="sim-m-pr" type="number" inputmode="numeric" min="1" step="1" placeholder="1000" data-sim-m="pr"><span>pt</span></span>
+          </div>
+          <div class="sim-field">
+            <label class="sim-field__label" for="sim-m-tot">全部で何口</label>
+            <span class="sim-input-unit"><input class="sim-input" id="sim-m-tot" type="number" inputmode="numeric" min="1" step="1" placeholder="1000" data-sim-m="tot"><span>口</span></span>
+          </div>
+          <div class="sim-field">
+            <label class="sim-field__label" for="sim-m-hz">ハズレで戻る</label>
+            <span class="sim-input-unit"><input class="sim-input" id="sim-m-hz" type="number" inputmode="numeric" min="0" step="1" placeholder="0" data-sim-m="hz"><span>pt</span></span>
+          </div>
+        </div>
+
+        <div class="sim-tiers-in">
+          <div class="sim-tiers-in__head" aria-hidden="true"><span>賞</span><span>景品（任意）</span><span>戻るpt</span><span>枚数</span><span></span></div>
+          <div data-sim-m-tiers></div>
+          <button type="button" class="sim-link-btn" data-sim-m-add>＋ 賞を足す</button>
+        </div>
+
+        <dl class="sim-calc" data-sim-calc aria-live="polite">
+          <div><dt>理論還元率</dt><dd data-sim-calc-rate>—</dd></div>
+          <div><dt>当たり確率</dt><dd data-sim-calc-hit>—</dd></div>
+          <div><dt>ハズレ</dt><dd data-sim-calc-hz>—</dd></div>
+          <div><dt>全部買うと</dt><dd data-sim-calc-cost>—</dd></div>
+        </dl>
+        <p class="sim-maker__msg" data-sim-m-msg aria-live="polite"></p>
+        <div class="sim-maker__actions">
+          <button type="submit" class="sim-btn">このガチャを作って引く</button>
+          <button type="button" class="sim-btn sim-btn--ghost sim-btn--small" data-sim-m-sample>例を入れてみる</button>
+          <button type="button" class="sim-link-btn" data-sim-m-reset>入力を消す</button>
+        </div>
+        <p class="sim-maker__note">入力が面倒なら、<a href="#pick">下のガチャ一覧</a>からすぐに引けます。</p>
+      </div>
+    </form>
+  </header>
+
+    <section class="sim-status sim-status--beginner" data-sim-only="game" data-sim-status hidden>
+    <div class="sim-status__main">
+      <span class="sim-status__label">現在のオリ得レベル</span>
+      <strong class="sim-status__rank" data-sim-level>BEGINNER</strong>
+      <span class="sim-status__next" data-sim-next></span>
+    </div>
+    <div class="sim-status__side">
+      <span class="sim-status__top"><button type="button" class="sim-status__help" data-sim-help="level" aria-label="オリ得レベルの説明">?</button></span>
+      <button type="button" class="sim-status__days" data-sim-login-open aria-label="ログインボーナスを見る">連続 <strong class="sim-num" data-sim-survive>1</strong>日目</button>
+    </div>
+  </section>
+
+    <p class="sim-myrank" data-sim-only="game" hidden><img class="sim-rankpt" src="rank-point.webp?v=1795486707" alt="" width="128" height="128"><span class="sim-ticker"><span class="sim-ticker__run" data-sim-ticker><span class="sim-ticker__set"><span class="sim-ticker__item">順位を読み込み中…</span></span></span></span></p>
+    <button type="button" class="sim-prizebar" data-sim-prizebar data-sim-only="game" hidden><span class="sim-prizebar__txt" data-sim-prizebar-txt>景品の対象かどうかを読み込み中…</span><span class="sim-prizebar__go" data-sim-prizebar-go>登録する</span></button>
+
+  <section class="ot-section sim-play" id="play" data-sim-play hidden>
+    <div class="sim-play__inner" data-sim-play-inner>
+      <p class="sim-play__empty">ガチャを作るか、下の箱を選ぶと、ここに箱が出ます。</p>
+    </div>
+  </section>
+
+  <section class="ot-section sim-mission" id="mission" data-sim-only="game" hidden>
+    <h2 class="ot-section__title">オリ得ミッション</h2>
+    <ul class="sim-mission__list" data-sim-missions><li class="sim-feed__empty">読み込み中…</li></ul>
+  </section>
+
+  <section class="ot-section sim-inv" id="inv" data-sim-inv data-sim-only="game" hidden>
+    <h2 class="ot-section__title">獲得商品 <span class="sim-inv__count"><span class="sim-num" data-sim-inv-count>0</span>枚</span></h2>
+    <p class="ot-section__lead">当たった景品を「ptに交換」して次のガチャに回すか、「発送」してオリ得ランクポイントにするかを選びます。発送するまで、その景品がいくらで売れるかは分かりません（相場価格を調べる必要があります）。</p>
+    <div class="sim-inv__bulk">
+      <button type="button" class="sim-btn sim-btn--yellow" data-inv-all-pt>すべてptに交換</button>
+      <button type="button" class="sim-btn" data-inv-all-ship>すべて発送</button>
+      <button type="button" class="sim-btn sim-btn--x" data-inv-finish>ゲーム終了（確定）</button>
+    </div>
+    <p class="sim-inv__log" data-sim-inv-log aria-live="polite"></p>
+    <ul class="sim-inv__list" data-sim-inv-list></ul>
+  </section>
+
+  <section class="ot-section" id="pick" data-sim-chosen hidden>
+    <h2 class="ot-section__title">ガチャ一覧</h2>
+        <p class="sim-coach" data-sim-coach hidden><strong>まずは好きなガチャを選んで1回引いてみましょう。</strong>当たったカードは「ポイントに交換」か「発送」を選ぶだけです。</p>
+    <div class="sim-filter" role="group" aria-label="並び替え">
+      <div class="sim-tabs">
+        <button type="button" class="sim-tab is-active" data-sim-sortbtn="price-asc" aria-pressed="true">ポイントが低い順</button>
+        <button type="button" class="sim-tab" data-sim-sortbtn="price-desc" aria-pressed="false">ポイントが高い順</button>
+        <button type="button" class="sim-tab" data-sim-sortbtn="left" aria-pressed="false">残りが少ない順</button>
+      </div>
+    </div>
+
+    <ul class="sim-cards" data-sim-list>
+            <li class="sim-card" title="PSA10が降ってくる！2/3ループ連打ガチャ" data-sim-row data-id="orikuji-ga0011_202610_865" data-site="orikuji" data-rate="0.85" data-hit="0.2032" data-price="100" data-left="100000" data-tot="100000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--mint">
+                              <img class="sim-card__thumb" src="c-20-m-p.webp?v=1795486707" alt="(PSA10)ピカチュウ(マクドナルド)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>PSA10が降ってくる！2/3ループ連打ガチャ</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">100</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_865">100,000</span>/100,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_865" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="PSA10のミモザを狙え！にぶいち虹色チャレンジ" data-sim-row data-id="orikuji-ga0011_202610_734" data-site="orikuji" data-rate="0.9524" data-hit="0.5" data-price="150" data-left="50000" data-tot="50000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--sky">
+                              <img class="sim-card__thumb" src="c-105-78.webp?v=1795486707" alt="(PSA10)ミモザ" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>PSA10のミモザを狙え！にぶいち虹色チャレンジ</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">150</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_734">50,000</span>/50,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_734" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="1/2で260pt以上！はじめてのにぶいち" data-sim-row data-id="orikuji-ga0011_202610_281" data-site="orikuji" data-rate="0.85" data-hit="0.36656666666667" data-price="150" data-left="30000" data-tot="30000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--sky">
+                              <img class="sim-card__thumb" src="c-110-98.webp?v=1795486707" alt="(PSA10)ルギアV(SA)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>1/2で260pt以上！はじめてのにぶいち</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">150</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_281">30,000</span>/30,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_281" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="ストームエメラルダ BOX×3を狙え！爆連ループ" data-sim-row data-id="orikuji-ga0011_202610_812" data-site="orikuji" data-rate="0.85" data-hit="0.24792" data-price="200" data-left="25000" data-tot="25000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--sky">
+                              <img class="sim-card__thumb" src="storm-emeralda.webp?v=1795486707" alt="ストームエメラルダ BOX×3" loading="lazy" decoding="async">
+                            </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>ストームエメラルダ BOX×3を狙え！爆連ループ</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">200</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_812">25,000</span>/25,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_812" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="PSA10のピカチュウを狙え！最低保証200ptの極厚ガチャ" data-sim-row data-id="orikuji-ga0011_202610_761" data-site="orikuji" data-rate="0.842" data-hit="0.0028333333333333" data-price="300" data-left="12000" data-tot="12000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--sky">
+                              <img class="sim-card__thumb" src="c-171-151.webp?v=1795486707" alt="(PSA10)ピカチュウ(中国語版)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>PSA10のピカチュウを狙え！最低保証200ptの極厚ガチャ</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">300</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_761">12,000</span>/12,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_761" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="PSA10のブースターEXを狙え！1/2で750pt以上の激アツ箱" data-sim-row data-id="orikuji-ga0011_202610_299" data-site="orikuji" data-rate="0.9386" data-hit="0.5556" data-price="500" data-left="10000" data-tot="10000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--sky">
+                              <img class="sim-card__thumb" src="c-7-32.webp?v=1795486707" alt="(PSA10)ブースターEX(1ED)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>PSA10のブースターEXを狙え！1/2で750pt以上の激アツ箱</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">500</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_299">10,000</span>/10,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_299" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="BOXを撃ち抜け！3等以上でBOX確定" data-sim-row data-id="orikuji-ga0011_202610_799" data-site="orikuji" data-rate="0.8783" data-hit="0.00225" data-price="500" data-left="8000" data-tot="8000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--sky">
+                              <img class="sim-card__thumb" src="orikuji-ga0011_202610_799.webp?v=1795486707" alt="イーブイヒーローズ-BOX" loading="lazy" decoding="async">
+                            </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>BOXを撃ち抜け！3等以上でBOX確定</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">500</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_799">8,000</span>/8,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_799" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="1/11で1万pt以上！灼熱ゴールドガチャ" data-sim-row data-id="orikuji-ga0011_202610_792" data-site="orikuji" data-rate="0.9914" data-hit="0.09095" data-price="1000" data-left="20000" data-tot="20000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--sky">
+                              <img class="sim-card__thumb" src="k-0d999a1473be.webp?v=1795486707" alt="(PSA10)ルザミーネ" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>1/11で1万pt以上！灼熱ゴールドガチャ</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">1,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_792">20,000</span>/20,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_792" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="PSA10のピカチュウEXを狙え！1/2のチャンピオンにぶいち" data-sim-row data-id="orikuji-ga0011_202610_749" data-site="orikuji" data-rate="0.9357" data-hit="0.5" data-price="2900" data-left="2500" data-tot="2500" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--cream">
+                              <img class="sim-card__thumb" src="c-94-87.webp?v=1795486707" alt="(PSA10)ピカチュウEX(1ED)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>PSA10のピカチュウEXを狙え！1/2のチャンピオンにぶいち</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">2,900</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_749">2,500</span>/2,500口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_749" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="1/2でプチュン！5,000pt以上のジャッジメント" data-sim-row data-id="orikuji-ga0011_202610_352" data-site="orikuji" data-rate="0.9243" data-hit="0.5" data-price="2900" data-left="2000" data-tot="2000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--cream">
+                              <img class="sim-card__thumb" src="30th-celebration.webp?v=1795486707" alt="30th CELEBRATION BOX×5" loading="lazy" decoding="async">
+                            </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>1/2でプチュン！5,000pt以上のジャッジメント</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">2,900</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_352">2,000</span>/2,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_352" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="今だけの特別箱！最高の瞬間を引き当てろ" data-sim-row data-id="dopa-369782" data-site="dopa" data-rate="0.8998" data-hit="0.002" data-price="5000" data-left="20000" data-tot="20000" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--cream">
+          <span class="sim-badge sim-badge--hz sim-card__limited">新規限定</span>                    <img class="sim-card__thumb" src="dopa-369782.webp?v=1795486707" alt="[1BOX]ロケット団の栄光" loading="lazy" decoding="async">
+                            </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>今だけの特別箱！最高の瞬間を引き当てろ</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">5,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="dopa-369782">20,000</span>/20,000口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="dopa-369782" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="PSA10のピカチュウ＆ゼクロムGX一点狙い！1/1.9で18,000pt以上" data-sim-row data-id="orikuji-ga0011_202610_277" data-site="orikuji" data-rate="0.9843" data-hit="0.52666666666667" data-price="10000" data-left="1500" data-tot="1500" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--pink">
+                              <img class="sim-card__thumb" src="k-8478e6b71db1.webp?v=1795486707" alt="(PSA10)ピカチュウ＆ゼクロムGX(SA)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>PSA10のピカチュウ＆ゼクロムGX一点狙い！1/1.9で18,000pt以上</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">10,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_277">1,500</span>/1,500口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_277" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="ストームエメラルダ BOX×5を狙え！1/1.9のピカピカにぶいち" data-sim-row data-id="orikuji-ga0011_202610_351" data-site="orikuji" data-rate="0.9681" data-hit="0.5275" data-price="10000" data-left="800" data-tot="800" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--pink">
+                              <img class="sim-card__thumb" src="storm-emeralda.webp?v=1795486707" alt="ストームエメラルダ BOX×5" loading="lazy" decoding="async">
+                            </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>ストームエメラルダ BOX×5を狙え！1/1.9のピカピカにぶいち</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">10,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_351">800</span>/800口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_351" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="ストームエメラルダ BOX×6を狙え！1/10の超虹ラッシュ" data-sim-row data-id="orikuji-ga0011_202610_290" data-site="orikuji" data-rate="0.8527" data-hit="0.17333333333333" data-price="10000" data-left="300" data-tot="300" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--pink">
+                              <img class="sim-card__thumb" src="storm-emeralda.webp?v=1795486707" alt="ストームエメラルダ BOX×6" loading="lazy" decoding="async">
+                            </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>ストームエメラルダ BOX×6を狙え！1/10の超虹ラッシュ</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">10,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_290">300</span>/300口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_290" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="PSA10のサンダースVを狙え！1/1.9でプチュンのにぶいち" data-sim-row data-id="orikuji-ga0011_202610_774" data-site="orikuji" data-rate="0.8511" data-hit="0.63333333333333" data-price="12000" data-left="30" data-tot="30" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--pink">
+                              <img class="sim-card__thumb" src="c-79-69.webp?v=1795486707" alt="(PSA10)サンダースV(SA)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>PSA10のサンダースVを狙え！1/1.9でプチュンのにぶいち</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">12,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_774">30</span>/30口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_774" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="ストームエメラルダ BOX×8を狙え！1/1.9のダイヤモンドにぶいち" data-sim-row data-id="orikuji-ga0011_202610_801" data-site="orikuji" data-rate="0.8851" data-hit="0.53" data-price="29800" data-left="200" data-tot="200" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--pink">
+                              <img class="sim-card__thumb" src="storm-emeralda.webp?v=1795486707" alt="ストームエメラルダ BOX×8" loading="lazy" decoding="async">
+                            </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>ストームエメラルダ BOX×8を狙え！1/1.9のダイヤモンドにぶいち</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">29,800</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="orikuji-ga0011_202610_801">200</span>/200口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="orikuji-ga0011_202610_801" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="度胸試しの5万pt" data-sim-row data-id="dopa-374656" data-site="dopa" data-rate="0.8536" data-hit="0.46875" data-price="50000" data-left="320" data-tot="320" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--pink">
+                              <img class="sim-card__thumb" src="c-186-s-p.webp?v=1795486707" alt="(PSA10)ブースターVMAX(SA仕様)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>度胸試しの5万pt</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">50,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="dopa-374656">320</span>/320口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="dopa-374656" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="20万ptの伝説にぶいち" data-sim-row data-id="dopa-371769" data-site="dopa" data-rate="0.85" data-hit="0.8" data-price="200000" data-left="80" data-tot="80" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--pink">
+                              <img class="sim-card__thumb" src="c-95-69.webp?v=1795486707" alt="(PSA10)ブラッキーVMAX(SA)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>20万ptの伝説にぶいち</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">200,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="dopa-371769">80</span>/80口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="dopa-371769" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+            <li class="sim-card" title="至高のニブイチ" data-sim-row data-id="dopa-376641" data-site="dopa" data-rate="0.8609" data-hit="0.7" data-price="300000" data-left="60" data-tot="60" tabindex="0">
+        <div class="sim-card__visual sim-card__visual--pink">
+                              <img class="sim-card__thumb" src="c-279-xy-p.webp?v=1795486707" alt="(PSA10)ピカチュウ(20thアニバーサリー)" loading="lazy" decoding="async">
+          <span class="sim-psa sim-card__psa" aria-label="PSA10"><b>10</b><small>PSA</small></span>                  </div>
+        <div class="sim-card__body">
+          <a class="sim-card__title" href="#play" tabindex="-1" data-sim-pick>至高のニブイチ</a>
+          <span class="sim-card__price"><span class="sim-coin" aria-hidden="true">P</span><span class="sim-num">300,000</span><small>/1回</small></span>
+          <div class="sim-card__meter">
+            <span class="sim-card__left">残り<span class="sim-num" data-sim-left="dopa-376641">60</span>/60口</span>
+            <div class="sim-meter"><div class="sim-meter__bar" data-sim-left-bar="dopa-376641" style="width:100%"></div></div>
+          </div>
+        </div>
+      </li>
+          </ul>
+    <p class="ot-table__legend">「残り」は全員で引いている箱のいまの残り口数（読み込み後に表示）。「当たり」はハズレ以外が出る確率。「*」は発送のみ（pt交換不可）の景品を0ptとして計算した理論値です。ptは各社のサイト内だけで使えるポイントで、現金には戻せません。ここでは1pt＝1円として換算しています。元の還元率が75%に届かない箱は、ゲームとして遊べるように「ボーナス賞」とハズレのptを足して85%前後にしています（上位の賞はそのまま）。ガチャ名は各社の表記を元に業者名だけ伏せています（2026年10月17日時点・真偽は未確認）。</p>
+  </section>
+  <section id="live" hidden></section>
+  <section class="ot-section" id="about">
+    <h2 class="ot-section__title">遊び方</h2>
+        <ol class="ot-policy__list sim-howto">
+      <li><strong>ルーレットを1日1回回す。</strong>止まった額（5,000〜15,000コイン）がその日の持ちコインです。</li>
+      <li><strong>ガチャを選んで引く。</strong>1口の価格より安い景品はハズレ。ハズレもカードとして手元に入るので、ptに交換するか発送するかを選べます。</li>
+      <li><strong>当たりは「ptに交換」か「発送」。</strong>交換すれば次のガチャに回せます。発送すると、相場の分だけオリ得ランクポイントが入ります。</li>
+      <li><strong>発送すると景品の相場がオリ得ランクポイントになり、多い人はランキングに載ります。</strong>本日のランキングは毎日0時に切り替わります。11月の月間ランキング1位には、ポケカ最新弾「ハドウシーカー」1BOXをプレゼントします。<span class="sim-req">要申請</span>XのIDの登録で申請できます。</li>
+      <li><strong>コインが尽きたら、復活キーで復活。</strong>1日1回だけです。</li>
+    </ol>
+    <h3 class="sim-live__h">注意</h3>
+    <ul class="ot-policy__list">
+      <li><strong>お金は一切かかりません。</strong>画面の金額とコインは架空の数字です。</li>
+      <li><strong>広告について。</strong>当サイトは別のページ（<a href="/oritoku/oripa/">オリパおすすめランキング</a>など）で、オリパ各社のアフィリエイトプログラムに参加しています。シミュレーターの結果や並び順は報酬と関係ありません。</li>
+    </ul>
+        <p class="ot-note">効果音: <a href="https://soundeffect-lab.info/" target="_blank" rel="noopener">効果音ラボ</a>、smartomaizu「プチュン」フリーズ演出-02（<a href="https://smartomaizu.com/ringtones/sozai/1399.html" target="_blank" rel="noopener">smartomaizuの素材を使用しています</a>・<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>）</p>
+  </section>
+  <section id="rank-pre" hidden></section>
+  <section class="ot-section" id="faq">
+    <h2 class="ot-section__title">よくある質問</h2>
+    <dl class="sim-faq">
+            <div class="sim-faq__item">
+        <dt class="sim-faq__q">お金はかかりますか？</dt>
+        <dd class="sim-faq__a">かかりません。ポイントの購入も、景品の発送もありません。画面に出る金額やptは、入力した数字や公開価格をそのまま使った架空の数字です。</dd>
+      </div>
+            <div class="sim-faq__item">
+        <dt class="sim-faq__q">確率は本物と同じですか？</dt>
+        <dd class="sim-faq__a">ラインナップ（景品の名前・枚数・pt）と口数は、各社が公開している数字を取った時点のまま使っています。どの口が当たりになるかはこのサーバーの乱数で決めるので、実在サイトの結果とは関係ありません。</dd>
+      </div>
+            <div class="sim-faq__item">
+        <dt class="sim-faq__q">残り枚数はなぜ減るのですか？</dt>
+        <dd class="sim-faq__a">本物のガチャと同じように、誰かが引くと減っていくようになっています。</dd>
+      </div>
+            <div class="sim-faq__item">
+        <dt class="sim-faq__q">還元率はどう計算していますか？</dt>
+        <dd class="sim-faq__a">受け取れるptの合計を、使った金額（1口の価格×口数）で割っています。発送のみでptに換えられない景品は0ptとして数えるため、実際より低めに出ます。ptは各社のサイト内だけで使えるポイントで現金には戻せず、ここでは1pt＝1円として換算しています。</dd>
+      </div>
+          </dl>
+  </section>
+
+    <nav class="sim-footbar" data-sim-only="game" aria-label="ゲームのメニュー" hidden>
+    <button type="button" class="sim-footbar__item sim-footbar__item--coin" data-sim-help="coin" aria-label="オリ得ポイントの説明">
+      <span class="sim-footbar__icon"><span class="sim-coin" aria-hidden="true">P</span></span>
+      <span class="sim-footbar__label"><span class="sim-num" data-sim-wallet-pt>0</span></span>
+    </button>
+    <button type="button" class="sim-footbar__item sim-footbar__item--cash" data-sim-help="rank" aria-label="オリ得ランクポイントの説明">
+      <span class="sim-footbar__icon"><img class="sim-rankpt" src="rank-point.webp?v=1795486707" alt="" width="128" height="128"></span>
+      <span class="sim-footbar__label"><span class="sim-num" data-sim-wallet-cash>0</span></span>
+    </button>
+    <a class="sim-footbar__item" href="#pick">
+      <span class="sim-footbar__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></span>
+      <span class="sim-footbar__label">ガチャ</span>
+    </a>
+    <button type="button" class="sim-footbar__item" data-sim-go-inv>
+      <span class="sim-footbar__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l8.5 4.5v10L12 21.5 3.5 17V7z"/><path d="M3.5 7L12 11.5 20.5 7"/><path d="M12 11.5v10"/></svg><span class="sim-footbar__cnt" data-sim-inv-count>0</span></span>
+      <span class="sim-footbar__label">獲得商品</span>
+    </button>
+  </nav>
+</article>
+<dialog class="sim-charge sim-tut" data-sim-tut aria-labelledby="sim-tut-title">
+  <div class="sim-charge__inner">
+    <p class="sim-tut__step"><span data-sim-tut-no>1</span> / 5</p>
+    <ol class="sim-tut__slides">
+      <li data-sim-tut-slide><img class="sim-tut__shot" src="roulette.webp?v=1795486707" alt="ルーレットの画面" width="630" height="227" loading="lazy" decoding="async"><h2 class="sim-charge__title" id="sim-tut-title">ルーレットで持ちポイントが決まる</h2><p>最初にルーレットを<strong>1回だけ</strong>回します。止まった額（5,000〜15,000pt）がその日の持ちポイントです。お金はかからない架空のポイントです。</p></li>
+      <li data-sim-tut-slide hidden><img class="sim-tut__shot" src="gacha.webp?v=1795486707" alt="ガチャの一覧" width="616" height="478" loading="lazy" decoding="async"><h2 class="sim-charge__title">好きなガチャを選んで引く</h2><p>並んでいるガチャから選んで、<strong>1回・10連・100連</strong>で引きます。ハズレもカードとして手元に入ります。</p></li>
+      <li data-sim-tut-slide hidden><img class="sim-tut__shot" src="inventory.webp?v=1795486707" alt="獲得商品の画面" width="630" height="177" loading="lazy" decoding="async"><h2 class="sim-charge__title">当たりは「ptに交換」か「発送」</h2><p>当たった景品は<strong>獲得商品</strong>に入ります。ptに換えて次のガチャに回すか、発送して<strong>オリ得ランクポイント</strong>にするかを選びます。いくらで売れるかは、<strong>発送するまで分かりません</strong>（相場価格を調べる必要があります）。</p></li>
+      <li data-sim-tut-slide hidden><span class="sim-tut__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg></span><h2 class="sim-charge__title">オリ得ランクポイントが多い人が勝ち</h2><p>発送して得たオリ得ランクポイントでランキングを競います。<strong>11月の月間ランキング1位には、ポケカ最新弾「ハドウシーカー」1BOXを無料でプレゼントします。</strong><span class="sim-req">要申請</span>XのIDの登録で申請できます。「ゲーム終了（確定）」を押すと今日の結果が確定し、ランキングが見られます。毎日0時（日本時間）にリセットされます。</p></li>
+      <li data-sim-tut-slide hidden><span class="sim-tut__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.7"/><path d="M20 4v4.7h-4.7"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.3"/><path d="M4 20v-4.7h4.7"/></svg></span><h2 class="sim-charge__title">ポイントが尽きたらゲームオーバー</h2><p>引けなくなったら終わりです。<strong>復活キーを入力すると、ポイントが復活</strong>します。それでは、ルーレットを回しましょう。</p></li>
+    </ol>
+    <div class="sim-charge__actions">
+      <button type="button" class="sim-btn sim-btn--plain" data-sim-tut-prev>戻る</button>
+      <button type="button" class="sim-btn" data-sim-tut-next>次へ</button>
+    </div>
+    <p class="sim-tut__skip"><button type="button" class="sim-tut__skipbtn" data-sim-tut-skip>説明を飛ばす</button></p>
+  </div>
+</dialog>
+<dialog class="sim-rpop" data-sim-rpop aria-labelledby="sim-rpop-title">
+  <div class="sim-rpop__head">
+    <img class="sim-rpop__logo" src="oritoku-logo-nav.webp?v=1795486707" alt="オリ得" decoding="async">
+    <h2 class="sim-rpop__title" id="sim-rpop-title">ガチャ結果</h2>
+    <button type="button" class="sim-rpop__skip" data-sim-rpop-skip>▶スキップ</button>
+  </div>
+  <p class="sim-rpop__sum" data-sim-rpop-sum></p>
+    <div class="sim-rpop__draw" data-sim-rpop-draw></div>
+  <ul class="sim-rpop__list" data-sim-rpop-list></ul>
+  <div class="sim-rpop__foot">
+    <div class="sim-rpop__bar">
+      <span class="sim-rpop__total"><span class="sim-coin" aria-hidden="true">P</span><b class="sim-num" data-sim-rpop-total>0</b> pt</span>
+      <button type="button" class="sim-rpop__mini" data-sim-rpop-all>全て選択</button>
+      <button type="button" class="sim-rpop__mini" data-sim-rpop-reset>リセット</button>
+    </div>
+    <div class="sim-rpop__acts">
+      <button type="button" class="sim-btn sim-btn--yellow" data-sim-rpop-trade disabled>ポイントに交換する</button>
+      <button type="button" class="sim-btn" data-sim-rpop-ship disabled>発送する</button>
+    </div>
+        <div class="sim-rpop__say">
+      <img class="sim-rpop__say-logo" src="oritoku-logo-nav.webp?v=1795486707" alt="" decoding="async">
+      <p class="sim-rpop__msg" data-sim-rpop-msg aria-live="polite"></p>
+    </div>
+        <button type="button" class="sim-btn sim-btn--ghost sim-rpop__again" data-sim-rpop-again hidden></button>
+  </div>
+</dialog>
+<dialog class="sim-charge sim-entdlg" data-sim-entdlg aria-label="XのIDの登録">
+  <div class="sim-charge__inner">
+    <button type="button" class="sim-charge__x" data-sim-entdlg-x aria-label="閉じる">×</button>
+    <div data-sim-entdlg-body></div>
+  </div>
+</dialog>
+<dialog class="sim-charge sim-lvdlg" data-sim-lvdlg aria-labelledby="sim-lvdlg-title">
+  <div class="sim-charge__inner">
+    <button type="button" class="sim-charge__x" data-sim-lvdlg-x aria-label="閉じる">×</button>
+    <h2 class="sim-charge__title" id="sim-lvdlg-title">オリ得レベル</h2>
+    <p class="sim-lvdlg__lead">コインが増えるとレベルが上がり、高いガチャが引けます。一度上がると下がりません。</p>
+    <ol class="sim-lvdlg__list" data-sim-lvdlg-list></ol>
+    <p class="sim-lvdlg__note">「連続◯日目」＝毎日来ている日数。日数に応じてログインボーナスが付きます（1日空けると1日目に戻ります）。前の日のコインは、いちばん安いガチャが引ける分が残っていれば持ち越せます</p>
+  </div>
+</dialog>
+<dialog class="sim-charge sim-view" data-sim-view aria-labelledby="sim-view-title">
+  <div class="sim-charge__inner">
+    <div data-sim-view-panel="view_oritoku" hidden>
+      <h2 class="sim-charge__title" id="sim-view-title">オリ得ってなに？</h2>
+      <a href="/oritoku/" target="_blank" rel="noopener"><img class="sim-view__shot" src="oritoku-top.webp?v=1795486707" alt="オリ得のトップページ" width="1200" height="650" loading="lazy" decoding="async"></a>
+      <p>オリ得は、オリパサイトの<strong>ゲリラクーポン</strong>や<strong>高還元キャンペーン</strong>を毎日まとめているページです。期間が短いクーポンや、いつもより当たりが多いガチャを、見逃さずにチェックできます。</p>
+      <ul class="sim-view__points">
+        <li>いま使えるゲリラクーポンが一覧で分かる</li>
+        <li>終わる時間・使える条件まで書いてある</li>
+        <li>このゲームもオリ得の一部です</li>
+      </ul>
+      <p class="sim-view__go"><a class="sim-btn sim-btn--yellow" href="/oritoku/" target="_blank" rel="noopener">オリ得でゲリラクーポンを見る</a></p>
+    </div>
+    <div data-sim-view-panel="view_ad" hidden>
+      <p class="sim-view__pr">PR</p>
+      <h2 class="sim-charge__title">オリパのティア表</h2>
+      <p>還元率・予算・当選報告で、オンラインオリパをランク分けしました。<strong>SSランクはどこ？</strong></p>
+      <a href="/oritoku/oripa/" target="_blank" rel="noopener"><img class="sim-view__shot" src="tier-mosaic.webp?v=1795486707" alt="オリパのティア表（サイト名は伏せています）" width="1100" height="654" loading="lazy" decoding="async"></a>
+      <p class="sim-view__go"><a class="sim-btn sim-btn--yellow" href="/oritoku/oripa/" target="_blank" rel="noopener">ティア表の答えを見る</a></p>
+    </div>
+    <p class="sim-view__timer" data-sim-view-timer aria-live="polite"></p>
+    <div class="sim-charge__actions">
+      <button type="button" class="sim-btn" data-sim-view-claim disabled>受け取る</button>
+      <button type="button" class="sim-btn sim-btn--plain" data-sim-view-close>閉じる</button>
+    </div>
+  </div>
+</dialog>
+<dialog class="sim-charge" data-sim-charge aria-labelledby="sim-charge-title">
+    <p class="sim-charge__lead sim-charge__bubble" data-sim-charge-lead><span class="sim-once">1日1回</span>ptをチャージできます</p>
+  <div class="sim-charge__inner">
+    <button type="button" class="sim-charge__x" data-sim-charge-x aria-label="閉じる">×</button>
+    <div class="sim-charge__head">
+      <h2 class="sim-charge__title" id="sim-charge-title">オリ得コインをチャージ</h2>
+    </div>
+    <ul class="sim-plans" data-sim-plans></ul>
+    <p class="sim-charge__msg" data-sim-charge-msg aria-live="polite"></p>
+    <div class="sim-charge__actions">
+      <button type="button" class="sim-btn" data-sim-charge-spin>ルーレットを回す</button>
+      <button type="button" class="sim-btn sim-btn--x" data-sim-charge-share hidden><svg class="sim-xicon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>復活キーで復活</button>
+      <button type="button" class="sim-btn sim-btn--plain" data-sim-charge-close hidden>閉じる</button>
+    </div>
+        <form class="sim-sharebox" data-sim-share-form hidden novalidate>
+      <p class="sim-sharebox__step"><strong>復活キーを入力してください</strong></p>
+      <div class="sim-sharebox__row">
+        <input class="sim-name__input" type="text" inputmode="text" placeholder="復活キーを入力" aria-label="復活キー" data-sim-share-url autocomplete="off">
+        <button type="submit" class="sim-btn">確認して復活</button>
+      </div>
+      <p class="sim-name__note">正しい復活キーを入力すると、ポイントが復活します。</p>
+      <p class="sim-sharebox__again"><button type="button" class="sim-tut__skipbtn" data-sim-share-again>もう一度シェア画面を開く</button></p>
+    </form>
+  </div>
+</dialog>
+<script type="application/json" id="sim-config">{"api":"/api/oritoku-sim/","token":"28416a33d4733cbbaeb923d480e714a0","fetched":"2026-10-17","allowed":[1,10,100],"minRank":100,"reader":false,"prize":{"month":"11月","item":"ポケカ最新弾「ハドウシーカー」1BOX","short":"ハドウシーカー1BOX","until":"11月30日 23:59","contact":"12月上旬"},"levels":[{"key":"beginner","name":"ビギナー（見習い）","min":0,"max_price":200},{"key":"beginner2","name":"ビギナー（脱初心者）","min":10000,"max_price":200},{"key":"bronze","name":"ブロンズ（駆け出し）","min":13000,"max_price":500},{"key":"bronze2","name":"ブロンズ（常連）","min":15000,"max_price":500},{"key":"silver","name":"シルバー（中堅）","min":17000,"max_price":1000},{"key":"silver2","name":"シルバー（腕利き）","min":20000,"max_price":1000},{"key":"gold","name":"ゴールド（上級者）","min":24000,"max_price":5000},{"key":"gold2","name":"ゴールド（目利き）","min":45000,"max_price":5000},{"key":"platinum","name":"プラチナ（勝負師）","min":65000,"max_price":12000},{"key":"platinum2","name":"プラチナ（豪運）","min":100000,"max_price":12000},{"key":"diamond","name":"ダイヤモンド（達人）","min":140000,"max_price":30000},{"key":"diamond2","name":"ダイヤモンド（名人）","min":200000,"max_price":30000},{"key":"master","name":"マスター（極み）","min":300000,"max_price":50000},{"key":"legend","name":"レジェンド（伝説）","min":600000,"max_price":200000},{"key":"vip","name":"VIP（殿堂入り）","min":1800000,"max_price":0}],"logo":"oritoku-logo-nav.webp?v=1795486707","rankIcon":"rank-point.webp?v=1795486707","sounds":{"cursor1":"/public/audio/oritoku-sim/cursor1.mp3?v=1795486706","jean1":"/public/audio/oritoku-sim/jean1.mp3?v=1795486706","jajean1":"/public/audio/oritoku-sim/jajean1.mp3?v=1795486706","trumpet1":"/public/audio/oritoku-sim/trumpet1.mp3?v=1795486706","dondonpafupafu1":"/public/audio/oritoku-sim/dondonpafupafu1.mp3?v=1795486706","kira1":"/public/audio/oritoku-sim/kira1.mp3?v=1795486706","shakin1":"/public/audio/oritoku-sim/shakin1.mp3?v=1795486706","shine1":"/public/audio/oritoku-sim/shine1.mp3?v=1795486706","drum-roll1":"/public/audio/oritoku-sim/drum-roll1.mp3?v=1795486706","tympani-roll1":"/public/audio/oritoku-sim/tympani-roll1.mp3?v=1795486706","boyon1":"/public/audio/oritoku-sim/boyon1.mp3?v=1795486706","puchun":"/public/audio/oritoku-sim/puchun.mp3?v=1795486706","pirori":"/public/audio/oritoku-sim/pirori.mp3?v=1795486706","money-drop1":"/public/audio/oritoku-sim/money-drop1.mp3?v=1795486706","money1":"/public/audio/oritoku-sim/money1.mp3?v=1795486706","clearing1":"/public/audio/oritoku-sim/clearing1.mp3?v=1795486706","gong-played2":"/public/audio/oritoku-sim/gong-played2.mp3?v=1795486706"}}</script>
+        </div>
+    </main>
+
+            <footer class="mfooter">
+    <div class="mfooter__inner">
+        <div class="mfooter__top">
+            <div class="mfooter__left">
+                <a href="/" class="mfooter__brand" aria-label="トレカプロ株式会社">
+                    <svg class="mfooter__mark" viewBox="0 0 58 80" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="mfooter-holo" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%"   stop-color="#ffc4dd"/>
+                                <stop offset="20%"  stop-color="#c4dff8"/>
+                                <stop offset="40%"  stop-color="#fff7c4"/>
+                                <stop offset="60%"  stop-color="#c4f5d9"/>
+                                <stop offset="80%"  stop-color="#dcc4f5"/>
+                                <stop offset="100%" stop-color="#ffd4c4"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="58" height="80" rx="8" fill="url(#mfooter-holo)"/>
+                        <path d="M 29 22 Q 34 34 47 40 Q 34 46 29 58 Q 24 46 11 40 Q 24 34 29 22 Z" fill="#0F0F0F"/>
+                    </svg>
+                    <span class="mfooter__brand-text">トレカプロ</span>
+                </a>
+                <div class="mfooter__info">
+                    <p>〒105-0004<br>東京都港区新橋1丁目12-9 新橋プレイス6F</p>
+                    <p><a href="tel:0368224909">03-6822-4909</a></p>
+                    <p>古物商許可<br>東京都公安委員会 第301082621878号</p>
+                </div>
+                <a href="/company/contact/" class="mfooter__contact">お問い合わせ<span aria-hidden="true">&rarr;</span></a>
+            </div>
+            <div class="mfooter__cols">
+                <div class="mfooter__col">
+                    <div class="mfooter__col-title">サービス</div>
+                    <ul class="mfooter__links">
+                        <li><a href="/pokeka-kakaku/">トレカプロ相場</a></li>
+                        <li><a href="/pokeka-satei/">トレカプロ査定</a></li>
+                        <li><a href="https://kanteipro.com/" target="_blank" rel="noopener">トレカプロ鑑定</a></li>
+                        <li><a href="/media/">トレカプロメディア</a></li>
+                        <li><a href="https://tcgnews.jp/">トレカプロニュース</a></li>
+                        <li><a href="/wholesale/">TCGPRO JAPAN（海外卸）</a></li>
+                    </ul>
+                </div>
+                <div class="mfooter__col">
+                    <div class="mfooter__col-title">オリパ</div>
+                    <ul class="mfooter__links">
+                        <li><a href="/oritoku/">オリ得</a></li>
+                        <li><a href="/oritoku/oripa/">オリパおすすめ</a></li>
+                        <li><a href="simulator">オリパシミュレーター</a></li>
+                        <li><a href="/oritoku/event/">イベントカレンダー</a></li>
+                        <li><a href="/oritoku/akiba/">秋葉原の店舗</a></li>
+                    </ul>
+                </div>
+                <div class="mfooter__col">
+                    <div class="mfooter__col-title">会社情報</div>
+                    <ul class="mfooter__links">
+                        <li><a href="/company/">会社概要</a></li>
+                        <li><a href="/company/message/">代表挨拶</a></li>
+                        <li><a href="/company/service/">事業内容</a></li>
+                        <li><a href="/company/news/">お知らせ</a></li>
+                        <li><a href="/company/recruitment/">採用</a></li>
+                        <li><a href="/media/kanshu/">監修者</a></li>
+                        <li><a href="/oritoku/contents-policy/">コンテンツポリシー</a></li>
+                        <li><a href="/company/privacy-policy/">プライバシーポリシー</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <p class="mfooter__copy">&copy; 2026 TCGPRO Inc.</p>
+    </div>
+</footer>
+    
+        
+    <script src="app.js?v=1795486707"></script>
+        <script src="oritoku-sim.js?v=1795486707" defer></script>
+                        <script src="//statics.a8.neta8media-ad.js"></script>
+</body>
+</html>

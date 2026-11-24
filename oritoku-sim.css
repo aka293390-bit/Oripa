@@ -1,0 +1,1703 @@
+/* =========================================================================
+   oritoku-sim.css — /oritoku/simulator/ オリパシミュレーター
+   oritoku.css（.ot-* の表・見出し・ハブ）に重ねて使う。値は var(--ds-*) のみ。
+   ホロのグラデはこのページでは「大当たりの演出」1回だけ（.sim-stage--top）。
+   ========================================================================= */
+
+.sim-hero { margin-bottom: var(--ds-space-stack-md); }
+.sim-hero::after { content: none; } /* ホロの線は置かない。このページのグラデは大当たりの演出 1 回だけ */
+.sim-hero__title {
+  margin: 0 0 var(--ds-space-stack-xs);
+  font-size: var(--ds-text-h1-size);
+  line-height: var(--ds-text-h1-lh);
+  font-weight: var(--ds-text-h1-weight);
+}
+.sim-hero__sub { margin: 0; color: var(--ds-color-text-muted); font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+
+/* ---------- 自分で作る（ファーストビュー） ---------- */
+.sim-maker {
+  display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: var(--ds-space-stack-md);
+  margin-top: var(--ds-space-stack-md);
+  padding: var(--ds-space-stack-md);
+  border: var(--ds-border-width) solid var(--ds-color-border);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-color-bg-elevated);
+  box-shadow: var(--ds-shadow-card);
+}
+.sim-drop {
+  position: relative; display: flex; align-items: center; justify-content: center; min-height: 12em;
+  border: var(--ds-border-width) dashed var(--ds-color-border-strong);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-color-bg-paper);
+  cursor: pointer; overflow: hidden; text-align: center;
+}
+.sim-drop.is-over { border-color: var(--ds-color-bg-inverse); background: var(--ds-color-badge-bg-sky); }
+.sim-drop__input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.sim-drop__empty { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-inline-xs); padding: var(--ds-space-stack-sm); pointer-events: none; }
+.sim-drop__empty[hidden] { display: none; }
+.sim-drop__title { font-weight: var(--ds-text-h3-weight); font-size: var(--ds-text-body-size); }
+.sim-drop__note { font-size: var(--ds-text-micro-size); line-height: var(--ds-text-micro-lh); color: var(--ds-color-text-subtle); }
+.sim-maker.has-shot .sim-drop { align-items: flex-start; justify-content: flex-start; cursor: default; }
+.sim-maker.has-shot .sim-drop__input { display: none; }
+.sim-shots { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-space-inline-sm); width: 100%; padding: var(--ds-space-inline-sm); }
+.sim-shots[hidden] { display: none; }
+.sim-shots__item { position: relative; display: block; aspect-ratio: 9 / 16; border-radius: var(--ds-radius-input); overflow: hidden; background: var(--ds-color-bg); border: var(--ds-border-width) solid var(--ds-color-border); }
+.sim-shots__item img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.sim-shots__n { position: absolute; left: var(--ds-space-inline-xs); top: var(--ds-space-inline-xs); padding: 0 var(--ds-space-inline-xs); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); font-family: var(--ds-font-num); font-size: var(--ds-text-micro-size); }
+.sim-shots__del { position: absolute; right: 0; top: 0; min-width: var(--ds-touch-target-min); min-height: var(--ds-touch-target-min); border: 0; background: none; color: var(--ds-color-text-inverse); font: inherit; font-size: var(--ds-text-body-size); font-weight: var(--ds-text-h3-weight); text-shadow: 0 0 .3em var(--ds-color-bg-inverse); cursor: pointer; }
+.sim-shots__add { display: flex; align-items: center; justify-content: center; aspect-ratio: 9 / 16; border: var(--ds-border-width) dashed var(--ds-color-border-strong); border-radius: var(--ds-radius-input); color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-size); cursor: pointer; }
+.sim-maker__read { width: 100%; margin-top: var(--ds-space-inline-sm); }
+.sim-maker__read-msg { min-height: 1.4em; margin: var(--ds-space-inline-xs) 0 0; font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-maker__read-msg.is-error { color: var(--ds-color-danger); }
+.sim-shot-guide { margin-top: var(--ds-space-inline-sm); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); background: var(--ds-color-bg-paper); border-radius: var(--ds-radius-input); font-size: var(--ds-text-caption-size); line-height: var(--ds-text-caption-lh); }
+.sim-shot-guide__h { margin: 0 0 var(--ds-space-inline-xs); font-weight: var(--ds-text-h3-weight); }
+.sim-shot-guide__list { margin: 0; padding-left: 1.4em; }
+.sim-shot-guide__note { margin: var(--ds-space-inline-xs) 0 0; color: var(--ds-color-text-subtle); font-size: var(--ds-text-micro-size); line-height: var(--ds-text-micro-lh); }
+.sim-box__shots { display: flex; gap: var(--ds-space-inline-sm); overflow-x: auto; margin: 0 0 var(--ds-space-stack-sm); }
+.sim-link-btn { margin-top: var(--ds-space-inline-xs); padding: var(--ds-space-inline-xs) 0; border: 0; background: none; color: var(--ds-color-text-muted); font: inherit; font-size: var(--ds-text-caption-size); text-decoration: underline; cursor: pointer; }
+.sim-link-btn[hidden] { display: none; }
+
+.sim-maker__form { display: flex; flex-direction: column; gap: var(--ds-space-stack-xs); min-width: 0; }
+.sim-maker__row3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-space-inline-sm); }
+.sim-field__label { display: block; margin-bottom: var(--ds-space-inline-xs); font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-h3-weight); }
+.sim-field__opt { margin-left: var(--ds-space-inline-xs); font-weight: var(--ds-text-body-weight); color: var(--ds-color-text-subtle); font-size: var(--ds-text-micro-size); }
+.sim-input {
+  width: 100%; min-width: 0; min-height: var(--ds-touch-target-min);
+  padding: 0 var(--ds-space-inline-sm);
+  border: var(--ds-border-width) solid var(--ds-color-border-strong);
+  border-radius: var(--ds-radius-input);
+  background: var(--ds-color-bg); color: var(--ds-color-text);
+  font: inherit; font-size: var(--ds-text-body-size);
+}
+.sim-input[type="number"] { font-family: var(--ds-font-num); font-variant-numeric: tabular-nums; }
+.sim-input-unit { display: flex; align-items: center; gap: var(--ds-space-inline-xs); }
+.sim-input-unit span { font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); white-space: nowrap; }
+.sim-tiers-in__head, .sim-tier-in { display: grid; grid-template-columns: 5em minmax(0, 1fr) 7em 5em 2em; gap: var(--ds-space-inline-xs); align-items: center; }
+.sim-tiers-in__head { font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); margin-bottom: var(--ds-space-inline-xs); }
+.sim-tier-in { margin-bottom: var(--ds-space-inline-xs); }
+.sim-tier-in__del { min-height: var(--ds-touch-target-min); border: 0; background: none; color: var(--ds-color-text-subtle); font: inherit; font-size: var(--ds-text-body-size); cursor: pointer; }
+.sim-tier-in__del:hover { color: var(--ds-color-danger); }
+.sim-calc { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ds-space-inline-sm); margin: var(--ds-space-inline-sm) 0 0; }
+.sim-calc div { padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); background: var(--ds-color-bg-paper); border-radius: var(--ds-radius-input); min-width: 0; }
+.sim-calc dt { font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+.sim-calc dd { margin: 0; font-family: var(--ds-font-num); font-size: var(--ds-text-body-size); font-weight: var(--ds-text-h3-weight); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.sim-calc dd small { display: block; font-size: var(--ds-text-micro-size); font-weight: var(--ds-text-body-weight); color: var(--ds-color-text-subtle); }
+.sim-calc .is-plus { color: var(--ds-color-positive); }
+.sim-maker__msg { min-height: 1.4em; margin: 0; font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-maker__msg.is-error { color: var(--ds-color-danger); }
+.sim-maker__actions { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-sm); align-items: center; }
+.sim-maker__note { margin: 0; font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-box__tools { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-xs); }
+.sim-box__shot { display: block; flex: none; height: 12em; border-radius: var(--ds-radius-input); border: var(--ds-border-width) solid var(--ds-color-border); }
+
+/* ---------- 絞り込み ---------- */
+.sim-filter {
+  display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-md); align-items: center; justify-content: space-between;
+  margin-bottom: var(--ds-space-stack-sm);
+}
+.sim-tabs { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-sm); }
+.sim-tab {
+  display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs);
+  min-height: var(--ds-touch-target-min);
+  padding: 0 var(--ds-space-inline-md);
+  border: var(--ds-border-width) solid var(--ds-color-border-strong);
+  border-radius: var(--ds-radius-chip);
+  background: var(--ds-color-bg);
+  color: var(--ds-color-text);
+  font: inherit; font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-h3-weight);
+  cursor: pointer;
+}
+.sim-tab.is-active { background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); border-color: var(--ds-color-bg-inverse); }
+.sim-tab__icon { border-radius: var(--ds-radius-avatar); }
+.sim-tab__n { font-family: var(--ds-font-num); font-weight: var(--ds-text-body-weight); opacity: .75; }
+.sim-sort { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-name__row .sim-btn { flex: none; }
+.sim-sort select {
+  min-height: var(--ds-touch-target-min);
+  padding: 0 var(--ds-space-inline-sm);
+  border: var(--ds-border-width) solid var(--ds-color-border-strong);
+  border-radius: var(--ds-radius-input);
+  background: var(--ds-color-bg); color: var(--ds-color-text);
+  font: inherit; font-size: var(--ds-text-body-sm-size);
+}
+
+/* ---------- 一覧（オリパサイト風の 2 列カード。SP は 1 列） ---------- */
+.sim-cards { list-style: none; margin: 0 0 var(--ds-space-stack-sm); padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-space-stack-sm); }
+.sim-card {
+  display: flex; flex-direction: column; min-width: 0;
+  border: var(--ds-border-width) solid var(--ds-color-border);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-color-bg-elevated);
+  box-shadow: var(--ds-shadow-card);
+  overflow: hidden; cursor: pointer;
+  transition: transform .15s ease;
+}
+.sim-card:hover, .sim-card:focus-visible { transform: translateY(-2%); outline: none; border-color: var(--ds-color-border-strong); }
+.sim-card.is-selected { border-color: var(--ds-color-bg-inverse); }
+.sim-card.is-hidden { display: none; }
+.sim-card__visual { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 16 / 9; padding: var(--ds-space-stack-sm); color: var(--ds-color-badge-text); }
+.sim-card__visual--mint { background: var(--ds-color-badge-bg-mint); }
+.sim-card__visual--sky { background: var(--ds-color-badge-bg-sky); }
+.sim-card__visual--cream { background: var(--ds-color-badge-bg-cream); }
+.sim-card__visual--pink { background: var(--ds-color-badge-bg-pink); }
+.sim-card__thumb { position: absolute; inset: 0; width: 100%; height: 100%; padding: var(--ds-space-inline-sm) 0; object-fit: contain; }
+.sim-card__site { z-index: 1;  position: absolute; top: var(--ds-space-inline-sm); left: var(--ds-space-inline-sm); padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); font-size: var(--ds-text-micro-size); font-weight: var(--ds-text-h3-weight); }
+.sim-card__limited { z-index: 1;  position: absolute; top: var(--ds-space-inline-sm); right: var(--ds-space-inline-sm); background: var(--ds-color-bg); }
+.sim-card__top { display: block; margin-bottom: var(--ds-space-inline-xs); }
+.sim-card__top-label { display: block; font-size: var(--ds-text-micro-size); opacity: .75; }
+.sim-card__top-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: var(--ds-text-h3-size); line-height: var(--ds-text-h3-lh); font-weight: var(--ds-text-h3-weight); }
+.sim-card__top-pt { display: block; font-family: var(--ds-font-num); font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-h3-weight); }
+.sim-card__title { grid-column: 1 / -1; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--ds-color-text); font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-h3-weight); line-height: var(--ds-text-body-sm-lh); text-decoration: none; }
+.sim-card__body { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--ds-space-inline-md); align-items: center; padding: var(--ds-space-inline-sm) var(--ds-space-stack-sm); }
+.sim-card__price { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); font-family: var(--ds-font-num); font-size: var(--ds-text-h3-size); font-weight: var(--ds-text-h3-weight); white-space: nowrap; }
+.sim-card__price small { font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-body-weight); }
+.sim-coin { display: inline-flex; align-items: center; justify-content: center; width: 1.4em; height: 1.4em; border-radius: var(--ds-radius-avatar); background: var(--ds-color-sim-btn-yellow); color: var(--ds-color-text); font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-h3-weight); }
+.sim-card__meter { min-width: 0; text-align: center; }
+.sim-card__meter .sim-meter { margin: 0; }
+.sim-card__left { display: block; margin-bottom: var(--ds-space-inline-xs); font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-h3-weight); font-family: var(--ds-font-num); }
+.sim-num { font-family: var(--ds-font-num); font-variant-numeric: tabular-nums; }
+.sim-unit { margin-left: var(--ds-space-inline-xs); font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+.sim-rate { font-family: var(--ds-font-num); font-weight: var(--ds-text-h3-weight); }
+.sim-rate--plus { color: var(--ds-color-positive); }
+.sim-rate__note { margin-left: var(--ds-space-inline-xs); color: var(--ds-color-text-subtle); }
+.sim-top { display: block; font-size: var(--ds-text-caption-size); line-height: var(--ds-text-caption-lh); }
+.sim-top__pt { display: block; font-family: var(--ds-font-num); font-size: var(--ds-text-micro-size); color: var(--ds-color-text-muted); }
+
+/* ---------- 引く ---------- */
+.sim-play__empty { color: var(--ds-color-text-muted); }
+.sim-box {
+  border: var(--ds-border-width) solid var(--ds-color-border);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-color-bg-elevated);
+  box-shadow: var(--ds-shadow-card);
+  padding: var(--ds-space-stack-md);
+}
+.sim-box__head { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-md); align-items: flex-start; justify-content: space-between; margin-bottom: var(--ds-space-stack-sm); }
+.sim-box__site { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-box__site img { border-radius: var(--ds-radius-avatar); }
+.sim-box__title { margin: var(--ds-space-inline-xs) 0 0; font-size: var(--ds-text-h3-size); line-height: var(--ds-text-h3-lh); font-weight: var(--ds-text-h3-weight); }
+.sim-box__official { font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-box__kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(9em, 1fr)); gap: var(--ds-space-inline-sm) var(--ds-space-inline-md); margin: 0 0 var(--ds-space-stack-sm); }
+.sim-box__kv div { padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); background: var(--ds-color-bg-paper); border-radius: var(--ds-radius-input); }
+.sim-box__kv dt { font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+.sim-box__kv dd { margin: 0; font-family: var(--ds-font-num); font-size: var(--ds-text-body-size); font-weight: var(--ds-text-h3-weight); font-variant-numeric: tabular-nums; }
+.sim-meter { height: var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg-subtle); overflow: hidden; margin-bottom: var(--ds-space-stack-sm); }
+.sim-meter__bar { height: 100%; background: var(--ds-color-positive); transition: width .4s ease; }
+
+.sim-actions { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-sm); align-items: center; margin: var(--ds-space-stack-sm) 0; }
+.sim-actions .sim-btn { flex: 1 1 0; flex-direction: column; gap: 0; line-height: 1.3; }
+.sim-btn {
+  /* このページのボタンは 2 色だけ: 赤＝引く・作る（主）、黄＝1回・それ以外（従）。オリパサイトのガチャボタンに合わせた配色 */
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-inline-xs);
+  min-height: var(--ds-touch-target-min);
+  padding: 0 var(--ds-space-stack-md);
+  border: var(--ds-border-width) solid var(--ds-color-sim-btn-red);
+  border-radius: var(--ds-radius-button);
+  background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse);
+  font: inherit; font-size: var(--ds-text-body-size); font-weight: var(--ds-text-h3-weight);
+  cursor: pointer;
+}
+.sim-btn:hover { background: var(--ds-color-sim-btn-red-hover); border-color: var(--ds-color-sim-btn-red-hover); }
+.sim-btn:disabled { opacity: .45; cursor: default; }
+.sim-btn--yellow, .sim-btn--ghost { background: var(--ds-color-sim-btn-yellow); border-color: var(--ds-color-sim-btn-yellow); color: var(--ds-color-text); }
+.sim-btn--yellow:hover, .sim-btn--ghost:hover { background: var(--ds-color-sim-btn-yellow-hover); border-color: var(--ds-color-sim-btn-yellow-hover); }
+.sim-btn--small { min-height: var(--ds-touch-target-min); padding: 0 var(--ds-space-inline-md); font-size: var(--ds-text-body-sm-size); }
+.sim-btn__cost { font-family: var(--ds-font-num); font-weight: var(--ds-text-body-weight); opacity: .8; font-size: var(--ds-text-caption-size); }
+.sim-actions__note { flex-basis: 100%; margin: 0; font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+
+/* ラインナップ */
+.sim-lineup { margin-top: var(--ds-space-stack-sm); }
+.sim-lineup summary { display: flex; align-items: center; justify-content: space-between; min-height: var(--ds-touch-target-min); padding: 0 var(--ds-space-inline-md); border: var(--ds-border-width) solid var(--ds-color-border-strong); border-radius: var(--ds-radius-input); background: var(--ds-color-bg); font-weight: var(--ds-text-h3-weight); cursor: pointer; list-style: none; }
+.sim-lineup summary::-webkit-details-marker { display: none; }
+.sim-lineup summary::after { content: '開く ＋'; font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-lineup[open] summary::after { content: '閉じる －'; }
+.sim-lineup[open] summary { margin-bottom: var(--ds-space-inline-sm); }
+.sim-group { margin: var(--ds-space-stack-xs) 0; }
+.sim-group__h { display: flex; align-items: baseline; gap: var(--ds-space-inline-sm); margin: 0 0 var(--ds-space-inline-xs); font-size: var(--ds-text-body-sm-size); }
+.sim-group__meta { font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); font-family: var(--ds-font-num); }
+.sim-prizes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(14em, 1fr)); gap: var(--ds-space-inline-xs) var(--ds-space-inline-sm); }
+.sim-prize { display: grid; grid-template-columns: 1fr auto; gap: 0 var(--ds-space-inline-sm); align-items: center; padding: var(--ds-space-inline-xs) var(--ds-space-inline-sm); border: var(--ds-border-width) solid var(--ds-color-border); border-radius: var(--ds-radius-input); font-size: var(--ds-text-caption-size); line-height: var(--ds-text-caption-lh); }
+.sim-prize.is-gone { opacity: .45; }
+.sim-prize__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sim-prize__pt { font-family: var(--ds-font-num); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sim-prize__left { grid-column: 1 / -1; font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); font-family: var(--ds-font-num); }
+.sim-prize__m { color: var(--ds-color-text-subtle); font-family: var(--ds-font-num); }
+
+/* 賞のバッジ（ホロの単色。グラデではない） */
+.sim-badge { display: inline-block; padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); font-size: var(--ds-text-micro-size); font-weight: var(--ds-text-h3-weight); color: var(--ds-color-badge-text); background: var(--ds-color-bg-subtle); white-space: nowrap; }
+.sim-badge--top { background: var(--ds-color-badge-bg-pink); }
+.sim-badge--high { background: var(--ds-color-badge-bg-cream); }
+.sim-badge--mid { background: var(--ds-color-badge-bg-sky); }
+.sim-badge--low { background: var(--ds-color-badge-bg-mint); }
+.sim-badge--hz { background: var(--ds-color-bg-subtle); color: var(--ds-color-text-muted); }
+
+/* 演出（結果が出るまでの間だけ表示） */
+.sim-stage {
+  position: relative; min-height: 8em; margin: var(--ds-space-stack-sm) 0;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-color-bg-paper);
+  overflow: hidden;
+}
+.sim-stage[hidden] { display: none; }
+.sim-stage__text { font-size: var(--ds-text-h2-size); font-weight: var(--ds-text-h2-weight); line-height: var(--ds-text-h2-lh); }
+.sim-stage__sub { display: block; margin-top: var(--ds-space-inline-xs); font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); font-weight: var(--ds-text-body-weight); }
+.sim-stage--spin .sim-stage__text { animation: sim-pulse .5s ease-in-out infinite alternate; }
+.sim-stage--shake { animation: sim-shake .12s linear 6; }
+.sim-stage--high { background: var(--ds-color-badge-bg-cream); }
+.sim-stage--mid { background: var(--ds-color-badge-bg-sky); }
+.sim-stage--top { background: var(--ds-color-accent-gradient); }
+.sim-stage--top .sim-stage__text { animation: sim-pop .45s ease-out 1; }
+@keyframes sim-pulse { from { opacity: .35; transform: scale(.96); } to { opacity: 1; transform: scale(1.04); } }
+@keyframes sim-shake { 0% { transform: translateX(0); } 25% { transform: translateX(-2%); } 75% { transform: translateX(2%); } 100% { transform: translateX(0); } }
+@keyframes sim-pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .sim-stage--spin .sim-stage__text, .sim-stage--shake, .sim-stage--top .sim-stage__text { animation: none; }
+}
+
+/* 結果 */
+.sim-result { margin-top: var(--ds-space-stack-sm); border-top: var(--ds-border-width) solid var(--ds-color-border); padding-top: var(--ds-space-stack-sm); }
+.sim-result[hidden] { display: none; }
+.sim-result__h { margin: 0 0 var(--ds-space-inline-sm); font-size: var(--ds-text-h3-size); font-weight: var(--ds-text-h3-weight); }
+.sim-result__verdict { margin: 0 0 var(--ds-space-inline-sm); font-size: var(--ds-text-body-size); }
+.sim-result__verdict strong { font-family: var(--ds-font-num); }
+.sim-result__kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(8em, 1fr)); gap: var(--ds-space-inline-sm); margin: 0 0 var(--ds-space-stack-sm); }
+.sim-result__kv div { padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border: var(--ds-border-width) solid var(--ds-color-border); border-radius: var(--ds-radius-input); }
+.sim-result__kv dt { font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+.sim-result__kv dd { margin: 0; font-family: var(--ds-font-num); font-size: var(--ds-text-h3-size); font-weight: var(--ds-text-h3-weight); font-variant-numeric: tabular-nums; }
+.sim-result__kv dd.is-plus { color: var(--ds-color-positive); }
+.sim-result__kv dd.is-minus { color: var(--ds-color-danger); }
+.sim-hits { list-style: none; margin: 0 0 var(--ds-space-stack-sm); padding: 0; display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-xs) var(--ds-space-inline-sm); }
+.sim-hit { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); padding: var(--ds-space-inline-xs) var(--ds-space-inline-sm); border: var(--ds-border-width) solid var(--ds-color-border); border-radius: var(--ds-radius-input); font-size: var(--ds-text-caption-size); }
+.sim-hit--hz { color: var(--ds-color-text-muted); }
+.sim-hit__n { font-family: var(--ds-font-num); color: var(--ds-color-text-muted); }
+.sim-result__note { margin: 0 0 var(--ds-space-inline-sm); font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+.sim-result__soldout { margin: 0 0 var(--ds-space-inline-sm); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); background: var(--ds-color-badge-bg-peach); border-radius: var(--ds-radius-input); font-size: var(--ds-text-caption-size); }
+.sim-share { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-sm); }
+.sim-share a { text-decoration: none; }
+
+/* ---------- みんなの結果 ---------- */
+.sim-live { display: grid; grid-template-columns: 1fr; gap: var(--ds-space-stack-md); }
+.sim-me__kv .sim-me__cash { font-family: var(--ds-font-pop); font-size: var(--ds-text-h2-size); font-weight: 900; }
+.sim-live__h { margin: 0 0 var(--ds-space-inline-sm); font-size: var(--ds-text-body-size); font-weight: var(--ds-text-h3-weight); }
+.sim-live__note { font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); font-weight: var(--ds-text-body-weight); }
+.sim-feed { list-style: none; margin: 0; padding: 0; }
+.sim-feed li { padding: var(--ds-space-inline-sm) 0; border-bottom: var(--ds-border-width) solid var(--ds-color-border); font-size: var(--ds-text-caption-size); line-height: var(--ds-text-caption-lh); }
+.sim-feed__empty { color: var(--ds-color-text-subtle); }
+.sim-feed__who { font-weight: var(--ds-text-h3-weight); }
+.sim-feed__ago { float: right; color: var(--ds-color-text-subtle); font-family: var(--ds-font-num); }
+.sim-feed__prize { display: block; }
+.sim-feed__gacha { display: block; color: var(--ds-color-text-subtle); font-size: var(--ds-text-micro-size); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sim-rank { list-style: none; margin: 0 0 var(--ds-space-stack-sm); padding: 0; counter-reset: rank; }
+.sim-rank li { display: grid; grid-template-columns: 2em 1fr auto; gap: var(--ds-space-inline-sm); align-items: baseline; padding: var(--ds-space-inline-sm) 0; border-bottom: var(--ds-border-width) solid var(--ds-color-border); font-size: var(--ds-text-caption-size); }
+.sim-rank li.is-me { background: var(--ds-color-badge-bg-cream); }
+.sim-rank li.sim-feed__empty { display: block; } /* 空の文言は 3 列グリッドに入れない（1 列目の 2em に押し込まれて縦に折り返していた） */
+.sim-rank__pos { font-family: var(--ds-font-num); font-weight: var(--ds-text-h3-weight); }
+.sim-rank__pos.is-1 { color: var(--ds-color-rank-1); }
+.sim-rank__pos.is-2 { color: var(--ds-color-rank-2); }
+.sim-rank__pos.is-3 { color: var(--ds-color-rank-3); }
+.sim-rank__name { font-weight: var(--ds-text-h3-weight); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sim-rank__meta { display: block; color: var(--ds-color-text-subtle); font-size: var(--ds-text-micro-size); font-family: var(--ds-font-num); font-weight: var(--ds-text-body-weight); }
+.sim-rank__rate { font-family: var(--ds-font-num); font-weight: var(--ds-text-h3-weight); font-variant-numeric: tabular-nums; }
+.sim-me { margin-top: var(--ds-space-stack-sm); padding: var(--ds-space-stack-sm); background: var(--ds-color-bg-paper); border-radius: var(--ds-radius-card); }
+.sim-me__kv { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ds-space-inline-sm); margin: 0 0 var(--ds-space-stack-sm); }
+.sim-me__kv dt { font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+.sim-me__kv dd { margin: 0; font-family: var(--ds-font-num); font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-h3-weight); font-variant-numeric: tabular-nums; }
+.sim-name__label { display: block; font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); margin-bottom: var(--ds-space-inline-xs); }
+.sim-name__row { display: flex; gap: var(--ds-space-inline-sm); }
+.sim-name__input { flex: 1; min-width: 0; min-height: var(--ds-touch-target-min); padding: 0 var(--ds-space-inline-md); border: var(--ds-border-width) solid var(--ds-color-border-strong); border-radius: var(--ds-radius-input); font: inherit; font-size: var(--ds-text-body-sm-size); background: var(--ds-color-bg); color: var(--ds-color-text); }
+.sim-name__note { margin: var(--ds-space-inline-xs) 0 0; font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+.sim-name__msg { margin: var(--ds-space-inline-xs) 0 0; min-height: 1.4em; font-size: var(--ds-text-micro-size); color: var(--ds-color-text-muted); }
+
+/* ---------- FAQ ---------- */
+.sim-faq { margin: 0; }
+.sim-faq__item { padding: var(--ds-space-stack-sm) 0; border-bottom: var(--ds-border-width) solid var(--ds-color-border); }
+.sim-faq__q { font-weight: var(--ds-text-h3-weight); margin-bottom: var(--ds-space-inline-xs); }
+.sim-faq__a { margin: 0; color: var(--ds-color-text-muted); font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+
+/* ---------- スマホ ---------- */
+@media (max-width: 767px) {
+  .sim-live { grid-template-columns: 1fr; }
+  .sim-maker { grid-template-columns: 1fr; padding: var(--ds-space-stack-sm); }
+  .sim-drop { min-height: 8em; }
+  .sim-maker.has-shot .sim-drop { min-height: 0; }
+  .sim-calc { grid-template-columns: 1fr 1fr; }
+  /* SP: 1 行目に 賞・pt・枚数、2 行目に景品名を全幅で */
+  .sim-tiers-in__head { display: none; }
+  .sim-tier-in { grid-template-columns: 4em minmax(0, 1fr) 4.5em 2em; grid-template-areas: "rl pt q del" "n n n n"; padding-bottom: var(--ds-space-inline-xs); border-bottom: var(--ds-border-width) solid var(--ds-color-border); }
+  .sim-tier-in [data-k="rl"] { grid-area: rl; }
+  .sim-tier-in [data-k="n"] { grid-area: n; }
+  .sim-tier-in [data-k="pt"] { grid-area: pt; }
+  .sim-tier-in [data-k="q"] { grid-area: q; }
+  .sim-tier-in__del { grid-area: del; }
+  .sim-input { padding: 0 var(--ds-space-inline-xs); }
+  .sim-cards { grid-template-columns: 1fr; }
+
+  .sim-box { padding: var(--ds-space-stack-sm); }
+  .sim-prizes { grid-template-columns: 1fr; }
+  .sim-actions .sim-btn { flex: 1 1 30%; min-width: 0; padding: var(--ds-space-inline-xs); flex-direction: column; gap: 0; line-height: 1.2; font-size: var(--ds-text-body-sm-size); white-space: nowrap; } /* 「100連ガチャ」が折り返さないよう、スマホでは字を一段小さく */
+  .sim-me__kv { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- 保有ポイントとチャージ（架空） ---------- */
+.sim-wallet { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-inline-sm) var(--ds-space-inline-md); margin-top: var(--ds-space-stack-sm); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border: var(--ds-border-width) solid var(--ds-color-border); border-radius: var(--ds-radius-card); background: var(--ds-color-bg-elevated); }
+.sim-wallet__bal { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); font-family: var(--ds-font-num); font-size: var(--ds-text-h3-size); font-weight: var(--ds-text-h3-weight); }
+.sim-wallet__label { font-family: var(--ds-font-body); font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-wallet__bal small { font-size: var(--ds-text-caption-size); }
+.sim-wallet__spent { font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-wallet__spent .sim-num { font-weight: var(--ds-text-h3-weight); color: var(--ds-color-text); }
+.sim-wallet .sim-btn { margin-left: auto; }
+.sim-box__wallet { display: flex; align-items: center; gap: var(--ds-space-inline-xs); margin: var(--ds-space-stack-sm) 0 0; font-size: var(--ds-text-caption-size); }
+.sim-box__wallet strong { font-size: var(--ds-text-h3-size); }
+.sim-box__wallet .sim-btn { margin-left: auto; }
+
+.sim-charge { width: min(40em, calc(100% - 2 * var(--ds-space-page-x))); max-height: calc(100% - 2 * var(--ds-space-stack-md)); padding: 0; border: 0; background: transparent; color: var(--ds-color-text); overflow: visible; }
+.sim-charge > .sim-charge__inner { border-radius: var(--ds-radius-card); background: var(--ds-color-bg-elevated); box-shadow: var(--ds-shadow-modal); }
+/* 説明は枠の外から吹き出しで（下の白い枠を指す） */
+.sim-charge__lead.sim-charge__bubble { position: relative; margin: 0 0 var(--ds-space-stack-sm); padding: var(--ds-space-inline-md) var(--ds-space-stack-sm); border-radius: var(--ds-radius-card); background: var(--ds-color-sim-btn-yellow); color: var(--ds-color-text); box-shadow: var(--ds-shadow-modal); }
+.sim-charge__bubble::after { content: ''; position: absolute; left: var(--ds-space-stack-md); bottom: calc(-1 * var(--ds-space-inline-md)); border: var(--ds-space-inline-sm) solid transparent; border-top: var(--ds-space-inline-md) solid var(--ds-color-sim-btn-yellow); border-bottom: 0; }
+.sim-charge__bubble strong { color: var(--ds-color-text); }
+.sim-charge::backdrop { background: var(--ds-color-scrim-modal); }
+.sim-charge__inner { padding: var(--ds-space-stack-md); }
+.sim-charge__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--ds-space-inline-sm); }
+.sim-charge__title { margin: 0; font-size: var(--ds-text-h2-size); font-weight: var(--ds-text-h2-weight); }
+.sim-charge__close { min-width: var(--ds-touch-target-min); min-height: var(--ds-touch-target-min); border: 0; background: none; color: var(--ds-color-text-muted); font: inherit; font-size: var(--ds-text-h2-size); cursor: pointer; }
+.sim-charge__need { margin: 0 0 var(--ds-space-inline-sm); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border-radius: var(--ds-radius-input); background: var(--ds-color-badge-bg-peach); font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-h3-weight); }
+.sim-charge__need[hidden] { display: none; }
+.sim-charge__lead { margin: 0 0 var(--ds-space-stack-sm); font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); color: var(--ds-color-text-muted); }
+.sim-plans { list-style: none; margin: 0 0 var(--ds-space-stack-sm); padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ds-space-inline-sm); }
+.sim-plan { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-inline-xs); padding: var(--ds-space-inline-md) var(--ds-space-inline-xs); border: var(--ds-border-width) solid var(--ds-color-border); border-radius: var(--ds-radius-input); background: var(--ds-color-bg); text-align: center; transition: transform .08s ease; }
+.sim-plan__pt { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); font-family: var(--ds-font-num); font-size: var(--ds-text-body-size); font-weight: var(--ds-text-h3-weight); }
+.sim-plan__pt small { font-size: var(--ds-text-micro-size); }
+.sim-plan__yen { padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-family: var(--ds-font-num); font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-h3-weight); }
+.sim-plan__rate { font-size: var(--ds-text-micro-size); color: var(--ds-color-text-subtle); }
+/* マスの色は高いほど熱く（止まる前から「ここは熱い」と分かるように）。同じ色の濃さで段階をつける */
+.sim-plan.is-heat-0 { background: var(--ds-color-sim-heat-0); border-color: var(--ds-color-sim-heat-0); }
+.sim-plan.is-heat-1 { background: var(--ds-color-sim-heat-1); border-color: var(--ds-color-sim-heat-1); }
+.sim-plan.is-heat-2 { background: var(--ds-color-sim-heat-2); border-color: var(--ds-color-sim-heat-2); }
+.sim-plan.is-heat-3 { background: var(--ds-color-sim-heat-3); border-color: var(--ds-color-sim-heat-3); }
+.sim-plan.is-heat-4 { background: var(--ds-color-sim-heat-4); border-color: var(--ds-color-sim-heat-4); }
+.sim-plan.is-heat-5 { background: var(--ds-color-sim-heat-5); border-color: var(--ds-color-sim-heat-5); }
+.sim-plan.is-heat-6 { background: var(--ds-color-sim-heat-6); border-color: var(--ds-color-sim-heat-6); }
+.sim-plan.is-heat-7 { background: var(--ds-color-sim-heat-7); border-color: var(--ds-color-sim-heat-7); }
+.sim-plan.is-heat-7 { box-shadow: 0 0 0 var(--ds-border-width-heading-accent) var(--ds-color-sim-btn-yellow) inset; }
+.sim-plan__tag { padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-micro-size); font-weight: 900; }
+.sim-once { display: inline-block; margin-right: var(--ds-space-inline-xs); padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-weight: 900; }
+.sim-charge__lead:has(.sim-once) { font-family: var(--ds-font-pop); font-size: var(--ds-text-h3-size); font-weight: 900; text-align: center; }
+.sim-charge__lead small { display: block; font-size: var(--ds-text-caption-size); font-weight: 800; }
+.sim-plan.is-on { background: var(--ds-color-bg-inverse); border-color: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); transform: scale(1.04); }
+.sim-plan.is-hit { background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); border-color: var(--ds-color-sim-btn-red); box-shadow: 0 0 0 var(--ds-border-width-heading-accent) var(--ds-color-sim-btn-red); transform: scale(1.06); }
+.sim-plan.is-on .sim-plan__rate, .sim-plan.is-hit .sim-plan__rate { color: var(--ds-color-text); }
+.sim-charge__msg { min-height: 1.5em; margin: 0 0 var(--ds-space-inline-sm); font-size: var(--ds-text-body-sm-size); }
+.sim-charge__actions { display: flex; gap: var(--ds-space-inline-sm); }
+.sim-charge__actions .sim-btn { flex: 1 1 0; }
+/* 回す前: 「ルーレットを回す」のまわりだけ明るく、ほかは暗くする（スポットライト） */
+.sim-charge.is-spot [data-sim-charge-spin] { position: relative; z-index: 1; box-shadow: 0 0 0 var(--ds-space-inline-md) var(--ds-color-bg-elevated), 0 0 0 100vmax var(--ds-color-scrim-modal); }
+.sim-charge__note { margin: var(--ds-space-inline-sm) 0 0; font-size: var(--ds-text-micro-size); line-height: var(--ds-text-micro-lh); color: var(--ds-color-text-subtle); }
+@media (max-width: 767px) {
+  /* スマホは縦に収まるよう詰める: 4列のまま小さく、円の札と注記は省く */
+  .sim-plans { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ds-space-inline-xs); }
+  .sim-plan { padding: var(--ds-space-inline-xs) 0; gap: 0; }
+  .sim-plan__pt { font-size: var(--ds-text-caption-size); gap: 0; }
+  .sim-plan__pt .sim-coin, .sim-plan__pt small, .sim-plan__yen { display: none; }
+  .sim-charge__inner { padding: var(--ds-space-stack-sm); }
+  .sim-charge__title { font-size: var(--ds-text-h3-size); }
+  .sim-charge__head { margin-bottom: var(--ds-space-inline-xs); }
+  .sim-charge__note { display: none; }
+  .sim-charge__lead.sim-charge__bubble { padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); font-size: var(--ds-text-caption-size); line-height: var(--ds-text-caption-lh); }
+}
+@media (prefers-reduced-motion: reduce) { .sim-plan { transition: none; } }
+
+/* ---------- 遊び方・難易度・手持ちの景品 ---------- */
+.sim-wallet .is-plus { color: var(--ds-color-positive); }
+.sim-wallet .is-minus { color: var(--ds-color-danger); }
+.sim-wallet__rule { flex-basis: 100%; margin: 0; font-size: var(--ds-text-caption-size); line-height: var(--ds-text-caption-lh); color: var(--ds-color-text-muted); }
+.sim-btn--x { background: var(--ds-color-bg-inverse); border-color: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); }
+.sim-btn--x:hover { background: var(--ds-color-text); border-color: var(--ds-color-text); }
+.sim-btn--plain { background: var(--ds-color-bg); border-color: var(--ds-color-border-strong); color: var(--ds-color-text); }
+.sim-btn--plain:hover { background: var(--ds-color-bg-paper); border-color: var(--ds-color-border-strong); }
+.sim-prize__link { flex: none; font-size: var(--ds-text-micro-size); font-weight: var(--ds-text-h3-weight); color: var(--ds-color-link); white-space: nowrap; }
+.sim-inv__name .sim-prize__link { display: inline-block; margin-left: var(--ds-space-inline-xs); }
+.sim-result__toinv { margin: 0 0 var(--ds-space-inline-sm); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border-radius: var(--ds-radius-input); background: var(--ds-color-badge-bg-cream); font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-h3-weight); }
+.sim-inv__count { margin-left: var(--ds-space-inline-sm); font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-body-weight); color: var(--ds-color-text-muted); }
+.sim-inv__bulk { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-sm); margin-bottom: var(--ds-space-inline-sm); }
+.sim-inv__log { min-height: 1.5em; margin: 0 0 var(--ds-space-inline-sm); font-size: var(--ds-text-body-sm-size); }
+.sim-inv__list { list-style: none; margin: 0; padding: 0; max-height: 32em; overflow-y: auto; border-top: var(--ds-border-width) solid var(--ds-color-border); }
+.sim-inv__item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-inline-sm); padding: var(--ds-space-inline-sm) 0; border-bottom: var(--ds-border-width) solid var(--ds-color-border); }
+.sim-inv__name { min-width: 0; flex: 1 1 16em; font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-h3-weight); }
+.sim-inv__name small { display: block; font-size: var(--ds-text-micro-size); font-weight: var(--ds-text-body-weight); color: var(--ds-color-text-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sim-inv__name .sim-inv__m { color: var(--ds-color-text); font-weight: var(--ds-text-h3-weight); }
+.sim-inv__acts { display: flex; gap: var(--ds-space-inline-xs); }
+
+/* ---------- 景品の画像（ラインナップ・演出・結果・手持ち） ---------- */
+.sim-box__thumb { flex: none; height: 6em; width: auto; max-width: 9em; object-fit: contain; border-radius: var(--ds-radius-input); }
+.sim-box__headtxt { flex: 1 1 12em; min-width: 0; }
+.sim-prize.has-img { grid-template-columns: auto minmax(0, 1fr) auto; }
+.sim-prize__img { grid-row: 1 / span 2; width: 2.6em; height: 3.6em; object-fit: contain; }
+.sim-prize.has-img .sim-prize__left { grid-column: 2 / -1; }
+.sim-stage__img { display: block; height: 10em; width: auto; margin: 0 auto var(--ds-space-inline-sm); border-radius: var(--ds-radius-input); box-shadow: var(--ds-shadow-card); animation: sim-pop .45s ease-out 1; }
+.sim-stage:has(.sim-stage__img) { min-height: 14em; padding: var(--ds-space-stack-sm) 0; }
+.sim-hit.has-img { flex-direction: column; align-items: center; width: 8.5em; padding: var(--ds-space-inline-sm); text-align: center; }
+.sim-hit__img { width: 100%; height: 9em; object-fit: contain; }
+.sim-hit.has-img .sim-hit__name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: var(--ds-text-micro-size); line-height: var(--ds-text-micro-lh); }
+.sim-inv__img { flex: none; width: 2.6em; height: 3.6em; object-fit: contain; }
+@media (prefers-reduced-motion: reduce) { .sim-stage__img { animation: none; } }
+.sim-hits { align-items: flex-start; }
+
+/* ---------- ヘッダー（このページだけ）: 「オリ得シミュレーター」のロゴと、右上に追尾する保有ptのコイン ---------- */
+.header--sim { position: sticky; top: 0; }
+.header__logo--sim { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); text-decoration: none; }
+.header__sim-logo { width: calc(var(--ds-size-oritoku-logo) * 1.3); }
+.header__simcoin {
+  order: 3; flex: none;
+  display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs);
+  min-height: var(--ds-touch-target-min); padding: 0 var(--ds-space-inline-xs) 0 var(--ds-space-inline-sm);
+  border: var(--ds-border-width) solid var(--ds-color-sim-btn-yellow); border-radius: var(--ds-radius-chip);
+  background: var(--ds-color-bg); color: var(--ds-color-text);
+  font: inherit; font-family: var(--ds-font-num); font-size: var(--ds-text-body-size); font-weight: var(--ds-text-h3-weight);
+  cursor: pointer; white-space: nowrap;
+}
+.header__simcoin small { font-size: var(--ds-text-micro-size); }
+.header__simcoin-plus { display: inline-flex; align-items: center; justify-content: center; width: 1.6em; height: 1.6em; border-radius: var(--ds-radius-avatar); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-size: var(--ds-text-caption-size); }
+.header__simcoin:hover { background: var(--ds-color-bg-paper); }
+@media (max-width: 820px) {
+  .header__simcoin { order: 0; margin-left: auto; font-size: var(--ds-text-body-sm-size); }
+  .header__sim-logo { width: var(--ds-size-oritoku-logo-mobile); }
+  .header__simcoin { padding-left: var(--ds-space-inline-xs); }
+}
+
+/* ---------- 遊び方を選ぶ（ゲーム／分析） ---------- */
+.sim-choose { display: flex; flex-direction: column; align-items: stretch; gap: var(--ds-space-inline-sm); margin: var(--ds-space-stack-sm) 0; } /* 主役は「ゲームで遊ぶ」。分析はおまけとして下に小さく */
+.sim-choose__btn { display: flex; flex-direction: column; gap: var(--ds-space-inline-xs); padding: var(--ds-space-stack-sm) var(--ds-space-stack-md); border: var(--ds-border-width-heading-accent) solid transparent; border-radius: var(--ds-radius-card); font: inherit; text-align: left; cursor: pointer; }
+.sim-choose__btn--game { align-items: center; padding: var(--ds-space-stack-md); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); text-align: center; }
+.sim-choose__btn--game:hover { background: var(--ds-color-sim-btn-red-hover); }
+.sim-choose__btn--game .sim-choose__title { font-size: var(--ds-text-h1-size); }
+.sim-choose__btn--game .sim-choose__desc { font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+.sim-choose__btn--analyze { flex-direction: row; flex-wrap: wrap; align-items: baseline; align-self: center; gap: 0 var(--ds-space-inline-sm); padding: var(--ds-space-inline-xs) var(--ds-space-inline-md); border-width: var(--ds-border-width); border-color: var(--ds-color-border-strong); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg); color: var(--ds-color-text); }
+.sim-choose__btn--analyze:hover { background: var(--ds-color-bg-paper); }
+.sim-choose__btn--analyze .sim-choose__title { font-size: var(--ds-text-body-sm-size); }
+.sim-choose__btn--analyze .sim-choose__desc { color: var(--ds-color-text-muted); }
+.sim-choose__btn.is-active { border-color: var(--ds-color-bg-inverse); box-shadow: var(--ds-shadow-card); }
+.sim-choose__title { font-size: var(--ds-text-h3-size); font-weight: var(--ds-text-display-weight); }
+.sim-choose__desc { font-size: var(--ds-text-caption-size); line-height: var(--ds-text-caption-lh); }
+[data-play=""] .sim-choose__btn--game { min-height: 8em; justify-content: center; }
+html:not(.sim-play-game) .header__simcoin { display: none; }
+[data-sim-charge-spin][hidden], [data-sim-charge-share][hidden], [data-sim-charge-close][hidden] { display: none; }
+[data-sim-only][hidden], [data-sim-chosen][hidden] { display: none !important; }
+
+/* ---------- 遊び方 ---------- */
+#about .sim-live__h { margin-top: var(--ds-space-stack-md); }
+.sim-howto { list-style: decimal; }
+.sim-howto__p { margin: 0; font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); color: var(--ds-color-text-muted); }
+
+/* ---------- 画面の下に追尾するバー（持ちポイント＋獲得商品）。PC もスマホも同じ ---------- */
+html:has(.header--sim), body:has(.header--sim) { overflow-x: clip; } /* 何かが横にはみ出しても、ページごと横にずれないように（iOS は html 側も要る） */
+.sim-footbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--ds-z-sticky);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding: var(--ds-space-inline-xs) max(var(--ds-space-inline-md), calc((100% - var(--ds-container-page)) / 2)) calc(var(--ds-space-inline-xs) + env(safe-area-inset-bottom));
+  background: var(--ds-color-bg); border-top: var(--ds-border-width) solid var(--ds-color-border);
+}
+/* オリパサイトの下タブと同じ型: アイコンの下に小さいラベル */
+.sim-footbar__item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ds-space-inline-xs); min-height: var(--ds-touch-target-min); padding: var(--ds-space-inline-xs) 0; border: 0; background: none; color: var(--ds-color-text-muted); font: inherit; text-decoration: none; cursor: pointer; }
+.sim-footbar__item:hover { color: var(--ds-color-text); }
+.sim-footbar__icon { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 1.6em; height: 1.6em; font-size: var(--ds-text-h3-size); }
+.sim-footbar__icon svg { width: 100%; height: 100%; }
+.sim-footbar__label { font-size: var(--ds-text-micro-size); font-weight: var(--ds-text-h3-weight); white-space: nowrap; }
+.sim-footbar__item--coin { color: var(--ds-color-text); }
+.sim-footbar__icon .sim-coin { width: 100%; height: 100%; font-size: var(--ds-text-body-sm-size); }
+.sim-footbar__cnt[hidden] { display: none; }
+.sim-footbar__item--coin .sim-footbar__label { font-family: var(--ds-font-num); font-size: var(--ds-text-body-sm-size); }
+.sim-footbar__cnt { position: absolute; top: calc(-1 * var(--ds-space-inline-xs)); right: calc(-1 * var(--ds-space-inline-sm)); display: inline-flex; align-items: center; justify-content: center; min-width: 1.5em; height: 1.5em; padding: 0 var(--ds-space-inline-xs); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-family: var(--ds-font-num); font-size: var(--ds-text-micro-size); font-weight: var(--ds-text-h3-weight); }
+/* ヘッダー右上のコインは大きく（ゲーム中ずっと見える） */
+html.sim-play-game body { padding-bottom: calc(var(--ds-touch-target-min) + var(--ds-space-stack-md)); }
+#inv, #live { scroll-margin-top: calc(var(--ds-touch-target-min) * 2); } /* 追尾ヘッダーの下に見出しが隠れないように */
+.sim-btn.is-confirm { background: var(--ds-color-sim-btn-red); border-color: var(--ds-color-sim-btn-red); }
+.sim-sound { min-height: var(--ds-touch-target-min); margin-left: var(--ds-space-inline-sm); padding: 0 var(--ds-space-inline-md); border: var(--ds-border-width) solid var(--ds-color-border-strong); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg); color: var(--ds-color-text); font: inherit; font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-h3-weight); cursor: pointer; }
+.sim-sound[aria-pressed="false"] { color: var(--ds-color-text-subtle); }
+
+/* ---------- ルーレットが止まったときの演出（is-lv0〜7。額が大きいほど派手） ---------- */
+.sim-charge__inner { position: relative; overflow: hidden; }
+.sim-charge__pop { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ds-space-inline-xs); pointer-events: none; animation: sim-pop .35s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-charge__pop-pt { padding: var(--ds-space-inline-sm) var(--ds-space-stack-md); border-radius: var(--ds-radius-card); background: var(--ds-color-bg-elevated); box-shadow: var(--ds-shadow-modal); font-family: var(--ds-font-num); font-size: var(--ds-text-h1-size); font-weight: var(--ds-text-display-weight); color: var(--ds-color-text); }
+.sim-charge__pop-pt small { margin-left: var(--ds-space-inline-xs); font-size: var(--ds-text-body-size); }
+.sim-charge__pop-tag { padding: 0 var(--ds-space-inline-md); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-size: var(--ds-text-h3-size); font-weight: var(--ds-text-display-weight); }
+.sim-charge.is-lv2 .sim-charge__pop-pt, .sim-charge.is-lv3 .sim-charge__pop-pt { background: var(--ds-color-badge-bg-cream); }
+.sim-charge.is-lv4 .sim-charge__pop-pt, .sim-charge.is-lv5 .sim-charge__pop-pt { background: var(--ds-color-sim-btn-yellow); transform: scale(1.15); }
+.sim-charge.is-lv6 .sim-charge__pop-pt, .sim-charge.is-lv7 .sim-charge__pop-pt { background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); transform: scale(1.35); }
+.sim-charge.is-lv4 .sim-charge__inner, .sim-charge.is-lv5 .sim-charge__inner, .sim-charge.is-lv6 .sim-charge__inner, .sim-charge.is-lv7 .sim-charge__inner { animation: sim-flash .5s ease 2; }
+.sim-charge.is-lv6, .sim-charge.is-lv7 { animation: sim-shake .12s linear 6; }
+.sim-charge.is-lv7 .sim-charge__inner { animation: sim-flash .4s ease 4; }
+.sim-charge.is-lv7 .sim-plan.is-hit { animation: sim-pulse .3s ease-in-out infinite alternate; }
+@keyframes sim-flash { 0%, 100% { background: var(--ds-color-bg-elevated); } 50% { background: var(--ds-color-badge-bg-cream); } }
+.sim-confetti { position: absolute; top: calc(-1 * var(--ds-space-stack-sm)); z-index: 1; width: .55em; height: .9em; border-radius: var(--ds-radius-chip); pointer-events: none; animation: sim-fall linear forwards; }
+.sim-confetti--0 { background: var(--ds-color-sim-btn-red); }
+.sim-confetti--1 { background: var(--ds-color-sim-btn-yellow); }
+.sim-confetti--2 { background: var(--ds-color-badge-bg-sky); }
+.sim-confetti--3 { background: var(--ds-color-badge-bg-mint); }
+.sim-confetti--4 { background: var(--ds-color-badge-bg-pink); }
+@keyframes sim-fall { from { transform: translateY(0) rotate(0); opacity: 1; } to { transform: translateY(40em) rotate(540deg); opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .sim-charge, .sim-charge__inner, .sim-plan.is-hit, .sim-charge__pop { animation: none !important; } }
+
+/* ---------- チュートリアル（ゲームで遊ぶ を押したとき） ---------- */
+.sim-tut__step { margin: 0 0 var(--ds-space-inline-sm); font-family: var(--ds-font-num); font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-h3-weight); color: var(--ds-color-text-muted); text-align: center; }
+.sim-tut__slides { list-style: none; margin: 0 0 var(--ds-space-stack-sm); padding: 0; min-height: 13em; text-align: center; }
+.sim-tut__slides [hidden] { display: none; }
+.sim-tut__slides li { animation: sim-pop .25s ease both; }
+.sim-tut__icon { display: block; width: 3em; height: 3em; margin: 0 auto var(--ds-space-inline-sm); color: var(--ds-color-sim-btn-red); }
+.sim-tut__icon svg { width: 100%; height: 100%; }
+.sim-tut__slides p { margin: var(--ds-space-inline-sm) 0 0; font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); color: var(--ds-color-text-muted); }
+.sim-tut__slides strong { color: var(--ds-color-text); }
+.sim-tut__skip { margin: var(--ds-space-inline-sm) 0 0; text-align: center; }
+.sim-tut__skipbtn { min-height: var(--ds-touch-target-min); border: 0; background: none; color: var(--ds-color-text-muted); font: inherit; font-size: var(--ds-text-caption-size); text-decoration: underline; cursor: pointer; }
+.sim-tut .sim-btn:disabled { opacity: .4; cursor: default; }
+.sim-choose__again { align-self: center; min-height: var(--ds-touch-target-min); padding: 0 var(--ds-space-inline-md); border: 0; background: none; color: var(--ds-color-text); font: inherit; font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-h3-weight); text-decoration: underline; cursor: pointer; }
+
+/* ---------- 現金化した額（円）。発送するとカウントアップ ---------- */
+.sim-yen { display: inline-flex; align-items: center; justify-content: center; width: 1.4em; height: 1.4em; border-radius: var(--ds-radius-avatar); background: var(--ds-color-positive); color: var(--ds-color-text-inverse); font-size: var(--ds-text-caption-size); font-weight: var(--ds-text-h3-weight); }
+.sim-footbar__icon .sim-yen { width: 100%; height: 100%; font-size: var(--ds-text-body-sm-size); }
+.sim-footbar__item--cash { position: relative; color: var(--ds-color-text); }
+.sim-footbar__item--cash .sim-footbar__label { font-family: var(--ds-font-num); font-size: var(--ds-text-body-sm-size); color: var(--ds-color-positive); }
+.sim-cashpop { position: absolute; left: 50%; bottom: 100%; padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-positive); color: var(--ds-color-text-inverse); font-family: var(--ds-font-num); font-size: var(--ds-text-body-sm-size); font-weight: var(--ds-text-display-weight); white-space: nowrap; pointer-events: none; animation: sim-cashpop 1.4s ease-out forwards; }
+@keyframes sim-cashpop { 0% { transform: translate(-50%, 0) scale(.6); opacity: 0; } 15% { transform: translate(-50%, -40%) scale(1.1); opacity: 1; } 100% { transform: translate(-50%, -160%) scale(1); opacity: 0; } }
+html.sim-play-game .header__simcash .sim-yen { width: 1.3em; height: 1.3em; font-size: var(--ds-text-body-size); }
+.header__simcash { margin-left: var(--ds-space-inline-xs); border-color: var(--ds-color-positive); }
+@media (max-width: 820px) { .header__simcash { display: none !important; } .header__simwallet .header__simcoin { border-left: 0; } } /* スマホは下のバーに円を出す */
+.sim-tut__shot { display: block; width: 100%; height: auto; max-height: 14em; margin: 0 auto var(--ds-space-inline-md); object-fit: contain; border-radius: var(--ds-radius-input); background: var(--ds-color-bg-subtle); }
+/* 抽選中はオリ得のロゴを真ん中に出して、ゆっくり脈打たせる */
+.sim-stage.is-drawing { flex-direction: column; }
+.sim-stage__logos { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--ds-space-inline-sm); margin: 0 auto var(--ds-space-inline-sm); }
+.sim-stage__logos img { width: clamp(5.5rem, 22vw, 8rem); height: auto; animation: sim-pop .3s cubic-bezier(.2, 1.6, .4, 1) both, sim-pulse .5s ease-in-out .3s infinite alternate; }
+.sim-stage__logos img:only-child { width: min(12em, 60%); }
+.sim-stage__logos:has(img:nth-child(5)) { max-width: 34rem; }
+.sim-reset { margin: var(--ds-space-stack-md) 0; text-align: center; }
+
+/* ---------- 1等のプチュン（画面暗転＝確定演出） ---------- */
+.sim-puchun { position: fixed; inset: 0; z-index: calc(var(--ds-z-sticky) + 100); background: var(--ds-color-bg-inverse); pointer-events: none; }
+dialog.sim-puchun { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden; }
+dialog.sim-puchun::backdrop { background: transparent; }
+.sim-puchun.is-flash { animation: sim-puchun-flash .5s ease-out forwards; }
+@keyframes sim-puchun-flash { 0% { background: var(--ds-color-bg); opacity: 1; } 100% { background: var(--ds-color-bg); opacity: 0; } }
+.sim-stage .sim-confetti { z-index: 2; }
+
+/* プチュンの光: 画面が横一本の光につぶれ、真ん中に星が光って、光ごと消える（そのあと無音の暗転） */
+.sim-puchun__line { position: absolute; top: 50%; left: 0; right: 0; height: var(--ds-border-width-heading-accent); margin-top: calc(var(--ds-border-width-heading-accent) / -2); background: linear-gradient(90deg, transparent, var(--ds-color-sim-puchun-glow) 15%, var(--ds-color-sim-puchun-core) 50%, var(--ds-color-sim-puchun-glow) 85%, transparent); box-shadow: 0 0 .8em var(--ds-color-sim-puchun-glow), 0 0 2.5em var(--ds-color-sim-puchun-glow); transform-origin: center; animation: sim-pc-line 1s cubic-bezier(.3, 0, .2, 1) forwards; }
+.sim-puchun__star { position: absolute; top: 50%; left: 50%; width: 2.4em; height: 2.4em; margin: -1.2em 0 0 -1.2em; border-radius: var(--ds-radius-avatar); background: radial-gradient(circle, var(--ds-color-sim-puchun-core) 30%, transparent 70%); box-shadow: 0 0 2em var(--ds-color-sim-puchun-core), 0 0 5em var(--ds-color-sim-puchun-glow), 0 0 9em var(--ds-color-sim-puchun-glow); opacity: 0; animation: sim-pc-star 1s ease-out .1s forwards; }
+.sim-puchun__star::before, .sim-puchun__star::after { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); filter: blur(.06em); }
+.sim-puchun__star::before { width: 22em; height: .35em; background: linear-gradient(90deg, transparent, var(--ds-color-sim-puchun-glow) 25%, var(--ds-color-sim-puchun-core) 50%, var(--ds-color-sim-puchun-glow) 75%, transparent); }
+.sim-puchun__star::after { width: .35em; height: 9em; background: linear-gradient(180deg, transparent, var(--ds-color-sim-puchun-glow) 25%, var(--ds-color-sim-puchun-core) 50%, var(--ds-color-sim-puchun-glow) 75%, transparent); }
+@keyframes sim-pc-line { 0% { transform: scaleY(80); opacity: .9; } 15% { transform: scaleY(1); opacity: 1; } 55% { transform: scaleX(1); opacity: 1; } 85% { transform: scaleX(.08); opacity: .8; } 100% { transform: scaleX(0); opacity: 0; } }
+@keyframes sim-pc-star { 0% { opacity: 0; transform: scale(.3); } 20% { opacity: 1; transform: scale(1.15); } 55% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.05); } }
+@media (prefers-reduced-motion: reduce) { .sim-puchun__line, .sim-puchun__star { animation: none; opacity: 0; } }
+
+/* ---------- 書体: 見出し・ボタン・数字・ガチャ名はしっかりした太ゴシック（M PLUS 1p 800/900）。本文は Noto のまま ---------- */
+.sim h1, .sim h2, .sim h3, .sim .ot-section__title,
+.sim-btn, .sim-tab, .sim-choose__title, .sim-choose__again, .sim-card__title, .sim-card__price, .sim-card__left,
+.sim-num, .sim-coin, .sim-yen, .sim-badge, .sim-prize__name, .sim-prize__pt, .sim-group__meta,
+.sim-stage__text, .sim-stage__sub, .sim-result h3, .sim-plan__pt, .sim-plan__yen, .sim-charge__title, .sim-charge__pop,
+.sim-tut .sim-charge__title, .sim-footbar__label, .header__simcoin, .sim-inv__name, .sim-wallet__bal, .ot-toc__link {
+  font-family: var(--ds-font-pop);
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+.sim h1, .sim h2, .sim .ot-section__title, .sim-choose__title, .sim-stage__text, .sim-charge__title, .sim-charge__pop, .sim-card__price, .header__simcoin, .sim-footbar__label {
+  font-weight: 900;
+}
+
+/* ゲームが始まったら「ゲームで遊ぶ」の選択と財布の欄は隠す（ポイントは右上と下のバーに出ている） */
+.sim[data-started] .sim-hero, .sim[data-started] .sim-choose, .sim[data-started] .sim-wallet, [data-sim-started] .breadcrumb { display: none !important; }
+
+/* ---------- ヘッダー右上の財布（pt と 円を1つの濃いカプセルにまとめる） ---------- */
+.header__simwallet { order: 3; flex: none; display: inline-flex; align-items: stretch; border-radius: var(--ds-radius-chip); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); box-shadow: var(--ds-shadow-card); text-decoration: none; overflow: hidden; }
+html:not(.sim-play-game) .header__simwallet { display: none; }
+.header__simwallet .header__simcoin { order: 0; display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); min-height: auto; margin: 0; padding: var(--ds-space-inline-xs) var(--ds-space-inline-md) var(--ds-space-inline-xs) var(--ds-space-inline-sm); border: 0; border-radius: 0; background: none; color: inherit; box-shadow: none; font-size: var(--ds-text-h2-size); line-height: 1.2; }
+.header__simwallet .header__simcash { border-left: var(--ds-border-width) solid var(--ds-color-text-muted); }
+.header__simwallet .header__simcoin small { color: var(--ds-color-text-inverse); opacity: .75; font-weight: 800; }
+.header__simwallet .header__simcash .header__simcoin-pt { color: var(--ds-color-sim-btn-yellow); }
+.header__simwallet .sim-coin, .header__simwallet .sim-yen { width: 1.4em; height: 1.4em; font-size: var(--ds-text-caption-size); }
+.header__simwallet:hover { filter: brightness(1.15); }
+@media (max-width: 820px) {
+  .header__simwallet { order: 0; margin-left: auto; }
+  .header__simwallet .header__simcoin { font-size: var(--ds-text-body-size); padding: var(--ds-space-inline-xs) var(--ds-space-inline-sm); }
+}
+/* ゲームの残り口数（数字の欄の代わり） */
+.sim-box__leftline { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 var(--ds-space-inline-xs); font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-box__leftline strong { color: var(--ds-color-text); font-size: var(--ds-text-body-size); }
+
+/* 下位の当たり: クリーム色に光らせてカードを跳ねさせる（中位以上より控えめ） */
+.sim-stage--low { background: var(--ds-color-badge-bg-cream); animation: sim-low-flash .6s ease-out 1; }
+.sim-stage--low .sim-stage__img { animation: sim-pop .45s cubic-bezier(.2, 1.6, .4, 1) 1; }
+.sim-stage--low .sim-stage__text { color: var(--ds-color-sim-btn-red); }
+@keyframes sim-low-flash { 0% { box-shadow: inset 0 0 0 100vmax var(--ds-color-sim-btn-yellow); } 100% { box-shadow: inset 0 0 0 100vmax transparent; } }
+@media (prefers-reduced-motion: reduce) { .sim-stage--low { animation: none; } }
+
+/* ---------- ポイントが足りない／ゲームオーバー: 目立たせて Xシェアでの復活へ ---------- */
+.sim-charge.is-alert .sim-charge__title { color: var(--ds-color-sim-btn-red); font-size: var(--ds-text-h1-size); text-align: center; }
+.sim-charge.is-alert .sim-charge__inner { box-shadow: 0 0 0 var(--ds-border-width-heading-accent) var(--ds-color-sim-btn-red), var(--ds-shadow-modal); }
+.sim-charge.is-alert .sim-plans { display: none; }
+.sim-charge.is-alert [data-sim-charge-share] { flex: 2 1 0; min-height: calc(var(--ds-touch-target-min) * 1.2); font-size: var(--ds-text-h3-size); }
+.sim-sharebox { margin-top: var(--ds-space-inline-md); padding: var(--ds-space-inline-md); border-radius: var(--ds-radius-input); background: var(--ds-color-bg-paper); font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+.sim-sharebox[hidden], .sim-sharebox__row[hidden] { display: none; }
+.sim-sharebox__step { margin: 0 0 var(--ds-space-inline-sm); }
+.sim-sharebox__code { padding: 0 var(--ds-space-inline-xs); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-yellow); color: var(--ds-color-text); font-family: var(--ds-font-num); font-weight: var(--ds-text-h3-weight); letter-spacing: .1em; }
+.sim-sharebox__row { display: flex; gap: var(--ds-space-inline-sm); }
+.sim-sharebox__row .sim-name__input { flex: 1; min-width: 0; }
+.sim-sharebox__again { margin: var(--ds-space-inline-xs) 0 0; text-align: right; }
+/* プレゼント企画の応募（あなたの記録） */
+.sim-entry { margin-top: var(--ds-space-stack-sm); padding: var(--ds-space-inline-md); border: var(--ds-border-width-heading-accent) solid var(--ds-color-sim-btn-yellow); border-radius: var(--ds-radius-card); background: var(--ds-color-bg); display: flex; flex-direction: column; gap: var(--ds-space-inline-sm); }
+.sim-entry__h { margin: 0; font-size: var(--ds-text-h3-size); color: var(--ds-color-sim-btn-red); }
+.sim-entry__lead { margin: 0; font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+/* 月間ランキングの景品の告知と、ランキングに載っている本人への案内（2026-11-14） */
+.sim-prizenote { margin: var(--ds-space-inline-xs) 0 var(--ds-space-inline-sm); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border-radius: var(--ds-radius-card); background: var(--ds-color-badge-bg-cream); font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+.sim-prizenote strong { color: var(--ds-color-sim-btn-red); }
+.sim-prizenote a { margin-left: var(--ds-space-inline-xs); font-weight: 700; white-space: nowrap; }
+.sim-entry__you { margin: 0; padding: var(--ds-space-inline-sm); border-radius: var(--ds-radius-input); background: var(--ds-color-badge-bg-cream); font-size: var(--ds-text-body-sm-size); font-weight: 700; }
+.sim-entry__grid { display: grid; grid-template-columns: 1fr; gap: var(--ds-space-inline-sm); }
+.sim-entry__xid { min-height: 56px; padding: 0 var(--ds-space-stack-md); border-radius: 14px; font-size: var(--ds-text-body-lg-size, 1.125rem); font-weight: 700; }
+
+/* ---------- カード画像の札（PSA10 / 発送のみ / ×枚数）。オリパサイトの景品表示と同じ型 ---------- */
+.sim-cardframe { position: relative; display: inline-block; line-height: 0; }
+.sim-stage__frame { display: block; width: fit-content; margin: 0 auto var(--ds-space-inline-sm); }
+.sim-stage__frame .sim-stage__img { margin: 0; }
+/* PSA10 の札は金の盾＋赤リボン（2026-11-01 岸田の見本画像に合わせた） */
+.sim-psa { position: absolute; top: 2%; right: -8%; display: block; width: 2.6em; height: 2.9em; line-height: 1; filter: drop-shadow(0 .08em .12em rgba(0, 0, 0, .4)); }
+.sim-psa::before, .sim-psa::after { content: ""; position: absolute; clip-path: polygon(50% 0, 97% 11%, 97% 50%, 88% 72%, 50% 100%, 12% 72%, 3% 50%, 3% 11%); }
+.sim-psa::before { inset: 0; background: linear-gradient(150deg, #fff4bf 0%, #c98a12 45%, #f6d15a 75%, #a96f0a 100%); }
+.sim-psa::after { inset: .16em; background: linear-gradient(170deg, #ffe58a 0%, #f4c23a 50%, #e3a21f 100%); }
+.sim-psa b { position: absolute; z-index: 1; top: .2em; left: 0; right: 0; text-align: center; font-family: var(--ds-font-pop); font-size: 1.3em; font-weight: 900; color: #1a1a1a; letter-spacing: -.02em; }
+.sim-psa small { position: absolute; z-index: 2; left: -.15em; right: -.15em; bottom: .62em; border: .2em solid #d7192a; border-radius: .12em; height: 1.9em; background: #fff url(/public/images/oritoku/psa-logo.webp) center / auto 88% no-repeat; color: transparent; font-size: .55em; overflow: hidden; } /* PSAの文字はロゴ画像（2026-11-01 岸田OK） */
+.sim-shiponly { position: absolute; right: -4%; top: 42%; padding: .2em .45em; border-radius: var(--ds-radius-input); background: var(--ds-color-badge-bg-sky); color: var(--ds-color-text); font-family: var(--ds-font-pop); font-size: .7em; font-weight: 800; line-height: 1.2; box-shadow: var(--ds-shadow-card); white-space: nowrap; }
+.sim-cnt { position: absolute; right: 0; bottom: 0; padding: .15em .45em; border-radius: var(--ds-radius-input) 0 0 0; background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: .9em; font-weight: 900; line-height: 1.2; }
+/* 一覧の小さい画像では札を小さく */
+.sim-prize .sim-cardframe { grid-row: 1 / span 2; }
+.sim-prize .sim-psa { top: -.1em; right: -.5em; transform: scale(.5); transform-origin: top right; }
+/* 箱のサムネ（一覧・箱の見出し）に重ねる PSA10 の札（2026-11-01 岸田「PSA10をサムネに」） */
+.sim-card__psa { top: .7em; right: 27%; transform: scale(.85); transform-origin: top right; } /* サムネのカードは中央に幅およそ4割で出るので、その右肩に重ねる */
+.sim-box__thumbwrap { flex: none; }
+.sim-box__thumbwrap .sim-psa { top: -.1em; right: -.4em; transform: scale(.5); transform-origin: top right; }
+.sim-prize .sim-shiponly { display: none; }
+.sim-stage__frame { font-size: var(--ds-text-body-size); }
+.sim-hit .sim-cardframe { width: 100%; text-align: center; font-size: var(--ds-text-caption-size); }
+
+/* ---------- オリ得レベル・生存日数・ミッション・オリ得タイム ---------- */
+.sim-lv { display: inline-flex; align-items: center; padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); font-family: var(--ds-font-pop); font-weight: 900; color: var(--ds-color-text-inverse); background: var(--ds-color-text-muted); white-space: nowrap; }
+.sim-lv--beginner, .sim-status--beginner { background-color: var(--ds-color-sim-lv-beginner); }
+.sim-lv--beginner2, .sim-status--beginner2 { background-color: var(--ds-color-sim-lv-beginner); }
+.sim-lv--bronze, .sim-status--bronze { background-color: var(--ds-color-sim-lv-bronze); }
+.sim-lv--bronze2, .sim-status--bronze2 { background-color: var(--ds-color-sim-lv-bronze); }
+.sim-lv--silver, .sim-status--silver { background-color: var(--ds-color-sim-lv-silver); }
+.sim-lv--silver2, .sim-status--silver2 { background-color: var(--ds-color-sim-lv-silver); }
+.sim-lv--gold, .sim-status--gold { background-color: var(--ds-color-sim-lv-gold); }
+.sim-lv--gold2, .sim-status--gold2 { background-color: var(--ds-color-sim-lv-gold); }
+.sim-lv--platinum, .sim-status--platinum { background-color: var(--ds-color-sim-lv-platinum); }
+.sim-lv--platinum2, .sim-status--platinum2 { background-color: var(--ds-color-sim-lv-platinum); }
+.sim-lv--diamond, .sim-status--diamond { background-color: var(--ds-color-sim-lv-diamond); }
+.sim-lv--diamond2, .sim-status--diamond2 { background-color: var(--ds-color-sim-lv-diamond); }
+.sim-lv--master, .sim-status--master { background-color: var(--ds-color-sim-lv-master); }
+.sim-lv--legend, .sim-status--legend { background-color: var(--ds-color-sim-lv-legend); }
+.sim-lv--vip, .sim-status--vip { background-color: var(--ds-color-sim-lv-vip); }
+.sim-lv--mini { margin-left: var(--ds-space-inline-xs); font-size: var(--ds-text-micro-size); line-height: 1.6; }
+.sim-status { position: relative; overflow: hidden; display: flex; align-items: stretch; justify-content: space-between; gap: var(--ds-space-inline-md); margin: var(--ds-space-stack-sm) 0; padding: var(--ds-space-inline-md) var(--ds-space-inline-md) var(--ds-space-inline-md) var(--ds-space-stack-md); border-radius: var(--ds-radius-card); color: var(--ds-color-text-inverse); background-image:
+    linear-gradient(115deg, transparent 0 46%, rgba(255,255,255,.22) 50%, transparent 54%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.07) 0 1px, transparent 1px 7px),
+    radial-gradient(120% 160% at 0% 0%, rgba(255,255,255,.28), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.28));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), inset 0 -3px 0 rgba(0,0,0,.18), 0 6px 16px rgba(0,0,0,.14); }
+/* 2026-10-31 岸田「柄をかっこよく」: メタルの面（上から光・細い斜線）＋ときどき光が走る */
+.sim-status::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%); transform: translateX(-120%); animation: sim-status-sheen 4.5s ease-in-out infinite; }
+@keyframes sim-status-sheen { 0%, 60% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+@media (prefers-reduced-motion: reduce) { .sim-status::after { animation: none; display: none; } }
+.sim-status > * { position: relative; z-index: 1; }
+.sim-status[hidden] { display: none; }
+.sim-status__main { display: flex; flex-direction: column; min-width: 0; }
+.sim-status__label { font-size: var(--ds-text-micro-size); font-weight: 800; }
+.sim-status__rank { font-family: var(--ds-font-pop); font-size: var(--ds-text-h1-size); font-weight: 900; line-height: 1.1; letter-spacing: .08em; text-shadow: 0 2px 0 rgba(0,0,0,.25); }
+.sim-status__next { margin-top: var(--ds-space-inline-xs); font-size: var(--ds-text-caption-size); }
+.sim-status__next strong { color: var(--ds-color-sim-btn-yellow); }
+.sim-status__left { display: block; } /* 2026-10-31 岸田: 「あと」から改行 */
+.sim-status__side { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: var(--ds-space-inline-sm); }
+.sim-status__tag { padding: 0 var(--ds-space-inline-md); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg); color: var(--ds-color-text); font-family: var(--ds-font-pop); font-size: var(--ds-text-caption-size); font-weight: 900; white-space: nowrap; }
+.sim-status__days { font-family: var(--ds-font-pop); font-weight: 800; white-space: nowrap; }
+.sim-status__days strong { font-size: var(--ds-text-h2-size); color: var(--ds-color-sim-btn-yellow); }
+.sim-card.is-locked .sim-card__visual { filter: grayscale(.85) brightness(.6); }
+.sim-card.is-locked .sim-card__price { opacity: .5; }
+.sim-card__visual { position: relative; }
+.sim-card__lock { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: var(--ds-space-inline-xs) var(--ds-space-inline-md); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-weight: 900; white-space: nowrap; filter: none; }
+.sim-mission__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ds-space-inline-sm); }
+.sim-mission__item { display: flex; align-items: center; gap: var(--ds-space-inline-sm); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border: var(--ds-border-width) solid var(--ds-color-border); border-radius: var(--ds-radius-input); background: var(--ds-color-bg); }
+.sim-mission__item.is-done { border-color: var(--ds-color-sim-btn-yellow); background: var(--ds-color-badge-bg-cream); }
+.sim-mission__item.is-claimed { opacity: .6; }
+.sim-mission__check { display: none; flex: none; width: 1.2em; height: 1.2em; border: var(--ds-border-width-heading-accent) solid var(--ds-color-border-strong); border-radius: var(--ds-radius-input); }
+.sim-mission__item.is-done .sim-mission__check, .sim-mission__item.is-claimed .sim-mission__check { border-color: var(--ds-color-positive); background: var(--ds-color-positive); }
+.sim-mission__label { flex: 1; font-family: var(--ds-font-pop); font-weight: 800; }
+.sim-mission__reward { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); font-family: var(--ds-font-pop); font-weight: 900; color: var(--ds-color-sim-btn-red); }
+.sim-mission__next { display: block; font-family: var(--ds-font-body); font-weight: 700; font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-mission__state { font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); }
+.sim-rank__tabs { margin-bottom: var(--ds-space-inline-xs); }
+
+/* 見るミッション（オリ得の説明・おすすめオリパの広告） */
+.sim-mission__item.is-view { border-color: var(--ds-color-sim-btn-red); }
+.sim-mission__play { flex: none; }
+/* 2026-10-31 岸田: スマホは文言を1行目、報酬とボタンを2行目に（文言が縦に潰れていた） */
+@media (max-width: 640px) {
+  .sim-mission__item { flex-wrap: wrap; }
+  .sim-mission__label { flex: 1 1 100%; }
+  .sim-mission__reward { margin-right: auto; }
+}
+.sim-view__shot { display: block; width: 100%; height: auto; margin: var(--ds-space-inline-sm) 0; border: var(--ds-border-width) solid var(--ds-color-border); border-radius: var(--ds-radius-input); }
+.sim-view__logo { display: block; height: 3em; width: auto; margin: 0 auto var(--ds-space-inline-md); }
+.sim-view__points { margin: var(--ds-space-inline-sm) 0; padding-left: 1.2em; font-size: var(--ds-text-body-sm-size); }
+.sim-view__go { margin: var(--ds-space-stack-sm) 0 0; text-align: center; }
+.sim-view__go .sim-btn { display: inline-flex; text-decoration: none; }
+.sim-view__pr { display: inline-block; margin: 0 0 var(--ds-space-inline-xs); padding: 0 var(--ds-space-inline-xs); border: var(--ds-border-width) solid var(--ds-color-border-strong); border-radius: var(--ds-radius-input); font-size: var(--ds-text-micro-size); color: var(--ds-color-text-muted); }
+.sim-view__ads { list-style: none; margin: var(--ds-space-inline-sm) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--ds-space-inline-sm); }
+.sim-view__ad { display: grid; grid-template-columns: auto 5.5em 1fr auto; align-items: center; gap: var(--ds-space-inline-sm); padding: var(--ds-space-inline-xs) var(--ds-space-inline-sm); border: var(--ds-border-width) solid var(--ds-color-border); border-radius: var(--ds-radius-input); background: var(--ds-color-bg); color: var(--ds-color-text); text-decoration: none; }
+.sim-view__ad img { width: 100%; aspect-ratio: 1200 / 630; object-fit: cover; border-radius: var(--ds-radius-input); background: var(--ds-color-bg-subtle); }
+.sim-view__rank { font-family: var(--ds-font-pop); font-weight: 900; color: var(--ds-color-sim-btn-red); }
+.sim-view__name { font-family: var(--ds-font-pop); font-weight: 800; min-width: 0; }
+.sim-view__cta { font-size: var(--ds-text-caption-size); color: var(--ds-color-text-muted); white-space: nowrap; }
+.sim-view__timer { margin: var(--ds-space-stack-sm) 0 0; text-align: center; font-family: var(--ds-font-pop); font-weight: 800; color: var(--ds-color-text-subtle); }
+
+/* ゲームの結果のポップアップ */
+.sim-rpop { width: min(100% - 2 * var(--ds-space-inline-md), 960px); max-height: calc(100dvh - 2 * var(--ds-space-inline-md)); padding: 0; border: 0; border-radius: var(--ds-radius-card); background: var(--ds-color-bg); color: var(--ds-color-text); box-shadow: var(--ds-shadow-modal); overflow: hidden; }
+.sim-rpop[open] { display: flex; flex-direction: column; }
+.sim-rpop::backdrop { background: var(--ds-color-scrim-modal); }
+.sim-rpop__head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); }
+.sim-rpop__logo { height: 2em; width: auto; }
+.sim-rpop__title { margin: 0; color: inherit; text-align: center; font-family: var(--ds-font-pop); font-size: var(--ds-text-body-size); font-weight: 900; }
+.sim-rpop__skip { justify-self: end; padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
+.sim-rpop__sum { margin: 0; padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); font-size: var(--ds-text-body-sm-size); text-align: center; }
+.sim-rpop__hz { display: block; color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-size); }
+.sim-rpop__list { flex: 1 1 auto; min-height: 7em; overflow-y: auto; list-style: none; margin: 0; padding: 0 var(--ds-space-inline-md) var(--ds-space-inline-md); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-space-inline-md); align-content: start; }
+.sim-rpop__item { position: relative; display: grid; grid-template-columns: 7em 1fr; gap: var(--ds-space-inline-md); align-items: center; padding: var(--ds-space-inline-md); border: var(--ds-border-width-heading-accent) solid transparent; border-radius: var(--ds-radius-card); background: var(--ds-color-bg-subtle); cursor: pointer; }
+.sim-rpop__item.is-sel { border-color: var(--ds-color-sim-btn-red); background: var(--ds-color-badge-bg-cream); }
+.sim-rpop__img .sim-cardframe { display: block; }
+.sim-rpop__pic { display: block; width: 100%; height: auto; border-radius: var(--ds-radius-input); }
+.sim-rpop__noimg { display: grid; place-items: center; aspect-ratio: 63 / 88; border-radius: var(--ds-radius-input); background: var(--ds-color-bg); font-family: var(--ds-font-pop); font-weight: 900; }
+.sim-rpop__info { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ds-space-inline-xs); min-width: 0; }
+.sim-rpop__name { font-family: var(--ds-font-pop); font-weight: 800; }
+.sim-rpop__pt { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); padding: var(--ds-space-inline-xs) var(--ds-space-inline-md); border-radius: var(--ds-radius-input); background: var(--ds-color-bg); font-family: var(--ds-font-num); font-weight: 900; }
+.sim-rpop__check { position: absolute; top: var(--ds-space-inline-sm); right: var(--ds-space-inline-sm); width: 1.3em; height: 1.3em; border-radius: 50%; background: var(--ds-color-border-strong); }
+.sim-rpop__item.is-sel .sim-rpop__check { background: var(--ds-color-sim-btn-red); box-shadow: inset 0 0 0 .3em var(--ds-color-sim-btn-red), inset 0 0 0 .45em var(--ds-color-bg); }
+.sim-rpop__empty { grid-column: 1 / -1; padding: var(--ds-space-stack-md); text-align: center; color: var(--ds-color-text-muted); }
+.sim-rpop__foot { display: flex; flex-direction: column; gap: var(--ds-space-inline-sm); padding: var(--ds-space-inline-md); border-top: var(--ds-border-width) solid var(--ds-color-border); background: var(--ds-color-bg); }
+.sim-rpop__bar { display: flex; align-items: center; justify-content: center; gap: var(--ds-space-inline-md); }
+.sim-rpop__total { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); font-family: var(--ds-font-num); font-size: var(--ds-text-h3-size); }
+.sim-rpop__mini { padding: var(--ds-space-inline-xs) var(--ds-space-inline-md); border: var(--ds-border-width) solid var(--ds-color-border-strong); border-radius: var(--ds-radius-input); background: var(--ds-color-bg); font: inherit; font-size: var(--ds-text-caption-size); font-weight: 800; cursor: pointer; }
+.sim-rpop__acts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-inline-md); }
+.sim-rpop__msg { margin: 0; text-align: center; font-weight: 800; }
+.sim-rpop__msg:empty { display: none; }
+/* 2026-11-21: オリ得のロゴがしゃべるふきだし（左にロゴ・右に吹き出し、しっぽはロゴ側） */
+.sim-rpop__say { display: flex; align-items: center; gap: var(--ds-space-inline-sm); }
+.sim-rpop__say:has(.sim-rpop__msg:empty) { display: none; }
+.sim-rpop__say-logo { flex: none; width: 4.5em; height: auto; }
+.sim-rpop__say .sim-rpop__msg { position: relative; flex: 1; min-width: 0; padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border: var(--ds-border-width) solid var(--ds-color-border-strong); border-radius: var(--ds-radius-card); background: var(--ds-color-bg); text-align: left; line-height: var(--ds-text-body-sm-lh); }
+.sim-rpop__say .sim-rpop__msg::before,
+.sim-rpop__say .sim-rpop__msg::after { content: ""; position: absolute; top: 50%; border-style: solid; border-color: transparent; transform: translateY(-50%); }
+.sim-rpop__say .sim-rpop__msg::before { left: -.6em; border-width: .5em .6em .5em 0; border-right-color: var(--ds-color-border-strong); }
+.sim-rpop__say .sim-rpop__msg::after { left: calc(-.6em + var(--ds-border-width) + 1px); border-width: .5em .6em .5em 0; border-right-color: var(--ds-color-bg); }
+@media (max-width: 640px) {
+  .sim-rpop__list { grid-template-columns: 1fr; }
+  /* 2026-10-31 岸田: スマホで崩れる。カードを詰めて、ボタンの文字は折り返さない */
+  .sim-rpop__item { grid-template-columns: 3.6em 1fr; gap: var(--ds-space-inline-sm); padding: var(--ds-space-inline-sm); }
+  .sim-rpop__name { font-size: var(--ds-text-body-sm-size); }
+  .sim-rpop__acts { gap: var(--ds-space-inline-sm); }
+  .sim-rpop__acts .sim-btn { padding-left: var(--ds-space-inline-xs); padding-right: var(--ds-space-inline-xs); font-size: var(--ds-text-body-sm-size); white-space: nowrap; }
+}
+
+/* 2026-10-31 岸田: 引いた時点でポップアップを出し、その中で演出する */
+.sim-rpop.is-drawing .sim-rpop__sum, .sim-rpop.is-drawing .sim-rpop__list, .sim-rpop.is-drawing .sim-rpop__foot { display: none; }
+.sim-rpop .sim-stage { margin: 0; min-height: min(60dvh, 26em); border-radius: 0; }
+
+/* 抽選中の演出 3種（logo は .sim-stage__logos）。data-heat が上がるほど熱い */
+.sim-fx { display: flex; justify-content: center; margin: 0 auto var(--ds-space-inline-md); perspective: 600px; }
+.sim-fx__obj { position: relative; display: flex; align-items: center; justify-content: center; font-style: normal; }
+.sim-fx__obj img { width: 70%; height: auto; }
+/* パック: 袋そのものが内側から光る（2026-11-02 岸田「パック自体が発光してほしい」）。
+   熱いほど 白 → 金 → 虹 と袋の色ごと変わり、明るさの脈と外への光漏れが強く・速くなる。上の切り口からは光の筋が漏れる */
+.sim-fx--pack .sim-fx__obj { --pk-glow: rgba(255,255,255,.75); --pk-core: rgba(255,255,255,.55); --pk-beat: 1.1s; --pk-spread: 14px; width: 7.5em; height: 10.5em; border-radius: 6px 6px 10px 10px; background: linear-gradient(160deg, #e8edf3, #9aa7b6 45%, #f4f7fa 55%, #7d8a99); box-shadow: inset 0 .6em 0 rgba(0,0,0,.12), inset 0 -.6em 0 rgba(0,0,0,.12); animation: sim-fx-shake .18s linear infinite, sim-pk-beat var(--pk-beat) ease-in-out infinite alternate; }
+.sim-fx--pack .sim-fx__obj img { position: relative; z-index: 2; }
+.sim-fx--pack .sim-fx__obj::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; background: radial-gradient(ellipse 60% 55% at 50% 50%, var(--pk-core), transparent 75%); mix-blend-mode: screen; animation: sim-pk-core var(--pk-beat) ease-in-out infinite alternate; pointer-events: none; }
+.sim-fx--pack .sim-fx__obj::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: 100%; height: 2.6em; z-index: 0; background: linear-gradient(0deg, var(--pk-glow), transparent); clip-path: polygon(10% 100%, 90% 100%, 100% 0, 0 0); filter: blur(3px); opacity: .5; animation: sim-pk-core var(--pk-beat) ease-in-out infinite alternate; pointer-events: none; }
+.sim-fx--pack[data-heat="1"] .sim-fx__obj { --pk-glow: #fff; --pk-core: rgba(255,255,255,.9); --pk-beat: .7s; --pk-spread: 24px; background: linear-gradient(160deg, #ffffff, #c9d3de 45%, #ffffff 55%, #a9b6c4); }
+.sim-fx--pack[data-heat="2"] .sim-fx__obj { --pk-glow: #ffc400; --pk-core: rgba(255,250,210,1); --pk-beat: .45s; --pk-spread: 46px; animation-duration: .12s, var(--pk-beat); background: linear-gradient(160deg, #fff6c2, #e6b400 45%, #fff3a8 55%, #b88600); }
+.sim-fx--pack[data-heat="3"] .sim-fx__obj, .sim-fx--pack[data-heat="4"] .sim-fx__obj, .sim-fx--pack[data-heat="5"] .sim-fx__obj { --pk-glow: #ff4fa3; --pk-core: rgba(255,255,255,1); --pk-beat: .3s; --pk-spread: 48px; animation: sim-fx-shake .08s linear infinite, sim-pk-beat var(--pk-beat) ease-in-out infinite alternate, sim-pk-rainbow 1.2s linear infinite; background: linear-gradient(160deg, #ff4fa3, #ffb800, #3ddc84, #2fd3ff, #7a5cff, #ff4fa3, #ffb800) 0 0 / 100% 300%; }
+.sim-fx--pack[data-heat="5"] .sim-fx__obj { --pk-spread: 70px; --pk-beat: .2s; }
+.sim-rpop.is-drawing .sim-stage:has(.sim-fx--pack) { background: radial-gradient(circle at 50% 42%, #2b2f48, #0c0e18 72%); }
+.sim-rpop.is-drawing .sim-stage:has(.sim-fx--pack) .sim-stage__text { color: #fff; }
+.sim-fx--pack { padding: 3em 4em 1em; }
+.sim-yk.is-noorb .sim-yk__orb { display: none; }
+/* 2026-11-02 岸田「青いろならパックを青色に、緑色ならパックを緑色に」: 保留の玉の色（data-yk）でパックを塗る。光り方の強さは data-heat のまま */
+.sim-fx--pack[data-yk="1"] .sim-fx__obj { --pk-c: var(--ds-color-sim-yk-blue); }
+.sim-fx--pack[data-yk="2"] .sim-fx__obj { --pk-c: var(--ds-color-sim-yk-green); }
+.sim-fx--pack[data-yk="3"] .sim-fx__obj { --pk-c: var(--ds-color-sim-yk-red); }
+.sim-fx--pack[data-yk="4"] .sim-fx__obj { --pk-c: var(--ds-color-sim-yk-gold); }
+.sim-fx--pack:is([data-yk="1"], [data-yk="2"], [data-yk="3"], [data-yk="4"]) .sim-fx__obj { --pk-glow: var(--pk-c); --pk-core: color-mix(in srgb, var(--pk-c) 30%, #fff); animation: sim-fx-shake .12s linear infinite, sim-pk-beat var(--pk-beat) ease-in-out infinite alternate; background: linear-gradient(160deg, color-mix(in srgb, var(--pk-c) 45%, #fff), var(--pk-c) 45%, color-mix(in srgb, var(--pk-c) 55%, #fff) 55%, color-mix(in srgb, var(--pk-c) 70%, #000)); }
+@keyframes sim-pk-beat { from { filter: brightness(1) drop-shadow(0 0 calc(var(--pk-spread) * .4) var(--pk-glow)); } to { filter: brightness(1.35) drop-shadow(0 0 var(--pk-spread) var(--pk-glow)) drop-shadow(0 0 calc(var(--pk-spread) * .5) var(--pk-glow)); } }
+@keyframes sim-pk-core { from { opacity: .35; } to { opacity: 1; } }
+@keyframes sim-pk-rainbow { to { background-position: 0 100%; } }
+/* カード: 裏面が回る。熱いほど速く回って、色が青→金→虹 */
+.sim-fx--card .sim-fx__obj { width: 7em; height: 9.8em; border: 5px solid #f2f2f2; border-radius: 8px; background: radial-gradient(circle at 50% 50%, #3d7bff 0 22%, #1b3a9e 23% 60%, #0f235f 61%); animation: sim-fx-flip 1s linear infinite; transform-style: preserve-3d; }
+.sim-fx--card[data-heat="2"] .sim-fx__obj { animation-duration: .6s; background: radial-gradient(circle at 50% 50%, #ffe27a 0 22%, #e0a800 23% 60%, #8a5a00 61%); }
+.sim-fx--card[data-heat="3"] .sim-fx__obj, .sim-fx--card[data-heat="4"] .sim-fx__obj, .sim-fx--card[data-heat="5"] .sim-fx__obj { animation-duration: .35s; background: conic-gradient(#ff4fa3, #ffb800, #3ddc84, #2fd3ff, #7a5cff, #ff4fa3); }
+@keyframes sim-fx-shake { 0% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-3px, 1px) rotate(-2deg); } 50% { transform: translate(2px, -1px) rotate(1.5deg); } 75% { transform: translate(-1px, 2px) rotate(-1deg); } 100% { transform: translate(0, 0) rotate(0); } }
+@keyframes sim-fx-flip { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }
+@media (prefers-reduced-motion: reduce) { .sim-fx__obj, .sim-fx__obj::before, .sim-fx__obj::after { animation: none !important; } }
+
+/* 10連確定（ハズレだけだったとき1枚を当たりに差し替えた）の印 */
+.sim-rpop__bonus { display: inline-block; margin-right: var(--ds-space-inline-sm); padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-yellow); font-weight: 900; font-size: var(--ds-text-caption-size); }
+
+/* 2026-10-31 岸田: スマホで景品の欄が数ピクセルに潰れていた（ポップアップが中身の高さまでしか伸びず、縮められるのが一覧だけ）。
+   スマホはポップアップを画面の高さいっぱいにして、残りを景品の一覧に回す */
+@media (max-width: 640px) {
+  .sim-rpop[open] { height: calc(100vh - 2 * var(--ds-space-inline-md)); height: calc(100dvh - 2 * var(--ds-space-inline-md)); max-height: none; }
+  .sim-rpop__sum { padding-top: var(--ds-space-inline-xs); padding-bottom: var(--ds-space-inline-xs); }
+  .sim-rpop__foot { padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); }
+}
+
+/* 2026-10-31 岸田: 「ポイントが足りません」はスマホだけ2行(11/1 PCは1行)・右上に×・Xでシェアのボタンは押しやすく横いっぱい */
+.sim-charge__inner { position: relative; }
+.sim-charge__x { display: none; position: absolute; top: var(--ds-space-inline-sm); right: var(--ds-space-inline-sm); z-index: 2; width: 2.4em; height: 2.4em; padding: 0; border: 0; border-radius: 50%; background: var(--ds-color-bg-subtle); color: var(--ds-color-text); font-size: var(--ds-text-body-size); font-weight: 900; line-height: 1; cursor: pointer; }
+.sim-charge.is-alert .sim-charge__x { display: block; }
+.sim-charge.is-alert .sim-charge__title { white-space: pre-line; line-height: 1.25; }
+.sim-charge.is-alert .sim-charge__actions { flex-direction: column; }
+.sim-charge.is-alert [data-sim-charge-share] { width: 100%; flex: none; min-height: calc(var(--ds-touch-target-min) * 1.4); white-space: nowrap; }
+
+/* ---------- 予告演出（2026-11-01 岸田「熱い演出・激アツ演出などバリエーションを」）----------
+   保留の玉が 白→青→緑→赤→金→虹 と変わる。赤=熱い、金=激アツ、虹=超激アツ。カットインは帯の文字が横切る */
+.sim-yk { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-inline-sm); margin-top: var(--ds-space-inline-md); }
+.sim-yk__orb { --orb: var(--ds-color-bg-subtle); display: block; width: 2.4em; height: 2.4em; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--ds-color-bg) 0 16%, var(--orb) 62%); box-shadow: 0 0 0 .15em var(--ds-color-bg), 0 0 .9em var(--orb); }
+.sim-yk__orb.is-c1 { --orb: var(--ds-color-sim-yk-blue); }
+.sim-yk__orb.is-c2 { --orb: var(--ds-color-sim-yk-green); }
+.sim-yk__orb.is-c3 { --orb: var(--ds-color-sim-yk-red); }
+.sim-yk__orb.is-c4 { --orb: var(--ds-color-sim-yk-gold); }
+.sim-yk__orb.is-c5 { background: var(--ds-color-accent-gradient); box-shadow: 0 0 0 .15em var(--ds-color-bg), 0 0 1.4em var(--ds-color-sim-yk-gold); animation: sim-yk-up .35s cubic-bezier(.2, 1.6, .4, 1) both, sim-yk-spin 1.2s linear infinite; }
+.sim-yk__orb.is-up { animation: sim-yk-up .35s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-yk__telop { min-height: 1.2em; white-space: nowrap; font-family: var(--ds-font-pop); font-size: var(--ds-text-h2-size); font-weight: 900; line-height: 1.2; }
+.sim-yk__telop:empty { display: none; }
+.sim-yk__telop.is-c1 { color: var(--ds-color-sim-yk-blue); animation: sim-pop .35s ease-out both; }
+.sim-yk__telop.is-c2 { color: var(--ds-color-sim-yk-green); animation: sim-pop .35s ease-out both; }
+.sim-yk__telop.is-c3 { color: var(--ds-color-sim-yk-red); font-size: calc(var(--ds-text-h2-size) * 1.3); animation: sim-pop .35s ease-out both, sim-shake .12s linear .35s 4; }
+.sim-yk__telop.is-c4 { color: var(--ds-color-sim-yk-red); text-shadow: 0 0 .2em var(--ds-color-sim-yk-gold), 0 0 .5em var(--ds-color-sim-yk-gold); font-size: calc(var(--ds-text-h2-size) * 1.45); animation: sim-yk-slam .45s cubic-bezier(.2, 1.6, .4, 1) both, sim-pulse .3s ease-in-out .45s infinite alternate; }
+.sim-yk__telop.is-c5 { color: var(--ds-color-bg); -webkit-text-stroke: .05em var(--ds-color-sim-yk-red); text-shadow: 0 0 .25em var(--ds-color-sim-yk-gold), 0 0 .6em var(--ds-color-sim-yk-gold); font-size: calc(var(--ds-text-h2-size) * 1.5); animation: sim-yk-slam .45s cubic-bezier(.2, 1.6, .4, 1) both, sim-pulse .25s ease-in-out .45s infinite alternate; }
+/* 箱そのものも色に合わせて熱くする */
+.sim-stage.sim-yk-c3 { box-shadow: inset 0 0 1.5em var(--ds-color-sim-yk-red); }
+.sim-stage.sim-yk-c4 { box-shadow: inset 0 0 2.5em var(--ds-color-sim-yk-gold); animation: sim-shake .1s linear 8; }
+.sim-stage.sim-yk-c5 { box-shadow: inset 0 0 3em var(--ds-color-sim-yk-gold); animation: sim-shake .1s linear 10; }
+.sim-stage.sim-yk-c5::before { content: ""; position: absolute; inset: 0; background: var(--ds-color-accent-gradient); opacity: .45; animation: sim-yk-flash .5s ease-in-out infinite alternate; pointer-events: none; }
+.sim-yk-cut { position: absolute; left: 0; right: 0; top: 38%; z-index: 3; padding: var(--ds-space-inline-sm) 0; background: var(--ds-color-bg-inverse); color: var(--ds-color-sim-btn-yellow); font-family: var(--ds-font-pop); font-size: var(--ds-text-h2-size); font-weight: 900; text-align: center; transform: skewY(-4deg); animation: sim-yk-cut 1s ease-out both; pointer-events: none; }
+.sim-yk-cut span { display: inline-block; animation: sim-yk-cuttext 1s ease-out both; }
+@keyframes sim-yk-up { from { transform: scale(.4); } to { transform: scale(1); } }
+@keyframes sim-yk-spin { to { filter: hue-rotate(360deg); } }
+@keyframes sim-yk-slam { from { transform: scale(2.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes sim-yk-flash { from { opacity: .15; } to { opacity: .5; } }
+@keyframes sim-yk-cut { 0% { clip-path: inset(0 100% 0 0); } 20%, 80% { clip-path: inset(0 0 0 0); } 100% { clip-path: inset(0 0 0 100%); } }
+@keyframes sim-yk-cuttext { 0% { transform: translateX(-30%); } 20%, 80% { transform: translateX(0); } 100% { transform: translateX(30%); } }
+@media (prefers-reduced-motion: reduce) {
+  .sim-yk__orb, .sim-yk__telop, .sim-stage.sim-yk-c4, .sim-stage.sim-yk-c5, .sim-stage.sim-yk-c5::before, .sim-yk-cut, .sim-yk-cut span { animation: none; }
+}
+
+/* 2026-11-01 岸田「もっと演出ふやして」: 背景変化・カウントダウン・擬似連・群予告・フリーズ・PUSHボタン・復活 */
+.sim-stage.sim-yk-bg-fire { background: radial-gradient(circle at 50% 120%, color-mix(in srgb, var(--ds-color-sim-yk-red) 45%, var(--ds-color-bg-paper)), var(--ds-color-bg-paper) 70%); animation: sim-yk-bgin .4s ease-out both; }
+.sim-stage.sim-yk-bg-gold { background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--ds-color-sim-yk-gold) 55%, var(--ds-color-bg-paper)), var(--ds-color-bg-paper) 75%); animation: sim-yk-bgin .4s ease-out both; }
+.sim-stage.sim-yk-bg-night { background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); animation: sim-yk-bgin .4s ease-out both; }
+.sim-stage.sim-yk-bg-night .sim-stage__sub { color: var(--ds-color-text-inverse); }
+.sim-yk-fx { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.sim-yk-count { background: color-mix(in srgb, var(--ds-color-bg) 80%, transparent); }
+.sim-yk-count b { font-family: var(--ds-font-pop); font-size: calc(var(--ds-text-h1-size) * 2.4); font-weight: 900; color: var(--ds-color-sim-yk-red); -webkit-text-stroke: .04em var(--ds-color-bg); opacity: 0; }
+.sim-yk-count b.is-on { animation: sim-yk-count .45s ease-out both; }
+.sim-yk-ren { background: color-mix(in srgb, var(--ds-color-bg) 85%, transparent); animation: sim-yk-ren .7s ease-out both; }
+.sim-yk-ren b { font-family: var(--ds-font-pop); font-size: calc(var(--ds-text-h1-size) * 1.3); font-weight: 900; color: var(--ds-color-sim-yk-blue); animation: sim-yk-slam .3s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-yk-group { overflow: hidden; }
+.sim-yk-group img { position: absolute; left: 100%; width: 3.4em; height: auto; animation: sim-yk-fly 1s linear both; }
+.sim-yk-group.is-gold img { filter: drop-shadow(0 0 .4em var(--ds-color-sim-yk-gold)); width: 4.2em; }
+.sim-yk-freeze { background: var(--ds-color-bg-inverse); }
+.sim-yk-freeze b { font-family: var(--ds-font-pop); font-size: var(--ds-text-h2-size); font-weight: 900; color: var(--ds-color-text-inverse); letter-spacing: .1em; }
+.sim-yk-freeze.is-on::before { content: ""; position: absolute; inset: 0; background: var(--ds-color-accent-gradient); opacity: .3; animation: sim-yk-flash .25s ease-in-out infinite alternate; }
+.sim-yk-freeze.is-on b { position: relative; color: var(--ds-color-sim-yk-gold); font-size: calc(var(--ds-text-h1-size) * 1.4); text-shadow: 0 0 .3em var(--ds-color-sim-yk-red), 0 0 .8em var(--ds-color-sim-yk-gold); animation: sim-yk-slam .4s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-yk-push { pointer-events: auto; background: color-mix(in srgb, var(--ds-color-bg-inverse) 35%, transparent); }
+.sim-yk-push button { --push: var(--ds-color-sim-yk-blue); min-width: 8em; min-height: 8em; padding: 0; border: .25em solid var(--ds-color-bg); border-radius: 50%; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--ds-color-bg) 55%, var(--push)), var(--push) 65%); box-shadow: 0 .4em 0 color-mix(in srgb, var(--ds-color-bg-inverse) 40%, var(--push)), 0 0 1.2em var(--push); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-h3-size); font-weight: 900; cursor: pointer; animation: sim-yk-slam .35s cubic-bezier(.2, 1.6, .4, 1) both, sim-pulse .35s ease-in-out .35s infinite alternate; }
+.sim-yk-push.is-c2 button { --push: var(--ds-color-sim-yk-green); }
+.sim-yk-push.is-c3 button { --push: var(--ds-color-sim-yk-red); }
+.sim-yk-push.is-c4 button { --push: var(--ds-color-sim-yk-gold); color: var(--ds-color-sim-yk-red); }
+.sim-yk-push.is-c5 button { background: var(--ds-color-accent-gradient); color: var(--ds-color-sim-yk-red); -webkit-text-stroke: .03em var(--ds-color-bg); }
+.sim-stage.sim-yk-revive .sim-stage__text { color: var(--ds-color-sim-yk-red); font-family: var(--ds-font-pop); font-weight: 900; animation: sim-yk-slam .4s cubic-bezier(.2, 1.6, .4, 1) both, sim-shake .1s linear .4s 4; }
+@keyframes sim-yk-bgin { from { filter: brightness(1.8); } to { filter: none; } }
+@keyframes sim-yk-count { from { transform: scale(2.2); opacity: 0; } 40% { transform: scale(1); opacity: 1; } to { transform: scale(.9); opacity: 0; } }
+@keyframes sim-yk-ren { 0% { opacity: 0; } 15%, 75% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes sim-yk-fly { to { transform: translateX(calc(-100vw - 8em)); } }
+@media (prefers-reduced-motion: reduce) {
+  .sim-stage.sim-yk-bg-fire, .sim-stage.sim-yk-bg-gold, .sim-stage.sim-yk-bg-night, .sim-yk-count b.is-on, .sim-yk-ren, .sim-yk-ren b, .sim-yk-group img, .sim-yk-freeze.is-on, .sim-yk-freeze.is-on b, .sim-yk-push button, .sim-stage.sim-yk-revive .sim-stage__text { animation: none; }
+  .sim-yk-count b.is-on { opacity: 1; }
+  .sim-yk-group { display: none; }
+}
+
+/* 2026-11-01 テーマ演出（チンチロ・カウントダウン・クリスタル・メカチャージ・カプセル）。合図の色で熱さが分かる */
+.sim-yk.is-th .sim-yk__orb { display: none; }
+.sim-th { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-inline-sm); margin: 0 auto var(--ds-space-inline-md); }
+.sim-th__note { min-height: 1.4em; color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-size); font-weight: 700; }
+.sim-th__note.is-hot { color: var(--ds-color-sim-yk-red); font-family: var(--ds-font-pop); font-size: var(--ds-text-h3-size); font-weight: 900; animation: sim-yk-slam .35s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-th__note.is-cold { color: var(--ds-color-text); font-size: var(--ds-text-body-size); }
+/* チンチロ */
+.sim-dice { display: flex; gap: var(--ds-space-inline-md); }
+.sim-dice i { display: flex; align-items: center; justify-content: center; width: 2.2em; height: 2.2em; border: .08em solid var(--ds-color-border); border-radius: .35em; background: var(--ds-color-bg); color: var(--ds-color-text); font-family: var(--ds-font-pop); font-size: var(--ds-text-h2-size); font-style: normal; font-weight: 900; box-shadow: 0 .15em 0 var(--ds-color-border); animation: sim-fx-shake .14s linear infinite; }
+.sim-dice i.is-stop { animation: sim-yk-up .3s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-th--dice.is-red .sim-dice i { border-color: var(--ds-color-sim-yk-red); background: var(--ds-color-sim-yk-red); color: var(--ds-color-text-inverse); box-shadow: 0 0 .6em var(--ds-color-sim-yk-red); }
+.sim-th--dice.is-gold .sim-dice i { border-color: var(--ds-color-sim-yk-gold); background: radial-gradient(circle at 35% 30%, var(--ds-color-bg) 0 10%, var(--ds-color-sim-yk-gold) 60%); color: var(--ds-color-sim-yk-red); box-shadow: 0 0 .8em var(--ds-color-sim-yk-gold); }
+/* カウントダウン */
+.sim-cd b { display: block; padding: 0 .3em; border-radius: .2em; background: var(--ds-color-bg-inverse); color: var(--ds-color-sim-yk-gold); font-family: var(--ds-font-pop); font-size: calc(var(--ds-text-h1-size) * 1.6); font-variant-numeric: tabular-nums; font-weight: 900; letter-spacing: .05em; }
+.sim-th--count.is-red .sim-cd b { color: var(--ds-color-sim-yk-red); text-shadow: 0 0 .3em var(--ds-color-sim-yk-red); animation: sim-pulse .3s ease-in-out infinite alternate; }
+.sim-th--count.is-logo .sim-cd b { display: flex; align-items: center; justify-content: center; background: var(--ds-color-bg-inverse); animation: sim-cd-logo .45s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-th--count.is-logo .sim-cd b { padding: .2em .35em; }
+.sim-th--count.is-logo .sim-cd b img { display: block; height: 1.25em; width: auto; }
+@keyframes sim-cd-logo { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* 箱の中のプチュン */
+.sim-th-dark { background: var(--ds-color-bg-inverse); }
+.sim-th-dark b { color: var(--ds-color-sim-yk-gold); font-family: var(--ds-font-pop); font-size: calc(var(--ds-text-h1-size) * 1.2); font-weight: 900; text-shadow: 0 0 .3em var(--ds-color-sim-yk-red); }
+.sim-th-dark.is-on b { animation: sim-yk-slam .4s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-th-dark.is-big.is-on::before { content: ""; position: absolute; inset: 0; background: var(--ds-color-accent-gradient); opacity: .3; animation: sim-yk-flash .25s ease-in-out infinite alternate; }
+.sim-th-dark b { position: relative; }
+/* クリスタル */
+.sim-crys__gem { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; width: 7em; height: 8.5em; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: linear-gradient(135deg, color-mix(in srgb, var(--ds-color-sim-yk-blue) 25%, var(--ds-color-bg)), color-mix(in srgb, var(--ds-color-sim-yk-blue) 55%, var(--ds-color-bg)) 50%, color-mix(in srgb, var(--ds-color-sim-yk-blue) 20%, var(--ds-color-bg))); }
+.sim-crys__gem::after { content: ""; position: absolute; inset: 0; opacity: 0; background: linear-gradient(115deg, transparent 30%, var(--ds-color-bg) 31% 33%, transparent 34% 52%, var(--ds-color-bg) 53% 54%, transparent 55%), linear-gradient(35deg, transparent 45%, var(--ds-color-bg) 46% 47%, transparent 48%); }
+.sim-crys { position: relative; display: flex; align-items: center; justify-content: center; }
+.sim-crys__card { position: absolute; z-index: 0; width: 3.4em; height: 4.7em; border-radius: .3em; background: var(--ds-color-border); opacity: .6; }
+.sim-th--crystal.is-crack1 .sim-crys__gem::after { opacity: .6; }
+.sim-th--crystal.is-crack2 .sim-crys__gem { animation: sim-fx-shake .12s linear infinite; }
+.sim-th--crystal.is-crack2 .sim-crys__gem::after { opacity: 1; }
+.sim-th--crystal.is-rainbow .sim-crys__gem { background: var(--ds-color-accent-gradient); box-shadow: 0 0 1em var(--ds-color-sim-yk-red); }
+.sim-th--crystal.is-break .sim-crys__gem { animation: sim-crys-break .5s ease-out both; }
+.sim-th--crystal.is-silver .sim-crys__card { z-index: 2; opacity: 1; background: linear-gradient(135deg, var(--ds-color-bg), var(--ds-color-border)); }
+.sim-th--crystal.is-empty .sim-crys__card { opacity: .3; }
+.sim-th--crystal.is-gold .sim-crys__card { z-index: 2; opacity: 1; background: radial-gradient(circle at 35% 30%, var(--ds-color-bg) 0 10%, var(--ds-color-sim-yk-gold) 60%); box-shadow: 0 0 1.2em var(--ds-color-sim-yk-gold); animation: sim-yk-up .4s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-stage.sim-th-glitch { animation: sim-th-glitch .18s steps(2) infinite; }
+@keyframes sim-crys-break { 0% { clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); } 100% { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%); background: transparent; } }
+@keyframes sim-th-glitch { 0% { transform: translate(0); filter: none; } 50% { transform: translate(-3px, 1px); filter: hue-rotate(90deg) saturate(2); } 100% { transform: translate(2px, -1px); filter: invert(.1); } }
+/* メカチャージ */
+.sim-chg { display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-inline-xs); width: min(16em, 80%); }
+.sim-chg span { font-family: var(--ds-font-pop); font-weight: 900; letter-spacing: .2em; color: var(--ds-color-sim-yk-blue); }
+.sim-chg__bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: .25em; width: 100%; padding: .25em; border-radius: .4em; background: var(--ds-color-bg-inverse); }
+.sim-chg__bar i { height: 1.6em; border-radius: .2em; background: color-mix(in srgb, var(--ds-color-bg) 15%, var(--ds-color-bg-inverse)); }
+.sim-chg__bar i.is-on { background: var(--ds-color-sim-yk-blue); box-shadow: 0 0 .6em var(--ds-color-sim-yk-blue); animation: sim-yk-up .25s ease-out both; }
+.sim-th--charge.is-gold span { color: var(--ds-color-sim-yk-gold); }
+.sim-th--charge.is-gold .sim-chg__bar i.is-on { background: var(--ds-color-sim-yk-gold); box-shadow: 0 0 .7em var(--ds-color-sim-yk-gold); }
+.sim-th--charge.is-full .sim-chg__bar { animation: sim-pulse .25s ease-in-out infinite alternate; }
+.sim-th--charge.is-fail .sim-chg__bar i.is-on { animation: sim-th-flicker .15s steps(2) 4 both; }
+.sim-chg__msg { min-height: 1.3em; white-space: nowrap; font-family: var(--ds-font-pop); font-size: var(--ds-text-h3-size); font-weight: 900; }
+.sim-th--charge.is-full .sim-chg__msg { color: var(--ds-color-sim-yk-red); animation: sim-yk-slam .35s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-th--charge.is-fail .sim-chg__msg { color: var(--ds-color-text-muted); }
+@keyframes sim-th-flicker { 50% { opacity: .2; } }
+/* カプセル */
+.sim-cap { position: relative; width: 8em; height: 11.6em; }
+.sim-cap__dome { position: absolute; left: .5em; top: 0; width: 7em; height: 5.5em; border: .2em solid var(--ds-color-sim-yk-red); border-radius: 50% 50% .6em .6em; background: radial-gradient(circle at 25% 78%, var(--ds-color-sim-yk-gold) 0 .55em, transparent .6em), radial-gradient(circle at 50% 82%, var(--ds-color-sim-yk-blue) 0 .55em, transparent .6em), radial-gradient(circle at 75% 76%, var(--ds-color-sim-yk-green) 0 .55em, transparent .6em), radial-gradient(circle at 38% 58%, var(--ds-color-sim-yk-red) 0 .55em, transparent .6em), radial-gradient(circle at 63% 60%, var(--ds-color-sim-yk-gold) 0 .55em, transparent .6em), radial-gradient(circle at 30% 30%, var(--ds-color-bg), color-mix(in srgb, var(--ds-color-sim-yk-blue) 18%, var(--ds-color-bg))); }
+.sim-cap__dome::after { content: ""; position: absolute; left: .3em; right: .3em; bottom: -2.9em; height: 2.6em; border-radius: 0 0 .6em .6em; background: var(--ds-color-sim-yk-red); }
+.sim-cap__lever { --from: 0deg; --to: 360deg; position: absolute; left: 3em; top: 6em; z-index: 1; width: 2em; height: 2em; border: .25em solid var(--ds-color-bg); border-radius: 50%; background: linear-gradient(var(--ds-color-bg) 0 0) center / 100% .35em no-repeat, var(--ds-color-sim-yk-gold); }
+.sim-cap__ball { position: absolute; left: 50%; bottom: 0; z-index: 2; width: 2.6em; height: 2.6em; margin-left: -1.3em; border-radius: 50%; opacity: 0; background: linear-gradient(var(--ds-color-bg) 0 50%, var(--ball, var(--ds-color-border)) 50%); box-shadow: 0 0 0 .12em var(--ds-color-border); }
+.sim-th--capsule.is-drop .sim-cap__ball { animation: sim-cap-drop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.sim-th--capsule.is-silver .sim-cap__ball { --ball: var(--ds-color-text-muted); }
+.sim-th--capsule.is-gold .sim-cap__ball { --ball: var(--ds-color-sim-yk-gold); box-shadow: 0 0 1em var(--ds-color-sim-yk-gold); }
+.sim-th--capsule.is-rainbow .sim-cap__ball { background: var(--ds-color-accent-gradient); box-shadow: 0 0 1.2em var(--ds-color-sim-yk-gold); }
+.sim-th--capsule.is-white .sim-cap__ball { --ball: var(--ds-color-bg); }
+@keyframes sim-cap-turn { from { transform: rotate(var(--from)); } to { transform: rotate(var(--to)); } }
+@keyframes sim-cap-drop { from { opacity: 0; transform: translateY(-2em) scale(.6); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .sim-dice i, .sim-th--count.is-red .sim-cd b, .sim-th--crystal.is-crack2 .sim-crys__gem, .sim-stage.sim-th-glitch, .sim-th--charge.is-full .sim-chg__bar, .sim-th-dark.is-big.is-on::before { animation: none; }
+}
+
+/* 2026-11-01 岸田「演出によってサムネの背景にすかし」案A: 演出のアイコンを薄く並べる。data-fx は JS が付ける（fxOf と同じ割り振り） */
+.sim-card__visual[data-fx]::before { content: ""; position: absolute; inset: 0; background: var(--ds-color-text); opacity: .1; -webkit-mask: var(--fx-mark) center / auto 42% space; mask: var(--fx-mark) center / auto 42% space; pointer-events: none; }
+.sim-card__visual[data-fx="logo"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='black' stroke-width='6'/%3E%3Ctext x='50' y='66' font-family='sans-serif' font-size='46' font-weight='900' text-anchor='middle'%3E%E5%BE%97%3C/text%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="dice"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cpath d='M14 30h40a8 8 0 0 1 8 8v40a8 8 0 0 1-8 8H14a8 8 0 0 1-8-8V38a8 8 0 0 1 8-8zM22 46a5 5 0 1 0 0 .1zM34 58a5 5 0 1 0 0 .1zM46 70a5 5 0 1 0 0 .1z'/%3E%3Cpath transform='rotate(18 70 40)' d='M54 12h30a6 6 0 0 1 6 6v30a6 6 0 0 1-6 6H54a6 6 0 0 1-6-6V18a6 6 0 0 1 6-6zM62 24a4 4 0 1 0 0 .1zM76 24a4 4 0 1 0 0 .1zM62 42a4 4 0 1 0 0 .1zM76 42a4 4 0 1 0 0 .1z'/%3E%3C/g%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="count"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='4' y='28' width='92' height='44' rx='8' fill='none' stroke='black' stroke-width='5'/%3E%3Ctext x='50' y='62' font-family='Arial,sans-serif' font-size='30' font-weight='900' text-anchor='middle'%3E00:05%3C/text%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="crystal"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 6l38 22v44L50 94 12 72V28z' fill='none' stroke='black' stroke-width='6' stroke-linejoin='round'/%3E%3Cpath d='M50 6v88M12 28l76 44M88 28L12 72' stroke='black' stroke-width='3'/%3E%3Cpath d='M60 40l-8 10 10 6-6 12' fill='none' stroke='black' stroke-width='4'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="charge"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='6' y='34' width='80' height='32' rx='6' fill='none' stroke='black' stroke-width='5'/%3E%3Crect x='88' y='44' width='6' height='12' rx='2'/%3E%3Crect x='13' y='41' width='20' height='18' rx='2'/%3E%3Crect x='36' y='41' width='20' height='18' rx='2'/%3E%3Cpath d='M66 38L58 52h8l-4 12 12-16h-8l4-10z'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="capsule"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M24 52a26 26 0 0 1 52 0z' fill='none' stroke='black' stroke-width='5'/%3E%3Ccircle cx='40' cy='42' r='5'/%3E%3Ccircle cx='54' cy='38' r='5'/%3E%3Ccircle cx='62' cy='47' r='5'/%3E%3Crect x='24' y='54' width='52' height='26' rx='4'/%3E%3Ccircle cx='50' cy='90' r='8' fill='none' stroke='black' stroke-width='4'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="pack"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M28 8l4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4v84l-4-4-4 4-4-4-4 4-4-4-4 4-4-4-4 4-4-4-4 4z' fill='none' stroke='black' stroke-width='5' stroke-linejoin='round'/%3E%3Cpath d='M36 40h28M36 50h28M36 60h18' stroke='black' stroke-width='5'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="card"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='22' y='8' width='56' height='84' rx='6' fill='none' stroke='black' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='16' fill='none' stroke='black' stroke-width='6'/%3E%3Cpath d='M34 50h32' stroke='black' stroke-width='6'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="slot"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='4' y='22' width='92' height='56' rx='8' fill='none' stroke='black' stroke-width='5'/%3E%3Cpath d='M34 26v48M66 26v48' stroke='black' stroke-width='4'/%3E%3Ctext x='19' y='64' font-family='Arial,sans-serif' font-size='34' font-weight='900' text-anchor='middle'%3E7%3C/text%3E%3Ctext x='50' y='64' font-family='Arial,sans-serif' font-size='34' font-weight='900' text-anchor='middle'%3E7%3C/text%3E%3Ctext x='81' y='64' font-family='Arial,sans-serif' font-size='34' font-weight='900' text-anchor='middle'%3E7%3C/text%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="door"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20 94V40a30 30 0 0 1 60 0v54z' fill='none' stroke='black' stroke-width='6' stroke-linejoin='round'/%3E%3Cpath d='M50 12v82' stroke='black' stroke-width='4'/%3E%3Ccircle cx='42' cy='60' r='4'/%3E%3Ccircle cx='58' cy='60' r='4'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="chain"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='black' stroke-width='7'%3E%3Crect x='6' y='36' width='34' height='22' rx='11' transform='rotate%28-30 23 47%29'/%3E%3Crect x='33' y='39' width='34' height='22' rx='11'/%3E%3Crect x='60' y='42' width='34' height='22' rx='11' transform='rotate%2830 77 53%29'/%3E%3C/g%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="moon"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M62 10a40 40 0 1 0 28 62A34 34 0 0 1 62 10z'/%3E%3Cpath d='M80 20l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="torii"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M4 18q46 10 92 0v12q-46 8-92 0z'/%3E%3Crect x='14' y='40' width='72' height='8'/%3E%3Crect x='22' y='30' width='9' height='64'/%3E%3Crect x='69' y='30' width='9' height='64'/%3E%3Crect x='45' y='30' width='10' height='18'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="sword"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M86 6L40 52l8 8 46-46 2-10z'/%3E%3Cpath d='M30 50l20 20-6 6-20-20z'/%3E%3Cpath d='M34 66L12 88l-4-4 22-22z'/%3E%3Cpath d='M6 80l14 14' stroke='black' stroke-width='6'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="disco"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='42' r='30' fill='none' stroke='black' stroke-width='5'/%3E%3Cpath d='M20 42h60M50 12v60M28 24q22 10 44 0M28 60q22-10 44 0M38 14q-10 28 0 56M62 14q10 28 0 56' fill='none' stroke='black' stroke-width='3'/%3E%3Cpath d='M50 2v10' stroke='black' stroke-width='4'/%3E%3Cpath d='M16 84l-8 10M84 84l8 10M50 80v14' stroke='black' stroke-width='5'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="roulette"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='54' r='38' fill='none' stroke='black' stroke-width='6'/%3E%3Cpath d='M50 16v76M12 54h76M23 27l54 54M77 27L23 81' stroke='black' stroke-width='3'/%3E%3Ccircle cx='50' cy='54' r='9'/%3E%3Cpath d='M42 4h16L50 18z'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="firework"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='black' stroke-width='5' stroke-linecap='round'%3E%3Cpath d='M50 40V12M50 40l20-20M50 40h28M50 40l20 20M50 40V68M50 40L30 60M50 40H22M50 40L30 20'/%3E%3C/g%3E%3Cpath d='M50 96V74' stroke='black' stroke-width='4' stroke-dasharray='4 4'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="chest"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M14 46q0-26 36-26t36 26z' fill='none' stroke='black' stroke-width='6'/%3E%3Crect x='14' y='46' width='72' height='38' rx='4' fill='none' stroke='black' stroke-width='6'/%3E%3Crect x='43' y='40' width='14' height='16' rx='2'/%3E%3C/svg%3E"); }
+.sim-card__visual[data-fx="thunder"] { --fx-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M24 34a14 14 0 0 1 26-10 16 16 0 0 1 30 8 10 10 0 0 1-2 20H26a12 12 0 0 1-2-18z'/%3E%3Cpath d='M52 54L38 78h12l-6 20 22-30H54l8-14z'/%3E%3C/svg%3E"); }
+/* 2026-11-01 岸田: Xでシェアのボタンに X のロゴ */
+.sim-xicon { display: inline-block; width: 1.05em; height: 1.05em; margin-right: .45em; vertical-align: -.15em; }
+/* 2026-11-01 岸田: FV の月間ランキング景品バナー */
+.sim-rankbn { display: block; margin: 0 0 var(--ds-space-stack-sm); border-radius: var(--ds-radius-card); overflow: hidden; transition: transform .15s ease; }
+.sim-rankbn:hover { transform: translateY(-2px); }
+.sim-rankbn img { display: block; width: 100%; height: auto; }
+/* 2026-11-01 岸田「演出の領域を大きく」: 引いている間は演出の箱をポップアップの下端まで広げる */
+.sim-rpop.is-drawing .sim-stage { flex: 1 1 auto; }
+/* 2026-11-01 岸田「ポイントが足りません は中央寄せ」: 見出しの行いっぱいに広げて真ん中に（右上の×と重ならないよう左右に余白） */
+.sim-charge.is-alert .sim-charge__head { justify-content: center; }
+.sim-charge.is-alert .sim-charge__title { flex: 1 1 auto; padding: 0 2.6em; }
+/* 2026-11-01 岸田: 「オリ得ポイント」と「オリ得ランクポイント」（発送で現金化した額＝ランキングの元）。ランクポイントはC02（斜めスピード）のアイコン */
+.sim-rankpt { display: inline-block; width: 1.4em; height: 1.4em; object-fit: contain; vertical-align: middle; }
+.sim-footbar__icon .sim-rankpt { width: 100%; height: 100%; }
+html.sim-play-game .header__simcash .sim-rankpt { width: 1.3em; height: 1.3em; }
+.header__simcash { border-color: var(--ds-color-sim-yk-gold); }
+.sim-footbar__item--cash .sim-footbar__label { color: var(--ds-color-text); }
+.sim-rank__rate { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); }
+.sim-rank__rate .sim-rankpt { font-size: var(--ds-text-caption-size); }
+/* 2026-11-01 岸田「改行きもちわるい」: 「ゲームで遊ぶ」と「（無料）」はそれぞれ途中で折らない。（無料）は小さめにして、スマホでも1行に収める */
+.sim-choose__main, .sim-choose__free { display: inline-block; white-space: nowrap; }
+.sim-choose__free { font-size: .62em; }
+@media (max-width: 360px) { /* 320px 幅の端末でも見出しとボタンを1行に */
+  .sim-hero__title { font-size: var(--ds-text-h2-size); white-space: nowrap; }
+  .sim-choose__btn--game .sim-choose__title { font-size: var(--ds-text-h2-size); }
+}
+
+/* 2026-11-01 コイン／ランクポイントの説明吹き出し・ハズレのマイナス額 */
+[data-sim-help] { cursor: pointer; }
+.sim-help { position: fixed; z-index: 1000; max-width: min(300px, calc(100vw - 24px)); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border-radius: var(--ds-radius-card); background: var(--ds-color-text); color: var(--ds-color-text-inverse); font-size: var(--ds-text-caption-size); line-height: 1.6; box-shadow: var(--ds-shadow-card); }
+.sim-help::after { content: ""; position: absolute; left: var(--sim-help-arrow, 50%); top: -6px; width: 12px; height: 12px; margin-left: -6px; background: inherit; transform: rotate(45deg); }
+.sim-help.is-up::after { top: auto; bottom: -6px; }
+.sim-help__title { display: block; margin-bottom: var(--ds-space-inline-xs); font-size: var(--ds-text-body-sm-size); }
+.sim-help__body { display: block; }
+.sim-help__em { color: var(--ds-color-sim-btn-yellow); font-weight: 800; }
+.sim-stage__minus { display: block; color: var(--ds-color-sim-btn-red); font-family: var(--ds-font-num); font-size: var(--ds-text-h2-size); font-weight: var(--ds-text-h3-weight); line-height: 1.2; }
+.sim-stage__minus-note { display: block; margin-top: var(--ds-space-inline-xs); font-size: var(--ds-text-caption-size); }
+.sim-rpop__minus { color: var(--ds-color-sim-btn-red); }
+.sim-rpop__noimg--logo { padding: var(--ds-space-inline-sm); }
+.sim-rpop__noimg--logo img { width: 100%; height: auto; }
+.sim-yk-ren b { white-space: nowrap; font-size: min(calc(var(--ds-text-h1-size) * 1.3), 9vw); }
+.sim-inv__img--logo { display: grid; place-items: center; border-radius: var(--ds-radius-input); background: var(--ds-color-bg); }
+.sim-inv__img--logo img { width: 90%; height: auto; }
+
+/* 2026-11-01 ハズレのノーマルカードをカードらしく（銀の枠＋内側の細い枠＋斜めの地紋＋NORMAL）・交換で戻ったポイントの表示 */
+.sim-rpop__noimg--logo { position: relative; padding: 8% 10% 34%; border: 4px solid var(--ds-color-sim-lv-silver); background: repeating-linear-gradient(135deg, var(--ds-color-bg-paper) 0 6px, var(--ds-color-bg) 6px 12px); box-shadow: 0 1px 3px color-mix(in srgb, var(--ds-color-text) 18%, transparent); }
+.sim-rpop__noimg--logo::before { content: ""; position: absolute; inset: 5px; border: 1px solid var(--ds-color-border-strong); border-radius: calc(var(--ds-radius-input) / 2); pointer-events: none; }
+.sim-rpop__noimg--logo::after { content: "NORMAL"; position: absolute; left: 50%; bottom: 9px; transform: translateX(-50%); padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-lv-silver); color: var(--ds-color-text-inverse); font-family: var(--ds-font-num); font-size: var(--ds-text-micro-size); font-weight: var(--ds-text-h3-weight); line-height: 1.6; letter-spacing: .08em; }
+.sim-rpop__noimg--logo img { position: relative; }
+.sim-rpop-done { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ds-space-inline-sm); background: var(--ds-color-bg-paper); animation: sim-pop .3s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-rpop-done .sim-coin { width: 3em; height: 3em; font-size: var(--ds-text-h3-size); }
+.sim-rpop-done b { font-family: var(--ds-font-num); font-size: calc(var(--ds-text-h1-size) * 1.4); font-weight: var(--ds-text-display-weight); color: var(--ds-color-text); line-height: 1.1; }
+.sim-rpop-done small { font-size: var(--ds-text-body-size); font-weight: var(--ds-text-h3-weight); color: var(--ds-color-text-muted); }
+.sim-rpop-done__net { margin-top: var(--ds-space-inline-sm); font-family: var(--ds-font-num); font-size: var(--ds-text-h2-size); font-weight: var(--ds-text-display-weight); }
+.sim-rpop-done__net.is-minus { color: var(--ds-color-sim-btn-red); }
+.sim-rpop-done__net.is-plus { color: var(--ds-color-positive); }
+.sim-rpop-done small.sim-rpop-done__cost { font-size: var(--ds-text-caption-size); }
+
+/* 2026-11-01 ガチャの必要レベルの札（ゲームのときだけ）と、タイトル頭の演出名 */
+.sim-card__lv { display: none; position: absolute; left: var(--ds-space-inline-sm); top: var(--ds-space-inline-sm); z-index: 1; padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-caption-size); font-weight: 900; line-height: 1.7; letter-spacing: .04em; box-shadow: 0 1px 2px color-mix(in srgb, var(--ds-color-text) 25%, transparent); filter: none; }
+[data-play="game"] .sim-card__lv { display: inline-block; }
+.sim-card__lv--beginner2 { background: var(--ds-color-sim-lv-beginner); }
+.sim-card__lv--bronze { background: var(--ds-color-sim-lv-bronze); }
+.sim-card__lv--bronze2 { background: var(--ds-color-sim-lv-bronze); }
+.sim-card__lv--silver { background: var(--ds-color-sim-lv-silver); }
+.sim-card__lv--silver2 { background: var(--ds-color-sim-lv-silver); }
+.sim-card__lv--gold { background: var(--ds-color-sim-lv-gold); }
+.sim-card__lv--gold2 { background: var(--ds-color-sim-lv-gold); }
+.sim-card__lv--platinum { background: var(--ds-color-sim-lv-platinum); }
+.sim-card__lv--platinum2 { background: var(--ds-color-sim-lv-platinum); }
+.sim-card__lv--diamond { background: var(--ds-color-sim-lv-diamond); }
+.sim-card__lv--diamond2 { background: var(--ds-color-sim-lv-diamond); }
+.sim-card__lv--master { background: var(--ds-color-sim-lv-master); }
+.sim-card__lv--legend { background: var(--ds-color-sim-lv-legend); }
+.sim-card__lv--vip { background: var(--ds-color-sim-lv-vip); }
+.sim-fxtag { display: inline-block; margin-right: var(--ds-space-inline-xs); padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); font-size: .8em; font-weight: 900; line-height: 1.6; vertical-align: .1em; }
+
+/* 2026-11-01 獲得商品のまとめボタンを大きく（PCは横幅いっぱいに3等分）・オリ得レベルのヘルプ */
+.sim-inv__bulk .sim-btn { min-height: calc(var(--ds-touch-target-min) * 1.3); font-size: var(--ds-text-body-size); }
+@media (min-width: 641px) { .sim-inv__bulk { display: grid; grid-template-columns: repeat(3, 1fr); } .sim-inv__bulk .sim-btn { width: 100%; } }
+@media (max-width: 640px) { .sim-inv__bulk .sim-btn { flex: 1 1 calc(50% - var(--ds-space-inline-sm)); } .sim-inv__bulk .sim-btn--x { flex-basis: 100%; } }
+.sim-status__top { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); }
+.sim-status__help { display: inline-flex; align-items: center; justify-content: center; width: 1.8em; height: 1.8em; padding: 0; border: 2px solid var(--ds-color-bg); border-radius: 50%; background: transparent; color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-caption-size); font-weight: 900; cursor: pointer; }
+.sim-status__help:hover { background: color-mix(in srgb, var(--ds-color-bg) 20%, transparent); }
+.sim-help__body + .sim-help__body { margin-top: var(--ds-space-inline-xs); }
+.sim-rpop-done__icon { width: 3em; height: 3em; object-fit: contain; font-size: var(--ds-text-h3-size); }
+
+/* 2026-11-01 チャンスアップの文字色: 青→緑→赤→金→虹（パチンコの期待度の色） */
+.sim-yk__telop.is-c4, .sim-yk-ren b.is-c4 { color: var(--ds-color-sim-yk-gold); -webkit-text-stroke: .03em var(--ds-color-text); text-shadow: 0 0 .3em var(--ds-color-sim-yk-gold); }
+.sim-yk__telop.is-c5, .sim-yk-ren b.is-c5 { color: transparent; background: linear-gradient(90deg, var(--ds-color-sim-yk-red), var(--ds-color-sim-yk-gold), var(--ds-color-sim-yk-green), var(--ds-color-sim-yk-blue), var(--ds-color-sim-yk-red)) 0 0 / 200% 100%; animation: sim-yk-rainbow 1.2s linear infinite, sim-yk-slam .45s cubic-bezier(.2, 1.6, .4, 1) both; -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: .035em var(--ds-color-text); text-shadow: none; filter: drop-shadow(0 0 .15em var(--ds-color-sim-yk-gold)); }
+.sim-yk-ren b.is-c1 { color: var(--ds-color-sim-yk-blue); }
+.sim-yk-ren b.is-c2 { color: var(--ds-color-sim-yk-green); }
+.sim-yk-ren b.is-c3 { color: var(--ds-color-sim-yk-red); }
+.sim-yk-ren b.is-c4 { color: var(--ds-color-sim-yk-gold); }
+@keyframes sim-yk-rainbow { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .sim-yk__telop.is-c5, .sim-yk-ren b.is-c5 { animation: none; } }
+/* 2026-11-01 ゲーム中はヘッダーとオリ得レベルのカードの間を詰める */
+html[data-sim-started] .main { padding-top: 0; }
+html[data-sim-started] .ot.sim { padding-top: var(--ds-space-inline-sm); }
+html[data-sim-started] .sim-status { margin-top: 0; }
+@media (max-width: 640px) { .sim-charge.is-alert .sim-charge__title { font-size: var(--ds-text-h2-size); } }
+.sim-charge.is-alert .sim-charge__title { white-space: pre-line; letter-spacing: .04em; }
+
+/* 2026-11-01 オリ得レベルのポップアップ（上がVIP。今のレベルを強調、届いていない段は薄く） */
+.sim-lvdlg .sim-charge__inner { max-height: calc(100dvh - 2 * var(--ds-space-stack-md)); overflow-y: auto; border-radius: var(--ds-radius-card); background: var(--ds-color-bg); box-shadow: var(--ds-shadow-modal); }
+.sim-lvdlg .sim-charge__x { display: block; }
+.sim-lvdlg .sim-charge__title { text-align: center; }
+.sim-lvdlg__lead, .sim-lvdlg__note { margin: var(--ds-space-inline-sm) 0; font-size: var(--ds-text-body-sm-size); }
+.sim-lvdlg__note { color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-size); }
+.sim-lvdlg__list { display: flex; flex-direction: column; gap: var(--ds-space-inline-xs); margin: var(--ds-space-inline-md) 0; padding: 0; list-style: none; }
+.sim-lvdlg__row { position: relative; display: grid; grid-template-columns: 9.5em 1fr auto; align-items: center; gap: var(--ds-space-inline-sm); padding: var(--ds-space-inline-xs) var(--ds-space-inline-sm); border-radius: var(--ds-radius-input); background: var(--ds-color-bg-subtle); font-size: var(--ds-text-body-sm-size); }
+.sim-lvdlg__row.is-ahead { opacity: .55; }
+.sim-lvdlg__row.is-now { background: var(--ds-color-bg-paper); box-shadow: 0 0 0 3px var(--ds-color-sim-btn-yellow); }
+.sim-lvdlg__name { display: block; padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-weight: 900; text-align: center; white-space: nowrap; line-height: 1.8; }
+.sim-lvdlg__min { font-weight: var(--ds-text-h3-weight); }
+.sim-lvdlg__max { color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-size); white-space: nowrap; }
+.sim-lvdlg__here { position: absolute; right: var(--ds-space-inline-sm); top: 0; transform: translateY(-55%); padding: 0 var(--ds-space-inline-sm); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-yellow); color: var(--ds-color-text); font-size: var(--ds-text-micro-size); font-weight: 900; line-height: 1.6; }
+@media (max-width: 400px) { .sim-lvdlg__row { grid-template-columns: 8em 1fr; } .sim-lvdlg__max { grid-column: 2; } }
+/* 2026-11-01 岸田「1画面に収める・1回◯までは不要」: 名前とコインの2列で詰める */
+.sim-lvdlg .sim-charge__inner { padding: var(--ds-space-inline-md); }
+.sim-lvdlg .sim-charge__title { font-size: var(--ds-text-h3-size); }
+.sim-lvdlg__lead { margin: var(--ds-space-inline-xs) 0; font-size: var(--ds-text-caption-size); text-align: center; }
+.sim-lvdlg__list { gap: 3px; margin: var(--ds-space-inline-sm) 0; }
+.sim-lvdlg__row, .sim-lvdlg__row:nth-child(n) { grid-template-columns: 9em 1fr; padding: 2px var(--ds-space-inline-sm); font-size: var(--ds-text-caption-size); }
+.sim-lvdlg__name { font-size: var(--ds-text-caption-size); line-height: 1.7; }
+.sim-lvdlg__note { margin: 0; text-align: center; }
+/* 2026-11-01 レベル名は「ビギナー（見習い）」の形。ポップアップは 色の札・（）の中・コイン の3列、カードの英字の横に（）の中 */
+.sim-lvdlg__row, .sim-lvdlg__row:nth-child(n) { grid-template-columns: 7em 6em 1fr; }
+.sim-lvdlg__sub { font-weight: var(--ds-text-h3-weight); white-space: nowrap; }
+.sim-status__sub { margin-left: var(--ds-space-inline-sm); font-size: .45em; letter-spacing: 0; vertical-align: .2em; }
+
+/* 2026-11-02 岸田「ルーレット結果は画面いっぱいに表示させてほしい」: 止まったら窓ごと全画面にして、金額を真ん中に大きく出す */
+.sim-charge.is-result[open] { inset: 0; width: 100vw; max-width: none; height: 100vh; height: 100dvh; max-height: none; margin: 0; }
+.sim-charge.is-result > .sim-charge__inner { height: 100%; border-radius: 0; box-shadow: none; }
+.sim-charge.is-result .sim-charge__pop { z-index: 3; gap: var(--ds-space-stack-sm); background: radial-gradient(circle at 50% 45%, var(--ds-color-bg-elevated) 0, var(--ds-color-badge-bg-cream) 45%, var(--ds-color-sim-btn-yellow) 100%); }
+.sim-charge.is-result.is-lv6 .sim-charge__pop, .sim-charge.is-result.is-lv7 .sim-charge__pop { background: radial-gradient(circle at 50% 45%, var(--ds-color-sim-btn-yellow) 0, var(--ds-color-sim-btn-red) 70%); }
+.sim-charge__pop-msg { font-size: clamp(1.5rem, 6vw, 2.75rem); font-weight: var(--ds-text-display-weight); color: var(--ds-color-text); }
+.sim-charge.is-lv6 .sim-charge__pop-msg, .sim-charge.is-lv7 .sim-charge__pop-msg { color: var(--ds-color-text-inverse); }
+.sim-charge.is-result .sim-charge__pop-pt { max-width: calc(100vw - 2 * var(--ds-space-page-x)); padding: var(--ds-space-stack-sm) var(--ds-space-stack-md); font-size: clamp(3rem, 15vw, 9rem); line-height: 1.1; white-space: nowrap; transform: none !important; }
+.sim-charge.is-result.is-lv6 .sim-charge__pop-pt, .sim-charge.is-result.is-lv7 .sim-charge__pop-pt { background: var(--ds-color-bg-elevated); color: var(--ds-color-sim-btn-red); }
+.sim-charge.is-result.is-lv6 .sim-charge__pop-tag, .sim-charge.is-result.is-lv7 .sim-charge__pop-tag { background: var(--ds-color-bg-inverse); }
+.sim-charge.is-result .sim-charge__pop-pt small { font-size: .35em; }
+.sim-charge.is-result .sim-charge__pop-tag { font-size: clamp(1.6rem, 7vw, 3.2rem); padding: var(--ds-space-inline-xs) var(--ds-space-stack-md); }
+.sim-charge.is-result .sim-confetti { z-index: 4; }
+
+/* ロゴ増殖の激アツ（logoRush）。スマホでも見えるよう、1つのロゴは最小 5rem */
+.sim-yk-rush { z-index: 6; overflow: hidden; display: block; }
+.sim-yk-rush img { position: absolute; width: clamp(5rem, 24vw, 10rem); height: auto; filter: drop-shadow(0 .2em .4em rgba(0,0,0,.35)); }
+.sim-yk-rush.is-gold { background: radial-gradient(circle, rgba(255,214,0,.35), transparent 70%); }
+.sim-yk-rush.is-rainbow::before { content: ""; position: absolute; inset: 0; background: var(--ds-color-accent-gradient); animation: sim-rush-bg 1.8s ease-out both; }
+.sim-yk-rush.is-flood img { transform: rotate(var(--rot)); animation: sim-rush-pop .3s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-yk-rush.is-school img { margin-left: var(--dx); animation: sim-rush-swim 1.3s cubic-bezier(.4, 0, .6, 1) both; }
+.sim-yk-rush.is-rain img { top: -30%; transform: rotate(var(--rot)); animation: sim-rush-fall .9s ease-in both; }
+.sim-yk-rush.is-burst img { translate: -50% -50%; animation: sim-rush-burst 1.1s cubic-bezier(.1, .8, .3, 1) both; }
+@keyframes sim-rush-pop { from { opacity: 0; scale: .2; } to { opacity: 1; scale: 1; } }
+@keyframes sim-rush-swim { 0% { left: -40%; transform: rotate(-4deg); } 50% { transform: translateY(-.4em) rotate(4deg); } 100% { left: 125%; transform: rotate(-4deg); } }
+@keyframes sim-rush-fall { to { top: 115%; } }
+@keyframes sim-rush-burst { from { left: 50%; top: 50%; transform: scale(.2) rotate(0); } to { left: var(--tx); top: var(--ty); transform: scale(1.1) rotate(var(--rot)); } }
+@keyframes sim-rush-bg { from { opacity: 0; } 15% { opacity: 1; } to { opacity: .85; } }
+@media (prefers-reduced-motion: reduce) { .sim-yk-rush img { animation: none !important; } }
+
+/* ---- 解放されるガチャの演出 7種（2026-11-02）。熱さの色は --k（sim-k1 青〜sim-k5 虹） ---- */
+.sim-th { --k: #c9d1db; --kg: var(--k); }
+.sim-th.sim-k1 { --k: var(--ds-color-sim-yk-blue); }
+.sim-th.sim-k2 { --k: var(--ds-color-sim-yk-green); }
+.sim-th.sim-k3 { --k: var(--ds-color-sim-yk-red); }
+.sim-th.sim-k4 { --k: var(--ds-color-sim-yk-gold); }
+.sim-th.sim-k5 { --k: #ff4fa3; --kg: linear-gradient(135deg, #ff4fa3, #ffb800, #3ddc84, #2fd3ff, #7a5cff); }
+.sim-th:is(.sim-k1, .sim-k2, .sim-k3, .sim-k4) { --kg: var(--k); }
+.sim-th-night { background: radial-gradient(circle at 50% 30%, #2b2f58, #0b0d1c 75%) !important; }
+.sim-th-night .sim-stage__text, .sim-th-night .sim-th__note.is-cold { color: #fff; }
+
+/* スロット */
+.sim-slot { display: flex; gap: .3em; padding: .45em; border-radius: .5em; background: #1b1d2a; box-shadow: 0 0 0 .18em var(--k), 0 0 1.2em var(--k); transition: box-shadow .3s; }
+.sim-slot i { display: flex; align-items: center; justify-content: center; width: 2.3em; height: 2.6em; border-radius: .3em; background: linear-gradient(#fff, #e9edf2 50%, #fff); color: var(--ds-color-sim-yk-red); font-family: var(--ds-font-pop); font-size: var(--ds-text-h2-size); font-style: normal; font-weight: 900; animation: sim-slot-spin .12s linear infinite; }
+.sim-slot i.is-stop { animation: sim-yk-up .3s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-th--slot.is-reach .sim-slot i.is-stop { background: #fff3c4; }
+.sim-th--slot.is-off .sim-slot { position: relative; }
+.sim-th--slot.is-off .sim-slot::after { content: ""; position: absolute; left: 0; right: 0; bottom: -.7em; height: .45em; border-radius: .2em; background: #000; box-shadow: 0 0 0 .1em #333; }
+.sim-th--slot.is-win .sim-slot i { background: var(--kg); color: #fff; text-shadow: 0 .06em 0 rgba(0,0,0,.4); animation: sim-pulse .35s ease-in-out infinite alternate; }
+@keyframes sim-slot-spin { from { transform: translateY(-12%); filter: blur(1.5px); } to { transform: translateY(12%); filter: blur(1.5px); } }
+
+/* 扉 */
+.sim-door { position: relative; width: 9em; height: 11em; border-radius: 4.5em 4.5em .4em .4em; overflow: hidden; box-shadow: 0 0 0 .25em var(--k), 0 0 1.4em var(--k); }
+.sim-door__in { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #fff 0, #fff6c2 40%, var(--k) 100%); }
+.sim-door__in img { width: 80%; }
+.sim-door__l, .sim-door__r { position: absolute; top: 0; bottom: 0; width: 50%; background: var(--kg); filter: brightness(.75); transition: transform .6s cubic-bezier(.6, 0, .2, 1); }
+.sim-door__l { left: 0; box-shadow: inset -.15em 0 0 rgba(0,0,0,.35); }
+.sim-door__r { right: 0; box-shadow: inset .15em 0 0 rgba(255,255,255,.2); }
+.sim-door__l::after { content: ""; position: absolute; right: .5em; top: 50%; width: .5em; height: .5em; border-radius: 50%; background: #ffd84a; }
+.sim-th--door.is-hit .sim-door { animation: sim-fx-shake .12s linear 3; }
+.sim-th--door.is-open .sim-door__l { transform: translateX(-102%); }
+.sim-th--door.is-open .sim-door__r { transform: translateX(102%); }
+
+/* 鎖 */
+.sim-chain { position: relative; width: 8em; height: 11em; }
+.sim-chain__card { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: .5em; background: #2a2d3e; box-shadow: 0 0 0 .2em #fff, 0 .3em .8em rgba(0,0,0,.3); filter: grayscale(1) brightness(.7); transition: filter .4s, box-shadow .4s; }
+.sim-chain__card img { width: 85%; }
+.sim-chain__x { position: absolute; left: -15%; right: -15%; top: 46%; height: .9em; border-radius: .45em; background: repeating-linear-gradient(90deg, var(--k) 0 .9em, transparent .9em 1.1em); box-shadow: 0 0 .5em var(--k); transition: transform .5s ease-in, opacity .5s; }
+.sim-chain__x.is-a { transform: rotate(32deg); }
+.sim-chain__x.is-b { transform: rotate(-32deg); }
+.sim-chain__lock { position: absolute; left: 50%; top: 50%; width: 2em; height: 1.7em; margin: -.6em 0 0 -1em; border-radius: .3em; background: var(--kg); box-shadow: 0 0 0 .12em #222; transition: transform .5s, opacity .5s; }
+.sim-chain__lock::before { content: ""; position: absolute; left: .4em; right: .4em; bottom: 100%; height: .9em; border: .25em solid #888; border-bottom: 0; border-radius: .7em .7em 0 0; }
+.sim-th--chain.is-pull .sim-chain { animation: sim-fx-shake .1s linear 3; }
+.sim-th--chain.is-cut .sim-chain__x.is-a { transform: translate(-60%, -200%) rotate(70deg); opacity: 0; }
+.sim-th--chain.is-cut .sim-chain__x.is-b { transform: translate(60%, -200%) rotate(-70deg); opacity: 0; }
+.sim-th--chain.is-cut .sim-chain__lock { transform: translateY(260%) rotate(40deg); opacity: 0; }
+.sim-th--chain.is-cut .sim-chain__card { filter: none; background: radial-gradient(circle, #fff, #fff6c2 50%, var(--k)); box-shadow: 0 0 0 .2em #fff, 0 0 2em var(--k); }
+
+/* 月 */
+.sim-moon { position: relative; width: 12em; height: 10em; }
+.sim-moon__m { position: absolute; left: 50%; top: 50%; width: 6em; height: 6em; margin: -3em 0 0 -3em; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff, #e8ecf3 60%, #c7cfdb); box-shadow: inset -2.2em -.6em 0 0 #12152a, 0 0 1.4em var(--k); animation: sim-moon-rise 1s ease-out both; transition: box-shadow .7s, background .5s; }
+.sim-th--moon.sim-k5 .sim-moon__m, .sim-th--moon.sim-k4 .sim-moon__m { background: radial-gradient(circle at 40% 35%, #fff, var(--k) 70%); }
+.sim-th--moon.sim-k5 .sim-moon__m { background: radial-gradient(circle at 40% 35%, #fff 0 15%, transparent 60%), linear-gradient(135deg, #ff4fa3, #ffb800, #3ddc84, #2fd3ff, #7a5cff); }
+.sim-th--moon.is-full .sim-moon__m { box-shadow: inset 0 0 0 0 #12152a, 0 0 3em var(--k), 0 0 6em var(--k); animation: sim-pulse .5s ease-in-out infinite alternate; }
+.sim-moon__cloud { position: absolute; left: -60%; top: 42%; width: 9em; height: 3.2em; border-radius: 2em; background: #5b6177; box-shadow: 2.2em -1em 0 .2em #5b6177, -1.5em .2em 0 -.2em #4b5066; opacity: 0; }
+.sim-th--moon.is-cloud .sim-moon__cloud { animation: sim-moon-cloud .7s ease-out both; }
+@keyframes sim-moon-rise { from { transform: translateY(60%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes sim-moon-cloud { from { left: -60%; opacity: 0; } to { left: 12%; opacity: .97; } }
+
+/* 鳥居 */
+.sim-torii { display: flex; flex-direction: column; align-items: center; gap: .6em; }
+.sim-torii__gate { position: relative; width: 10em; height: 8em; }
+.sim-torii__gate::before { content: ""; position: absolute; left: -.6em; right: -.6em; top: 0; height: 1em; border-radius: .5em .5em .15em .15em; background: var(--kg); box-shadow: 0 2em 0 -.15em var(--k), 0 0 1em var(--k); }
+.sim-torii__gate::after { content: ""; position: absolute; top: 1em; bottom: 0; left: 1.6em; right: 1.6em; border-left: 1em solid var(--k); border-right: 1em solid var(--k); }
+.sim-th--torii:not([class*="sim-k"]) { --k: #b5473c; }
+.sim-torii__lamps { display: flex; gap: 1.2em; }
+.sim-torii__lamps i { width: 1.5em; height: 2em; border-radius: .4em; background: #4a4f60; transition: background .25s, box-shadow .25s; }
+.sim-torii__lamps i.is-on { background: #ffcf4a; box-shadow: 0 0 1em #ffb800, 0 0 2em #ffb800; animation: sim-yk-up .3s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-th--torii.is-bless .sim-torii__gate { animation: sim-pulse .4s ease-in-out infinite alternate; filter: drop-shadow(0 0 1em var(--k)); }
+
+/* 一刀両断 */
+.sim-slash { position: relative; width: 8em; height: 11em; }
+.sim-slash__h { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: .5em; background: linear-gradient(160deg, #353a52, #1a1d2b); box-shadow: 0 0 0 .2em #fff; transition: transform .5s cubic-bezier(.2, .8, .3, 1), filter .3s; }
+.sim-slash__h img { width: 85%; }
+.sim-slash__h.is-a { clip-path: polygon(0 0, 100% 0, 100% 30%, 0 70%); }
+.sim-slash__h.is-b { clip-path: polygon(0 70%, 100% 30%, 100% 100%, 0 100%); }
+.sim-slash__line { position: absolute; left: -30%; right: -30%; top: 50%; height: .35em; margin-top: -.17em; border-radius: .2em; background: var(--kg); box-shadow: 0 0 1em var(--k), 0 0 2em var(--k); transform: rotate(-22deg) scaleX(0); transform-origin: 0 50%; opacity: 0; }
+.sim-th--sword.is-ready .sim-slash { animation: sim-fx-shake .14s linear infinite; }
+.sim-th--sword.is-slash .sim-slash { animation: none; }
+.sim-th--sword.is-slash .sim-slash__line { animation: sim-slash-cut .25s ease-out both; }
+.sim-th--sword.is-split .sim-slash__h.is-a { transform: translate(-.6em, -.9em) rotate(-6deg); }
+.sim-th--sword.is-split .sim-slash__h.is-b { transform: translate(.6em, .9em) rotate(6deg); }
+.sim-th--sword.is-split .sim-slash__h { filter: drop-shadow(0 0 1em var(--k)); background: radial-gradient(circle, #fff, #fff6c2 55%, var(--k)); }
+.sim-th--sword.is-guard .sim-slash { animation: sim-fx-shake .1s linear 3; }
+.sim-th--sword.is-guard .sim-slash__line { opacity: 0; transition: opacity .3s; }
+@keyframes sim-slash-cut { from { transform: rotate(-22deg) scaleX(0); opacity: 1; } 70% { opacity: 1; } to { transform: rotate(-22deg) scaleX(1); opacity: .2; } }
+
+/* ミラーボール */
+.sim-disco { position: relative; width: 14em; height: 12em; }
+.sim-disco__ball { position: absolute; left: 50%; top: 0; width: 3.6em; height: 3.6em; margin-left: -1.8em; border-radius: 50%; background: repeating-conic-gradient(#e8ecf3 0 10deg, #8f99ab 10deg 20deg); box-shadow: 0 0 1.4em var(--k); animation: sim-disco-drop .7s ease-out both, sim-disco-spin 1.2s linear infinite; }
+.sim-disco__beam { position: absolute; inset: 0; background: repeating-conic-gradient(from 0deg at 50% 15%, transparent 0 18deg, color-mix(in srgb, var(--k) 45%, transparent) 18deg 24deg); opacity: .8; mix-blend-mode: screen; transition: background .4s, opacity .4s; } /* 光の筋は回さず、色だけ変える（2026-11-02 岸田） */
+.sim-disco__spot { position: absolute; left: 50%; bottom: 0; width: 8em; height: 4.5em; margin-left: -4em; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: radial-gradient(ellipse, rgba(255,255,255,.12), transparent 70%); }
+.sim-disco__spot img { width: 90%; opacity: 0; transform: scale(.6); transition: opacity .3s, transform .4s cubic-bezier(.2, 1.6, .4, 1); }
+.sim-th--disco.is-spot .sim-disco__spot { background: radial-gradient(ellipse, #fff, color-mix(in srgb, var(--k) 70%, #fff) 45%, transparent 72%); }
+.sim-th--disco.is-spot .sim-disco__spot img { opacity: 1; transform: scale(1); }
+.sim-th--disco.is-spot .sim-disco__beam { opacity: 1; }
+.sim-th--disco.is-miss .sim-disco__beam { opacity: .25; }
+.sim-th--disco.is-miss .sim-disco__spot { background: radial-gradient(ellipse, rgba(255,255,255,.35), transparent 70%); }
+@keyframes sim-disco-drop { from { transform: translateY(-120%); } to { transform: translateY(0); } }
+@keyframes sim-disco-spin { to { rotate: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .sim-slot i, .sim-disco__ball, .sim-disco__beam { animation: none !important; } }
+
+/* 2026-11-02 岸田「チャンスアップは、ふわっと出てくるより、カットイン的に」: 斜めの黒い帯が右から走り、文字が勢いよく滑り込んで止まる（全演出共通） */
+.sim-yk__telop[class*="is-c"], .sim-yk-ren b { position: relative; isolation: isolate; display: inline-block; padding: .08em .7em; }
+.sim-yk__telop[class*="is-c"]::before, .sim-yk-ren b::before { content: ""; position: absolute; inset: 0 -.2em; z-index: -1; background: var(--ds-color-bg-inverse); transform: skewX(-14deg); box-shadow: 0 .12em 0 var(--ds-color-sim-btn-yellow), 0 -.12em 0 var(--ds-color-sim-btn-yellow); animation: sim-yk-band .22s ease-out both; }
+.sim-yk__telop.is-c1, .sim-yk__telop.is-c2, .sim-yk-ren b { animation: sim-yk-cutin .34s cubic-bezier(.15, .9, .3, 1.1) both; }
+.sim-yk__telop.is-c3 { animation: sim-yk-cutin .34s cubic-bezier(.15, .9, .3, 1.1) both, sim-shake .12s linear .34s 4; }
+.sim-yk__telop.is-c4 { animation: sim-yk-cutin .34s cubic-bezier(.15, .9, .3, 1.1) both, sim-pulse .3s ease-in-out .34s infinite alternate; }
+.sim-yk__telop.is-c5, .sim-yk-ren b.is-c5 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--ds-color-sim-yk-red); -webkit-text-stroke: 0; animation: sim-yk-rainbowc .8s linear infinite, sim-yk-cutin .34s cubic-bezier(.15, .9, .3, 1.1) both; } /* 帯の上で文字の背景クリップが隠れるので、虹は文字色を回して出す */
+@keyframes sim-yk-rainbowc { 0%, 100% { color: var(--ds-color-sim-yk-red); } 25% { color: var(--ds-color-sim-yk-gold); } 50% { color: var(--ds-color-sim-yk-green); } 75% { color: var(--ds-color-sim-yk-blue); } }
+.sim-yk__telop.is-c4::before, .sim-yk-ren b.is-c4::before { box-shadow: 0 .12em 0 var(--ds-color-sim-yk-gold), 0 -.12em 0 var(--ds-color-sim-yk-gold), 0 0 .6em var(--ds-color-sim-yk-gold); }
+.sim-yk__telop.is-c5::before, .sim-yk-ren b.is-c5::before { box-shadow: 0 .12em 0 var(--ds-color-sim-yk-red), 0 -.12em 0 var(--ds-color-sim-yk-blue), 0 0 .8em var(--ds-color-sim-yk-gold); }
+@keyframes sim-yk-cutin { from { transform: translateX(110vw) skewX(-25deg); } 75% { transform: translateX(-6%) skewX(-6deg); } to { transform: none; } }
+@keyframes sim-yk-band { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0); } }
+@media (prefers-reduced-motion: reduce) { .sim-yk__telop[class*="is-c"], .sim-yk__telop[class*="is-c"]::before, .sim-yk-ren b, .sim-yk-ren b::before { animation: none !important; } }
+
+/* サムネ: カード画像の白い地を背景になじませる（2026-11-02 岸田「背景白色になっているの気になる」） */
+.sim-card__thumb { mix-blend-mode: multiply; }
+
+/* ロゴ増殖のシークレット（2026-11-02）: 黒いシルエットのまま増え、当たりで一斉に色が付く */
+.sim-stage__logos.is-secret img { filter: brightness(0) drop-shadow(0 0 .15em rgba(255,255,255,.6)); }
+.sim-stage__logos.is-many { max-width: 40rem; gap: var(--ds-space-inline-xs); }
+.sim-stage__logos.is-many img { width: clamp(4.5rem, 17vw, 6.5rem); }
+.sim-stage__logos.is-open img { filter: none; animation: sim-logo-open .5s cubic-bezier(.2, 1.6, .4, 1) both, sim-pulse .4s ease-in-out .5s infinite alternate; }
+.sim-stage__logos.is-fail img { animation: none; opacity: .45; }
+@keyframes sim-logo-open { 0% { filter: brightness(0); transform: scale(1); } 30% { filter: brightness(3); transform: scale(1.35); } 100% { filter: none; transform: scale(1); } }
+.sim-live__col > .sim-rank + .sim-live__h { margin-top: var(--ds-space-stack-md); }
+/* 2026-11-02 岸田「チャンスアップは帯が着色で白抜き」: 帯を段の色（青・緑・赤・金・虹）で塗り、文字は白 */
+.sim-yk__telop[class*="is-c"], .sim-yk-ren b[class*="is-c"] { color: #fff !important; -webkit-text-stroke: 0; text-shadow: 0 .06em 0 rgba(0,0,0,.35); filter: none; }
+.sim-yk__telop.is-c1::before, .sim-yk-ren b.is-c1::before { background: var(--ds-color-sim-yk-blue); box-shadow: 0 0 .5em var(--ds-color-sim-yk-blue); }
+.sim-yk__telop.is-c2::before, .sim-yk-ren b.is-c2::before { background: var(--ds-color-sim-yk-green); box-shadow: 0 0 .5em var(--ds-color-sim-yk-green); }
+.sim-yk__telop.is-c3::before, .sim-yk-ren b.is-c3::before { background: var(--ds-color-sim-yk-red); box-shadow: 0 0 .6em var(--ds-color-sim-yk-red); }
+.sim-yk__telop.is-c4::before, .sim-yk-ren b.is-c4::before { background: linear-gradient(180deg, #ffe680, var(--ds-color-sim-yk-gold) 45%, #c99400); box-shadow: 0 0 .8em var(--ds-color-sim-yk-gold); }
+.sim-yk__telop.is-c5::before, .sim-yk-ren b.is-c5::before { background: linear-gradient(90deg, var(--ds-color-sim-yk-red), var(--ds-color-sim-yk-gold), var(--ds-color-sim-yk-green), var(--ds-color-sim-yk-blue), #7a5cff) 0 0 / 200% 100%; box-shadow: 0 0 .9em var(--ds-color-sim-yk-gold); animation: sim-yk-band .22s ease-out both, sim-yk-rainbow 1.2s linear infinite; }
+.sim-yk__telop.is-c4, .sim-yk-ren b.is-c4, .sim-yk__telop.is-c5, .sim-yk-ren b.is-c5 { text-shadow: 0 .06em 0 rgba(0,0,0,.45), 0 0 .2em rgba(0,0,0,.3); }
+.sim-yk__telop.is-c5, .sim-yk-ren b.is-c5 { animation: sim-yk-cutin .34s cubic-bezier(.15, .9, .3, 1.1) both; }
+
+/* ミラーボール（2026-11-02 岸田「光らせろ！光れば当たり。光るまではロゴも暗く、光ったらロゴ出現」）: 光の筋もロゴも暗いまま待ち、当たりで一気に光る */
+.sim-th--disco .sim-disco__beam { opacity: .3; }
+.sim-th--disco .sim-disco__ball { filter: brightness(.55); }
+.sim-th--disco .sim-disco__spot img { opacity: .8; transform: none; filter: brightness(0) drop-shadow(0 0 .1em rgba(255,255,255,.35)); transition: filter .35s, transform .4s cubic-bezier(.2, 1.6, .4, 1); }
+.sim-th--disco.is-spot .sim-disco__beam { opacity: 1; }
+.sim-th--disco.is-spot .sim-disco__ball { filter: brightness(1.3); box-shadow: 0 0 2.5em #fff, 0 0 4em var(--k); }
+.sim-th--disco.is-spot .sim-disco__spot img { opacity: 1; filter: none; transform: scale(1.15); animation: sim-pulse .4s ease-in-out .4s infinite alternate; }
+.sim-th--disco.is-miss .sim-disco__spot img { opacity: .5; }
+
+/* カウントダウンが止まった瞬間: 枠が金に光って揺れる（2026-11-02 岸田「止まったら止まったことが分かるように」） */
+.sim-th--count.is-stop .sim-cd b { box-shadow: 0 0 0 .08em #fff, 0 0 0 .18em var(--ds-color-sim-yk-gold), 0 0 1.2em var(--ds-color-sim-yk-gold), 0 0 2.4em var(--ds-color-sim-yk-gold); animation: sim-cd-stop .5s ease-out both; }
+.sim-th--count.is-stop.is-logo .sim-cd b { animation: sim-cd-logo .45s cubic-bezier(.2, 1.6, .4, 1) both; }
+@keyframes sim-cd-stop { 0% { transform: scale(1.18); filter: brightness(2); } 30% { transform: scale(.96) translateX(-.05em); } 50% { transform: scale(1.02) translateX(.05em); } 100% { transform: none; filter: none; } }
+
+/* カード変色（2026-11-02 岸田「色を変えよ！ 最初はグレー、青は当たり、ハズレはグレー」）: 回っている間はグレー。当たりで色が付く（青→緑→赤→金→虹は戻りの大きさ） */
+.sim-fx--card:not(.is-win) .sim-fx__obj { background: radial-gradient(circle at 50% 50%, #d3d7de 0 22%, #9097a2 23% 60%, #5f656f 61%); }
+.sim-fx--card.is-lose .sim-fx__obj { animation: none; filter: grayscale(1) brightness(.85); }
+.sim-fx--card.is-win .sim-fx__obj { animation: sim-card-win .5s cubic-bezier(.2, 1.6, .4, 1) both; box-shadow: 0 0 1.4em var(--ds-color-sim-yk-blue); }
+.sim-fx--card.is-win[data-win="1"] .sim-fx__obj { background: radial-gradient(circle at 50% 50%, #3d7bff 0 22%, #1b3a9e 23% 60%, #0f235f 61%); }
+.sim-fx--card.is-win[data-win="2"] .sim-fx__obj { background: radial-gradient(circle at 50% 50%, #5ee08f 0 22%, #1d8a4a 23% 60%, #0d4a26 61%); box-shadow: 0 0 1.4em var(--ds-color-sim-yk-green); }
+.sim-fx--card.is-win[data-win="3"] .sim-fx__obj { background: radial-gradient(circle at 50% 50%, #ff7a7a 0 22%, #c81e1e 23% 60%, #6e0b0b 61%); box-shadow: 0 0 1.8em var(--ds-color-sim-yk-red); }
+.sim-fx--card.is-win[data-win="4"] .sim-fx__obj { background: radial-gradient(circle at 50% 50%, #ffe27a 0 22%, #e0a800 23% 60%, #8a5a00 61%); box-shadow: 0 0 2.2em var(--ds-color-sim-yk-gold); }
+.sim-fx--card.is-win[data-win="5"] .sim-fx__obj { background: conic-gradient(#ff4fa3, #ffb800, #3ddc84, #2fd3ff, #7a5cff, #ff4fa3); box-shadow: 0 0 2.6em #ff4fa3; }
+@keyframes sim-card-win { 0% { transform: rotateY(90deg) scale(.9); filter: brightness(2.5); } 100% { transform: none; filter: none; } }
+
+/* ---- 追加の4種（2026-11-02）: ルーレット・花火・宝箱・雷 ---- */
+.sim-th-flash { animation: sim-th-flash .25s ease-out; }
+@keyframes sim-th-flash { 0% { filter: brightness(3); } 100% { filter: none; } }
+
+/* ルーレット: 8マス。偶数番が当たり（熱さの色）、奇数番がグレー */
+.sim-rlt { position: relative; width: 11em; height: 11em; }
+.sim-rlt__wheel { position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(from -22.5deg, var(--k) 0 45deg, #9aa1ab 45deg 90deg); box-shadow: 0 0 0 .3em #fff, 0 0 0 .5em #222, 0 0 1.2em var(--k); }
+.sim-th--roulette.sim-k5 .sim-rlt__wheel { background: conic-gradient(from -22.5deg, #ff4fa3 0 45deg, #9aa1ab 45deg 90deg, #ffb800 90deg 135deg, #9aa1ab 135deg 180deg, #3ddc84 180deg 225deg, #9aa1ab 225deg 270deg, #2fd3ff 270deg 315deg, #9aa1ab 315deg 360deg); }
+.sim-th--roulette:not([class*="sim-k"]) .sim-rlt__wheel { --k: #3d7bff; }
+.sim-rlt__wheel::after { content: ""; position: absolute; inset: 38%; border-radius: 50%; background: #fff; box-shadow: 0 0 0 .2em #222; }
+.sim-rlt__wheel.is-spin { animation: sim-rlt-spin 2s cubic-bezier(.15, .6, .2, 1) both; }
+.sim-rlt__pin { position: absolute; left: 50%; top: -.6em; width: 0; height: 0; margin-left: -.7em; border: .7em solid transparent; border-top: 1.4em solid #e8202a; border-bottom: 0; filter: drop-shadow(0 .1em .1em rgba(0,0,0,.4)); }
+.sim-th--roulette.is-win .sim-rlt__wheel { box-shadow: 0 0 0 .3em #fff, 0 0 0 .5em #222, 0 0 2.4em var(--k), 0 0 4em var(--k); }
+@keyframes sim-rlt-spin { from { transform: rotate(0); } to { transform: rotate(var(--to)); } }
+
+/* 花火 */
+.sim-hnb { position: relative; width: 14em; height: 13em; }
+.sim-hnb__ball { position: absolute; left: 50%; bottom: 0; width: .6em; height: .6em; margin-left: -.3em; border-radius: 50%; background: #fff; box-shadow: 0 .6em .4em -.1em rgba(255,200,120,.8), 0 0 .6em var(--k); opacity: 0; }
+.sim-th--firework.is-up .sim-hnb__ball { animation: sim-hnb-up 1.1s cubic-bezier(.3, .7, .4, 1) both; }
+.sim-hnb__burst { position: absolute; left: 50%; top: 35%; width: 12em; height: 12em; margin: -6em 0 0 -6em; border-radius: 50%; background: repeating-conic-gradient(var(--k) 0 4deg, transparent 4deg 15deg); -webkit-mask: radial-gradient(circle, transparent 0 18%, #000 20% 48%, transparent 50%); mask: radial-gradient(circle, transparent 0 18%, #000 20% 48%, transparent 50%); opacity: 0; transform: scale(.1); }
+.sim-th--firework.sim-k5 .sim-hnb__burst { background: repeating-conic-gradient(#ff4fa3 0 4deg, transparent 4deg 15deg, #ffb800 15deg 19deg, transparent 19deg 30deg, #2fd3ff 30deg 34deg, transparent 34deg 45deg); }
+.sim-th--firework:not([class*="sim-k"]) { --k: #ffd36b; }
+.sim-th--firework.is-boom .sim-hnb__burst { animation: sim-hnb-boom .9s cubic-bezier(.1, .8, .3, 1) both; }
+.sim-hnb__logo { position: absolute; left: 50%; top: 35%; width: 7em; translate: -50% -50%; opacity: 0; }
+.sim-th--firework.is-boom .sim-hnb__logo { animation: sim-yk-up .5s cubic-bezier(.2, 1.6, .4, 1) .25s both; opacity: 1; }
+.sim-th--firework.is-dud .sim-hnb__ball { animation: sim-hnb-up 1.1s cubic-bezier(.3, .7, .4, 1) both, sim-hnb-dud .6s ease-in 1.1s forwards; }
+@keyframes sim-hnb-up { 0% { bottom: 0; opacity: 1; } 100% { bottom: 62%; opacity: 1; } }
+@keyframes sim-hnb-boom { 0% { transform: scale(.1); opacity: 1; } 70% { opacity: 1; } 100% { transform: scale(1.1); opacity: .85; } }
+@keyframes sim-hnb-dud { to { bottom: 50%; opacity: 0; } }
+
+/* 宝箱 */
+.sim-chest { position: relative; width: 11em; height: 12em; }
+.sim-chest__box { position: absolute; left: 10%; right: 10%; bottom: 0; height: 45%; border-radius: 0 0 .4em .4em; background: linear-gradient(#a8662a, #6e3d12); box-shadow: inset 0 0 0 .25em #d9a441, inset 0 .9em 0 -.6em #d9a441; }
+.sim-chest__lid { position: absolute; left: 8%; right: 8%; bottom: 44%; height: 26%; border-radius: 3em 3em .2em .2em; background: linear-gradient(#c07a35, #82481a); box-shadow: inset 0 0 0 .25em #d9a441; transform-origin: 50% 100%; transition: transform .4s cubic-bezier(.2, 1.6, .4, 1); }
+.sim-chest__lid::after { content: ""; position: absolute; left: 50%; bottom: -.5em; width: 1.2em; height: 1.2em; margin-left: -.6em; border-radius: .2em; background: #d9a441; }
+.sim-chest__glow { position: absolute; left: 50%; bottom: 40%; width: 0; height: 0; opacity: 0; }
+.sim-chest__logo { position: absolute; left: 50%; bottom: 76%; width: 7.5em; z-index: 2; translate: -50% 0; opacity: 0; }
+.sim-th--chest.is-rattle .sim-chest { animation: sim-fx-shake .1s linear 3; }
+.sim-th--chest.is-open .sim-chest__lid { transform: translate(-1.6em, -.6em) rotate(-28deg); }
+.sim-th--chest.is-win .sim-chest__glow { left: 0; right: 0; bottom: 40%; width: auto; height: 9em; opacity: 1; background: linear-gradient(0deg, var(--k), transparent); clip-path: polygon(30% 100%, 70% 100%, 100% 0, 0 0); filter: blur(4px); animation: sim-pulse .4s ease-in-out infinite alternate; }
+.sim-th--chest:not([class*="sim-k"]) { --k: #ffd36b; }
+.sim-th--chest.is-win .sim-chest__logo { opacity: 1; animation: sim-yk-up .5s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-th--chest.is-empty .sim-chest__lid { transform: translateY(-.2em) rotate(-6deg); }
+
+/* 雷 */
+.sim-thd { position: relative; width: 13em; height: 12em; }
+.sim-thd__cloud { position: absolute; left: 15%; right: 15%; top: 0; height: 3em; border-radius: 2em; background: #3c4156; box-shadow: -2.4em .6em 0 -.2em #3c4156, 2.4em .5em 0 -.1em #3c4156, 0 0 1em rgba(0,0,0,.5); }
+.sim-thd__bolt { position: absolute; left: 50%; top: 2.6em; width: 3em; height: 6.4em; margin-left: -1.5em; background: var(--k); clip-path: polygon(55% 0, 20% 50%, 48% 50%, 30% 100%, 85% 40%, 55% 40%, 75% 0); filter: drop-shadow(0 0 .5em var(--k)); opacity: 0; }
+.sim-th--thunder:not([class*="sim-k"]) { --k: #fff6a8; }
+.sim-th--thunder.sim-k5 .sim-thd__bolt { background: linear-gradient(#ff4fa3, #ffb800, #3ddc84, #2fd3ff); }
+.sim-thd__logo { position: absolute; left: 50%; bottom: 0; width: 7.5em; translate: -50% 0; filter: brightness(.25); transition: filter .2s; }
+.sim-th--thunder.is-hit .sim-thd__bolt { opacity: 1; animation: sim-thd-strike .35s ease-out both; }
+.sim-th--thunder.is-hit .sim-thd__logo { filter: drop-shadow(0 0 .6em var(--k)) brightness(1.15); animation: sim-yk-up .45s cubic-bezier(.2, 1.6, .4, 1) .15s both; }
+.sim-th--thunder.is-miss .sim-thd__bolt { opacity: .9; left: 88%; animation: sim-thd-strike .35s ease-out both; }
+@keyframes sim-thd-strike { 0% { transform: scaleY(0); transform-origin: 50% 0; } 100% { transform: scaleY(1); transform-origin: 50% 0; } }
+@media (prefers-reduced-motion: reduce) { .sim-rlt__wheel.is-spin, .sim-th-flash { animation: none !important; } }
+
+/* ==== 2026-11-14 手触りの底上げ（結果の瞬間の手応え・引き直し・導入） ==== */
+/* 結果が出た瞬間: 中身を大きく出して --hs の間だけ止め（ヒットストップ）、止めている間に震わせてから収める。
+   震え方は段で変える（ハズレ・小当たりは縦だけ、中は横、大当たりは縦横）。大きく始めて小さく収束 */
+.sim-stage > .is-hit-lose { animation: sim-hit-lose calc(var(--hs, 60ms) + 260ms) cubic-bezier(.3, 0, .2, 1) both; }
+.sim-stage > .is-hit-low { animation: sim-hit-low calc(var(--hs, 80ms) + 300ms) linear both; }
+.sim-stage > .is-hit-mid { animation: sim-hit-mid calc(var(--hs, 120ms) + 340ms) linear both; }
+.sim-stage > .is-hit-high { animation: sim-hit-high calc(var(--hs, 190ms) + 380ms) linear both; }
+.sim-stage > .is-hit-top { animation: sim-hit-top calc(var(--hs, 280ms) + 460ms) linear both; }
+@keyframes sim-hit-lose { 0% { transform: translateY(-.5em) scale(1.06, .94); } 35% { transform: translateY(.3em) scale(.96, 1.05); } 60% { transform: translateY(-.12em); } 80% { transform: translateY(.06em); } 100% { transform: none; } }
+@keyframes sim-hit-low { 0% { transform: translateY(0) scale(1.14); } 15% { transform: translateY(-.28em) scale(1.14); } 30% { transform: translateY(.22em) scale(1.14); } 45% { transform: translateY(-.14em) scale(1.1); } 60% { transform: translateY(.08em) scale(1.04); } 80% { transform: scale(.985); } 100% { transform: none; } }
+@keyframes sim-hit-mid { 0% { transform: translateX(0) scale(1.2); } 12% { transform: translateX(-.45em) scale(1.2); } 24% { transform: translateX(.4em) scale(1.2); } 36% { transform: translateX(-.3em) scale(1.2); } 48% { transform: translateX(.2em) scale(1.16); } 62% { transform: translateX(-.1em) scale(1.06); } 80% { transform: scale(.98); } 100% { transform: none; } }
+@keyframes sim-hit-high { 0% { transform: translate(0, 0) scale(1.28); } 10% { transform: translate(-.6em, .35em) scale(1.28); } 20% { transform: translate(.55em, -.3em) scale(1.28); } 30% { transform: translate(-.45em, -.25em) scale(1.28); } 40% { transform: translate(.35em, .2em) scale(1.26); } 52% { transform: translate(-.2em, .1em) scale(1.18); } 66% { transform: translate(.1em, -.05em) scale(1.06); } 82% { transform: scale(.975); } 100% { transform: none; } }
+@keyframes sim-hit-top { 0% { transform: translate(0, 0) scale(1.4) rotate(0); } 8% { transform: translate(-.9em, .5em) scale(1.4) rotate(-2deg); } 16% { transform: translate(.8em, -.45em) scale(1.4) rotate(2deg); } 24% { transform: translate(-.7em, -.4em) scale(1.4) rotate(-1.5deg); } 32% { transform: translate(.6em, .35em) scale(1.4) rotate(1.5deg); } 40% { transform: translate(-.45em, .25em) scale(1.38) rotate(-1deg); } 50% { transform: translate(.3em, -.15em) scale(1.3); } 62% { transform: translate(-.15em, .08em) scale(1.14); } 76% { transform: scale(.96); } 88% { transform: scale(1.02); } 100% { transform: none; } }
+/* 光・衝撃の輪・火花。明るい背景でも暗い背景でも見えるように、明るい色に暗い縁を付ける。短く出してすぐ消す */
+.sim-hitfx { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; --hit: var(--ds-color-sim-btn-yellow); }
+.sim-hitfx.is-high, .sim-hitfx.is-top { --hit: var(--ds-color-bg); }
+.sim-hitfx__flash { position: absolute; inset: 0; background: var(--ds-color-bg); opacity: 0; animation: sim-hitfx-flash calc(var(--hs, 100ms) + 180ms) steps(1) both; }
+.sim-hitfx.is-low .sim-hitfx__flash { display: none; }
+.sim-hitfx__ring { position: absolute; left: 50%; top: 42%; width: 6em; height: 6em; margin: -3em 0 0 -3em; border-radius: 50%; border: .2em solid var(--hit); box-shadow: 0 0 0 .08em var(--ds-color-bg-inverse), inset 0 0 0 .08em var(--ds-color-bg-inverse); opacity: 0; animation: sim-hitfx-ring .32s cubic-bezier(.1, .7, .3, 1) var(--hs, 0ms) both; }
+.sim-hitfx__ring.is-2 { animation-duration: .4s; animation-delay: calc(var(--hs, 0ms) + 70ms); border-width: .1em; }
+.sim-hitfx b { position: absolute; left: 50%; top: 42%; width: .45em; height: calc(2.6em * var(--l, 1)); margin-left: -.22em; border-radius: .3em; background: var(--hit); box-shadow: 0 0 0 .1em var(--ds-color-bg-inverse); transform-origin: 50% 0; opacity: 0; animation: sim-hitfx-spark .38s cubic-bezier(.1, .8, .3, 1) calc(var(--hs, 0ms) * .5) both; }
+.sim-hitfx.is-top b, .sim-hitfx.is-high b { width: .6em; height: calc(4em * var(--l, 1)); margin-left: -.3em; }
+@keyframes sim-hitfx-flash { 0% { opacity: .85; background: var(--ds-color-bg); } 34% { opacity: .3; background: var(--ds-color-bg-inverse); } 67% { opacity: .5; background: var(--ds-color-bg); } 100% { opacity: 0; } }
+@keyframes sim-hitfx-ring { 0% { transform: scale(.3); opacity: 1; } 45% { opacity: .8; } 100% { transform: scale(4.5); opacity: 0; } }
+@keyframes sim-hitfx-spark { 0% { transform: rotate(var(--a)) translateY(1.5em) scaleY(.3); opacity: 1; } 60% { opacity: 1; } 100% { transform: rotate(var(--a)) translateY(9em) scaleY(1); opacity: 0; } }
+/* 結果のポップアップ: 勝ち負けと差し引きを一番大きく */
+.sim-rpop__verdict { display: block; margin: var(--ds-space-inline-xs) 0; font-family: var(--ds-font-pop); font-size: var(--ds-text-h2-size); font-weight: 900; line-height: 1.2; animation: sim-yk-up .35s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-rpop__verdict b { font-family: var(--ds-font-num); }
+.sim-rpop__verdict.is-win b { color: var(--ds-color-positive); }
+.sim-rpop__again { width: 100%; }
+.sim-rpop__again[hidden] { display: none; }
+/* 持ちポイントの増減: 下のバーの数字が弾み、「−◯」は赤で浮く */
+.sim-cashpop.is-minus { background: var(--ds-color-sim-btn-red); }
+.sim-footbar__item--coin { position: relative; }
+.sim-footbar__item.is-bump .sim-footbar__label { animation: sim-yk-up .35s cubic-bezier(.2, 1.6, .4, 1) both; }
+/* 次のレベルまでの進み具合（目標を目の前に見せる） */
+.sim-status__bar { display: block; height: .5em; margin-top: var(--ds-space-inline-xs); border-radius: var(--ds-radius-chip); background: color-mix(in srgb, var(--ds-color-bg-inverse) 35%, transparent); overflow: hidden; }
+.sim-status__bar i { display: block; height: 100%; border-radius: inherit; background: var(--ds-color-sim-btn-yellow); transition: width .6s cubic-bezier(.2, .8, .2, 1); }
+/* 導入: 説明は読みたい人だけ。初回の一言案内 */
+.sim-choose__how { align-self: center; }
+[data-started] .sim-choose__how { display: none; }
+.sim-coach { margin: 0 0 var(--ds-space-stack-sm); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border-radius: var(--ds-radius-card); background: var(--ds-color-badge-bg-cream); font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+.sim-coach[hidden] { display: none; }
+/* 抽選中の演出は、スマホのポップアップでは大きく見せる（主役を大きく） */
+@media (max-width: 640px) {
+  .sim-rpop.is-drawing .sim-stage .sim-th, .sim-rpop.is-drawing .sim-stage .sim-fx, .sim-rpop.is-drawing .sim-stage .sim-stage__logos { zoom: 1.3; }
+  .sim-rpop.is-drawing .sim-stage__text { font-size: var(--ds-text-h1-size); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sim-stage > [class*="is-hit-"], .sim-rpop__verdict, .sim-footbar__item.is-bump .sim-footbar__label { animation: none; }
+  .sim-hitfx { display: none; }
+  .sim-status__bar i { transition: none; }
+}
+
+/* ==== 2026-11-14 その2（レベルアップ・自分の順位・結果を1枚ずつ・抽選中の帯） ==== */
+/* 画面の上に短く出すお知らせ（順位が上がった等） */
+.sim-toast { position: fixed; left: 50%; top: var(--ds-space-stack-md); z-index: 50; max-width: calc(100vw - 2 * var(--ds-space-inline-md)); padding: var(--ds-space-inline-sm) var(--ds-space-stack-md); border-radius: var(--ds-radius-chip); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-body-size); font-weight: 800; white-space: nowrap; box-shadow: var(--ds-shadow-card); pointer-events: none; animation: sim-toast 2.8s cubic-bezier(.2, 1.4, .4, 1) both; }
+.sim-toast b { color: var(--ds-color-sim-btn-yellow); font-family: var(--ds-font-num); font-size: 1.3em; }
+@keyframes sim-toast { 0% { transform: translate(-50%, -160%) scale(.8); opacity: 0; } 10% { transform: translate(-50%, 0) scale(1.08); opacity: 1; } 16% { transform: translate(-50%, 0) scale(1); } 85% { transform: translate(-50%, 0); opacity: 1; } 100% { transform: translate(-50%, -120%); opacity: 0; } }
+/* レベルアップ: 暗い地に、レベルの色の大きな札と紙吹雪 */
+.sim-lvup { position: fixed; inset: 0; width: min(100% - 2 * var(--ds-space-inline-md), 26em); margin: auto; padding: var(--ds-space-stack-lg) var(--ds-space-stack-md); border: 0; border-radius: var(--ds-radius-card); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); text-align: center; overflow: hidden; animation: sim-lvup-in .5s cubic-bezier(.2, 1.5, .4, 1) both; }
+.sim-lvup::backdrop { background: color-mix(in srgb, var(--ds-color-bg-inverse) 70%, transparent); }
+.sim-lvup p { margin: 0; }
+.sim-lvup__label { font-family: var(--ds-font-pop); font-size: var(--ds-text-h3-size); font-weight: 900; color: var(--ds-color-sim-btn-yellow); letter-spacing: .08em; }
+.sim-lvup__rank { display: inline-block; margin: var(--ds-space-inline-sm) 0 !important; padding: var(--ds-space-inline-xs) var(--ds-space-stack-md); border-radius: var(--ds-radius-card); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-display-size, var(--ds-text-h1-size)); font-weight: 900; line-height: 1.15; letter-spacing: .06em; text-shadow: 0 .06em 0 color-mix(in srgb, var(--ds-color-bg-inverse) 60%, transparent); animation: sim-lvup-rank .7s cubic-bezier(.2, 1.7, .4, 1) .15s both; }
+.sim-lvup__sub { font-weight: 800; }
+.sim-lvup__msg { margin-top: var(--ds-space-stack-sm) !important; font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+.sim-lvup__msg strong { color: var(--ds-color-sim-btn-yellow); font-size: 1.25em; }
+.sim-lvup .sim-btn { position: relative; z-index: 1; width: 100%; margin-top: var(--ds-space-stack-md); }
+@keyframes sim-lvup-in { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sim-lvup-rank { 0% { transform: scale(2.4) rotate(-6deg); opacity: 0; } 60% { transform: scale(.94) rotate(1deg); opacity: 1; } 100% { transform: none; } }
+/* 解放されたガチャ: 一覧で光らせて「解放！」の札を付ける（選ぶと消える） */
+.sim-card.is-unlocked { animation: sim-unlock 1.1s ease-in-out infinite alternate; }
+.sim-card__new { position: absolute; left: var(--ds-space-inline-sm); bottom: var(--ds-space-inline-sm); /* 左上はレベルの札があるので左下 */ z-index: 2; padding: 0 var(--ds-space-inline-md); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-body-sm-size); font-weight: 900; }
+@keyframes sim-unlock { from { box-shadow: 0 0 0 0 var(--ds-color-sim-btn-yellow); } to { box-shadow: 0 0 0 .35em var(--ds-color-sim-btn-yellow); } }
+/* 今日の自分の順位（レベルのカードのすぐ下） */
+.sim-myrank { display: flex; align-items: center; gap: var(--ds-space-inline-sm); margin: var(--ds-space-inline-sm) 0 0; padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border-radius: var(--ds-radius-card); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+.sim-myrank[hidden] { display: none; }
+.sim-myrank .sim-rankpt { flex: none; width: 1.8em; height: 1.8em; }
+.sim-myrank b { color: var(--ds-color-sim-btn-yellow); font-family: var(--ds-font-pop); font-weight: 900; }
+.sim-myrank b:first-child { margin-right: var(--ds-space-inline-xs); font-size: var(--ds-text-body-size); }
+.sim-me__rank { margin: 0 0 var(--ds-space-inline-sm); font-size: var(--ds-text-body-sm-size); }
+.sim-me__rank:empty { display: none; }
+/* 抽選中の帯: いま何を何連引いているか */
+.sim-rpop__draw { display: none; }
+.sim-rpop.is-drawing .sim-rpop__draw { display: flex; align-items: center; gap: var(--ds-space-inline-md); padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border-top: var(--ds-border-width) solid var(--ds-color-border); background: var(--ds-color-bg); text-align: left; }
+.sim-rpop__draw:empty { display: none !important; }
+.sim-rpop__draw-thumb { flex: none; width: 2.6em; }
+.sim-rpop__draw-thumb img { display: block; width: 100%; height: auto; border-radius: var(--ds-radius-input); }
+.sim-rpop__draw-txt { display: flex; flex-direction: column; min-width: 0; }
+.sim-rpop__draw-txt b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--ds-font-pop); font-size: var(--ds-text-body-sm-size); font-weight: 800; }
+.sim-rpop__draw-txt small { color: var(--ds-color-text-muted); font-size: var(--ds-text-caption-size); }
+/* 10連・100連の結果: 低い賞から1枚ずつ出して、いちばん上の賞を最後に大きく出す */
+.sim-rpop__item.is-reveal { animation: sim-rv-in .28s cubic-bezier(.2, 1.4, .4, 1) both; }
+.sim-rpop__item.is-reveal.is-best { animation: sim-rv-best .55s cubic-bezier(.2, 1.6, .4, 1) both; }
+@keyframes sim-rv-in { from { transform: translateY(.8em) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sim-rv-best { 0% { transform: scale(1.5); opacity: 0; filter: brightness(2.2); } 55% { transform: scale(.97); opacity: 1; filter: brightness(1.3); } 100% { transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .sim-toast, .sim-lvup, .sim-lvup__rank, .sim-card.is-unlocked, .sim-rpop__item.is-reveal { animation: none !important; }
+}
+
+/* ==== 2026-11-14 その3（景品までの距離・XのIDの登録を流れの中へ） ==== */
+/* 順位の帯のすぐ下: 景品の対象かどうか。未登録は黄色で目立たせ、登録ずみは落ち着いた緑 */
+.sim-prizebar { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-inline-md); width: 100%; margin: var(--ds-space-inline-xs) 0 0; padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border: var(--ds-border-width-heading-accent) solid var(--ds-color-sim-btn-yellow); border-radius: var(--ds-radius-card); background: var(--ds-color-badge-bg-cream); color: var(--ds-color-text); font: inherit; font-size: var(--ds-text-caption-size); line-height: var(--ds-text-body-sm-lh); text-align: left; cursor: pointer; }
+.sim-prizebar[hidden] { display: none; }
+.sim-prizebar__txt b { display: block; font-family: var(--ds-font-pop); font-size: var(--ds-text-body-sm-size); font-weight: 900; }
+.sim-prizebar__go { flex: none; padding: var(--ds-space-inline-xs) var(--ds-space-inline-md); border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-body-sm-size); font-weight: 900; white-space: nowrap; }
+.sim-prizebar.is-hot { animation: sim-unlock 1.1s ease-in-out infinite alternate; }
+.sim-prizebar.is-done { border-color: var(--ds-color-positive); background: var(--ds-color-bg); }
+.sim-prizebar.is-done .sim-prizebar__go { background: none; color: var(--ds-color-positive); padding-right: 0; }
+/* ランキングの「登録ずみ」（景品の対象）の印 */
+.sim-rank__ent { display: inline-block; margin-left: var(--ds-space-inline-xs); padding: 0 var(--ds-space-inline-sm); border: var(--ds-border-width) solid var(--ds-color-positive); border-radius: var(--ds-radius-chip); color: var(--ds-color-positive); font-size: var(--ds-text-micro-size); font-weight: 800; vertical-align: middle; white-space: nowrap; }
+/* うれしい瞬間の声かけ（画面の下・フッターの上） */
+.sim-nudge { position: fixed; left: var(--ds-space-inline-md); right: var(--ds-space-inline-md); bottom: calc(5.4em + env(safe-area-inset-bottom, 0px)); z-index: 40; display: flex; align-items: center; gap: var(--ds-space-inline-sm); max-width: 34em; margin: 0 auto; padding: var(--ds-space-inline-sm) var(--ds-space-inline-md); border-radius: var(--ds-radius-card); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); box-shadow: var(--ds-shadow-card); animation: sim-nudge-in .4s cubic-bezier(.2, 1.4, .4, 1) both; }
+.sim-nudge__txt { flex: 1 1 auto; min-width: 0; font-size: var(--ds-text-caption-size); line-height: var(--ds-text-body-sm-lh); }
+.sim-nudge__txt b { display: block; color: var(--ds-color-sim-btn-yellow); font-family: var(--ds-font-pop); font-size: var(--ds-text-body-sm-size); font-weight: 900; }
+.sim-nudge .sim-btn { flex: none; white-space: nowrap; }
+.sim-nudge__x { flex: none; min-width: var(--ds-touch-target-min); min-height: var(--ds-touch-target-min); border: 0; background: none; color: inherit; font-size: var(--ds-text-h3-size); cursor: pointer; }
+@keyframes sim-nudge-in { from { transform: translateY(120%); opacity: 0; } to { transform: none; opacity: 1; } }
+/* 登録のポップアップ（応募欄をそのまま中に入れる）と、完了の画面 */
+.sim-entdlg .sim-charge__inner { position: relative; }
+.sim-entdlg .sim-entry { margin-top: 0; border: 0; padding: 0; background: none; }
+.sim-entdone { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ds-space-stack-sm); border-radius: inherit; background: var(--ds-color-bg); }
+.sim-entdone__ok { width: 5.5em; height: 5.5em; color: var(--ds-color-positive); animation: sim-yk-up .4s cubic-bezier(.2, 1.6, .4, 1) both; }
+.sim-entdone__ok svg { display: block; width: 100%; height: 100%; }
+.sim-entdone p { margin: 0; font-family: var(--ds-font-pop); font-size: var(--ds-text-h3-size); font-weight: 800; }
+@media (prefers-reduced-motion: reduce) { .sim-prizebar.is-hot, .sim-nudge, .sim-entdone__ok { animation: none; } }
+.sim-entry__grid[hidden] { display: none; } /* XのIDの欄は使わない（投稿のアカウントで登録する） */
+
+/* 「登録ずみ」のバッジ（2026-11-14 岸田「もっとカッコいいバッジに」）: 黒地・金の縁・Xのマーク・金のチェック。ときどき光が走る */
+.sim-rank__ent { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: .3em; margin-left: var(--ds-space-inline-xs); padding: .15em .7em .15em .55em; border: .12em solid var(--ds-color-sim-yk-gold); border-radius: var(--ds-radius-chip); background: linear-gradient(135deg, var(--ds-color-bg-inverse) 0%, color-mix(in srgb, var(--ds-color-bg-inverse) 78%, var(--ds-color-sim-yk-gold)) 100%); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: var(--ds-text-micro-size); font-weight: 900; line-height: 1.5; letter-spacing: .04em; vertical-align: middle; white-space: nowrap; box-shadow: 0 .1em .25em color-mix(in srgb, var(--ds-color-bg-inverse) 35%, transparent); }
+.sim-rank__ent .sim-xicon { flex: none; width: .95em; height: .95em; margin: 0; }
+.sim-rank__ent b { color: var(--ds-color-sim-yk-gold); font-weight: 900; }
+.sim-rank__ent i { display: inline-flex; align-items: center; justify-content: center; width: 1.25em; height: 1.25em; border-radius: 50%; background: var(--ds-color-sim-yk-gold); color: var(--ds-color-bg-inverse); font-style: normal; font-size: .85em; font-weight: 900; }
+.sim-rank__ent::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--ds-color-bg) 55%, transparent), transparent); animation: sim-ent-sheen 3.2s ease-in-out infinite; }
+@keyframes sim-ent-sheen { 0%, 62% { left: -60%; } 100% { left: 130%; } }
+@media (prefers-reduced-motion: reduce) { .sim-rank__ent::after { animation: none; display: none; } }
+/* バッジは行の右下に重ねて置く（列に入れると名前かポイントの欄が狭くなる）。2行目の文はバッジの手前で切る */
+.sim-rank li.has-ent { position: relative; }
+.sim-rank li.has-ent > .sim-rank__ent { position: absolute; right: 0; bottom: var(--ds-space-inline-sm); margin: 0; }
+.sim-rank li.has-ent .sim-rank__meta { max-width: calc(100% - 7.5em); overflow: hidden; text-overflow: ellipsis; }
+.sim-rank li.has-ent { padding-bottom: calc(var(--ds-space-inline-sm) + .35em); }
+
+/* 順位の帯は、電光掲示板のように文字を流す（2026-11-14 岸田）。右から出てきて左へ流れ、頭から順に読める。押さえている間は止まる。
+   流すのは別々の内容（順位・景品・いまの1位・締切・次のレベル）。切れ目なく回すために同じ並びを2組置くが、1組が帯より長いので同じ文が同時に並ぶことはない */
+.sim-myrank { overflow: hidden; }
+.sim-ticker { flex: 1 1 auto; min-width: 0; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1.2em, #000 calc(100% - 1.2em), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 1.2em, #000 calc(100% - 1.2em), transparent 100%); }
+.sim-ticker__run { display: inline-flex; white-space: nowrap; will-change: transform; }
+.sim-ticker__run.is-run { animation: sim-ticker var(--tk, 30s) linear infinite; }
+.sim-ticker__set { display: inline-flex; flex: none; }
+.sim-ticker__item { flex: none; padding-right: 3.5em; }
+.sim-ticker:hover .sim-ticker__run, .sim-ticker:active .sim-ticker__run { animation-play-state: paused; }
+@keyframes sim-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .sim-ticker { -webkit-mask-image: none; mask-image: none; }
+  .sim-ticker__run, .sim-ticker__run.is-run { animation: none; white-space: normal; }
+  .sim-ticker__set[aria-hidden], .sim-ticker__item + .sim-ticker__item { display: none; }
+  .sim-ticker__item { padding-right: 0; }
+}
+
+/* 応募欄の見出しの横に景品の絵（2026-11-14 岸田）。少し傾けて、金色の光を背負わせる */
+.sim-entry__head { display: flex; align-items: center; gap: var(--ds-space-inline-md); }
+.sim-entry__headtxt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--ds-space-inline-sm); }
+@media (max-width: 640px) { .sim-entry__head { align-items: flex-start; } }
+.sim-entry__prize { flex: none; width: 5.5em; margin: 0; text-align: center; }
+.sim-entry__prize img { display: block; width: 100%; height: auto; transform: rotate(-6deg); filter: drop-shadow(0 .2em .5em color-mix(in srgb, var(--ds-color-sim-yk-gold) 70%, transparent)); }
+.sim-entry__prize figcaption { margin-top: var(--ds-space-inline-xs); color: var(--ds-color-text-muted); font-size: var(--ds-text-micro-size); line-height: 1.3; }
+@media (min-width: 641px) { .sim-entry__prize { width: 7em; } }
+
+/* 「要申請」の札（2026-11-14 岸田「赤色で目立つように」）: 赤地に白の太字。景品の文言の横には必ずこれを置く */
+.sim-req { display: inline-block; margin: 0 var(--ds-space-inline-sm); padding: .05em .7em; border-radius: var(--ds-radius-chip); background: var(--ds-color-sim-btn-red); color: var(--ds-color-text-inverse); font-family: var(--ds-font-pop); font-size: .85em; font-weight: 900; line-height: 1.5; letter-spacing: .06em; vertical-align: .08em; white-space: nowrap; box-shadow: 0 0 0 .12em var(--ds-color-bg); }
+.sim-entry__h .sim-req { font-size: .75em; }
+.sim-ticker .sim-req { box-shadow: none; }
+/* 応募欄の絵はBOX（正方形に近い）。傾けず、金色の光だけ背負わせる */
+.sim-entry__prize { width: 7em; }
+.sim-entry__prize img { transform: none; }
+@media (min-width: 641px) { .sim-entry__prize { width: 9.5em; } }
+
+/* 応募欄の説明は箇条書き（2026-11-15 岸田「説明長い、箇条書きで」）。左に項目名、右に中身 */
+.sim-entry__points { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--ds-space-inline-xs); font-size: var(--ds-text-body-sm-size); line-height: var(--ds-text-body-sm-lh); }
+.sim-entry__points li { display: grid; grid-template-columns: 6.5em 1fr; gap: var(--ds-space-inline-sm); align-items: baseline; }
+.sim-entry__points b { font-family: var(--ds-font-pop); font-weight: 800; white-space: nowrap; }
+.sim-entry__points b::before { content: ""; display: inline-block; width: .5em; height: .5em; margin-right: .45em; border-radius: 50%; background: var(--ds-color-sim-btn-red); vertical-align: .12em; }
+/* スマホでは箇条書きを絵の横に押し込まず、絵と見出しの下に全幅で置く。項目名は中身の上の行に */
+@media (max-width: 640px) {
+  .sim-entry__head { flex-wrap: wrap; align-items: center; }
+  .sim-entry__headtxt { display: contents; }
+  .sim-entry__head .sim-entry__h { flex: 1 1 0; min-width: 0; }
+  .sim-entry__points { flex: 0 0 100%; gap: var(--ds-space-inline-sm); }
+  .sim-entry__points li { grid-template-columns: 1fr; gap: 0; }
+}
+/* 景品の帯の下に余白（2026-11-15 岸田「空間あけて」）。すぐ下の「オリ得ミッション」の見出しとくっつかないように */
+.sim-prizebar { margin-bottom: var(--ds-space-stack-md); }
+
+/* ---------- 2026-11-17 ランキングをゲーセンのスコアボード風に（岸田「ゲーセンのスコアっぽく」）。あわせてスマホで行が画面の右へはみ出していたのを直す ---------- */
+.sim-live { grid-template-columns: minmax(0, 1fr); }
+.sim-live__col { min-width: 0; }
+.sim-rank { padding: var(--ds-space-inline-xs) var(--ds-space-inline-md); border-radius: var(--ds-radius-card); background: var(--ds-color-bg-inverse); color: var(--ds-color-text-inverse); box-shadow: inset 0 0 0 .12em color-mix(in srgb, var(--ds-color-sim-yk-gold) 55%, transparent); }
+.sim-rank li { grid-template-columns: 3.2em minmax(0, 1fr) auto; grid-template-areas: "pos name rate" "pos sub sub"; gap: 0 var(--ds-space-inline-sm); align-items: center; border-bottom-color: color-mix(in srgb, var(--ds-color-text-inverse) 16%, transparent); }
+.sim-rank li:last-child { border-bottom: 0; }
+.sim-rank li.sim-feed__empty { color: var(--ds-color-text-inverse); }
+.sim-rank__pos { grid-area: pos; font-size: var(--ds-text-body-size); font-style: italic; font-weight: 900; letter-spacing: .02em; color: color-mix(in srgb, var(--ds-color-text-inverse) 70%, transparent); }
+.sim-rank__name { grid-area: name; min-width: 0; font-size: var(--ds-text-body-size); letter-spacing: .04em; }
+.sim-rank__rate { grid-area: rate; justify-self: end; font-size: var(--ds-text-h3-size); font-weight: 900; letter-spacing: .06em; color: var(--ds-color-sim-yk-gold); text-shadow: 0 0 .5em color-mix(in srgb, var(--ds-color-sim-yk-gold) 70%, transparent); white-space: nowrap; }
+.sim-rank__rate .sim-rankpt { font-size: var(--ds-text-caption-size); }
+.sim-rank__sub { grid-area: sub; min-width: 0; }
+.sim-rank__sub .sim-rank__meta { color: color-mix(in srgb, var(--ds-color-text-inverse) 60%, transparent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sim-rank li.is-me { margin: 0 calc(var(--ds-space-inline-sm) * -1); padding-left: var(--ds-space-inline-sm); padding-right: var(--ds-space-inline-sm); border-radius: var(--ds-radius-sm); background: color-mix(in srgb, var(--ds-color-sim-yk-gold) 22%, transparent); }
+.sim-rank li.is-me .sim-rank__name { animation: sim-rank-blink 1.2s steps(2, jump-none) infinite; }
+/* 登録ずみのバッジは重ねずに 2 行目の右の枠へ置く（内訳の文字の末尾に重なっていた） */
+.sim-rank li.has-ent { grid-template-areas: "pos name rate" "pos sub ent"; padding-bottom: var(--ds-space-inline-sm); }
+.sim-rank li.has-ent > .sim-rank__ent { grid-area: ent; position: relative; right: auto; bottom: auto; justify-self: end; margin: 0; }
+.sim-rank li.has-ent .sim-rank__meta { max-width: none; }
+@keyframes sim-rank-blink { from { opacity: 1; } to { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .sim-rank li.is-me .sim-rank__name { animation: none; } }
+@media (max-width: 767px) {
+  .sim-rank { padding: var(--ds-space-inline-xs) var(--ds-space-inline-sm); }
+  .sim-rank li { grid-template-columns: 2.8em minmax(0, 1fr) auto; }
+  .sim-rank__rate { font-size: var(--ds-text-body-size); letter-spacing: .03em; }
+}
+
+/* ログインボーナス（2026-11-23）: レベルアップと同じ黒い窓に、7日分のスタンプを並べる */
+button.sim-status__days { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-family: var(--ds-font-pop); font-weight: 800; cursor: pointer; text-align: right; }
+.sim-status__tmr { display: block; font-size: var(--ds-text-caption-size); font-weight: 800; line-height: 1.3; opacity: .9; }
+.sim-status__tmr b { color: var(--ds-color-sim-btn-yellow); }
+.sim-status__tmr[hidden] { display: none; }
+.sim-lvup__msg small { font-size: var(--ds-text-caption-size); opacity: .8; }
+
+/* ログインボーナス（2026-11-23 岸田）: 金の額縁のシートに、毎日1枚めくるカード。額は確率で変わる */
+.sim-login { width: min(100% - 24px, 22rem); max-width: none; max-height: calc(100dvh - 12px); margin: auto; padding: 46px 0 6px; border: 0; outline: none; background: transparent; overflow-y: auto; overscroll-behavior: contain; font-family: var(--ds-font-pop); }
+.sim-login:focus, .sim-login:focus-visible { outline: none; }
+.sim-login::backdrop { background: radial-gradient(ellipse at 50% 40%, rgba(42,63,158,.85), rgba(7,9,23,.92) 75%); }
+.sim-login__frame { position: relative; padding: 9px; border-radius: 16px; background: linear-gradient(135deg, #f7e08a, #b8862b 30%, #fbe9a6 50%, #a1701c 75%, #f2d47a); box-shadow: 0 0 0 2px #5a3a08, 0 12px 34px rgba(0,0,0,.55); }
+.sim-login__logo { position: absolute; left: 50%; top: -42px; transform: translateX(-50%); height: 30px; filter: drop-shadow(0 2px 0 rgba(0,0,0,.4)); }
+.sim-login__ribbon { position: absolute; left: 50%; top: -16px; transform: translateX(-50%); width: 15em; margin: 0; padding: 7px 0; text-align: center; color: #fff6c8; font-weight: 900; font-size: 18px; letter-spacing: .08em; text-shadow: 0 2px 0 #5a0d06; background: linear-gradient(#e0412f, #8c1a12); border: 2px solid #f6d77a; clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%); }
+.sim-login__in { padding: 24px 11px 12px; border-radius: 9px; background: radial-gradient(ellipse at top, #3a2a10, #1a120a 70%); border: 2px solid #5a3a08; color: #fff; }
+.sim-login__say { margin: 0 0 10px; padding: 7px 11px; border-radius: 10px; background: #fff; color: var(--ds-color-text); font-size: 12.5px; font-weight: 800; line-height: 1.5; }
+.sim-login__say em { color: #e8322d; font-style: normal; }
+.sim-lc__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; padding: 0 10px; }
+.sim-lc { position: relative; aspect-ratio: .9; border-radius: 8px; background: linear-gradient(#2c2c3c, #15151f); border: 1.5px solid #8c6a2a; perspective: 700px; }
+.sim-lc.is-last { grid-column: span 3; aspect-ratio: auto; height: 42px; border-color: #ffe27a; box-shadow: 0 0 0 1px #ffe27a, 0 0 14px rgba(255,214,0,.45); }
+.sim-lc.is-now { cursor: pointer; }
+.sim-lc__lab { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #f6e3a1; font-size: 10px; font-weight: 800; }
+.sim-lc__lab b { font-size: 22px; line-height: 1; color: rgba(246,227,161,.55); }
+.sim-lc__lab em { font-style: normal; font-size: 11px; color: #ffe680; }
+.sim-lc__tc { position: absolute; inset: 3px; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.3, 1.4, .5, 1); }
+.sim-lc__tc.is-flipped { transform: rotateY(180deg); }
+.sim-lc__face { position: absolute; inset: 0; display: flex; flex-direction: column; border-radius: 7px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.sim-lc__back { align-items: center; justify-content: center; background: radial-gradient(circle at 50% 45%, #3d5ff0, #1b2a8a 60%, #0e1650); border: 2px solid #e9edff; box-shadow: 0 0 0 2px #ffd400, 0 0 16px #ffd400; animation: sim-lc-glow 1s ease-in-out infinite alternate; }
+@keyframes sim-lc-glow { to { box-shadow: 0 0 0 2px #fff3a0, 0 0 26px #ffd400; } }
+.sim-lc__back img { width: 78%; transform: rotate(-8deg); }
+.sim-lc__back span { position: absolute; bottom: 6%; left: 0; right: 0; text-align: center; color: #fff; font-weight: 900; font-size: 10px; }
+.sim-lc__front { transform: rotateY(180deg); padding: 6%; color: var(--ds-color-text); }
+.sim-lc__nm { display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 8px; }
+.sim-lc__nm i { font-style: normal; font-size: 9px; padding: 0 4px; border-radius: 3px; background: rgba(0,0,0,.75); color: #fff; }
+.sim-lc__art { flex: 1; display: flex; align-items: center; justify-content: center; margin: 5% 0; border-radius: 5px; }
+.sim-lc__art .sim-coin { width: auto; height: 80%; max-width: 52%; aspect-ratio: 1; font-size: 1.3em; box-shadow: inset 0 -.08em 0 rgba(0,0,0,.18), 0 3px 6px rgba(0,0,0,.3); }
+.sim-lc__pw { text-align: center; font-weight: 900; line-height: 1.05; }
+.sim-lc__pw small { display: block; font-size: 7px; opacity: .8; white-space: nowrap; }
+.sim-lc__pw b { font-size: 14px; }
+.sim-lc--N .sim-lc__front { background: linear-gradient(#f3f4f7, #c9ced9); border: 2px solid #fff; } .sim-lc--N .sim-lc__art { background: linear-gradient(#dfe3ec, #b8bfcf); }
+.sim-lc--R .sim-lc__front { background: linear-gradient(#e6f1ff, #7fb2ff); border: 2px solid #fff; } .sim-lc--R .sim-lc__art { background: linear-gradient(135deg, #b8d6ff, #4d8fff); }
+.sim-lc--SR .sim-lc__front { background: linear-gradient(135deg, #fff7c2, #ffc400 45%, #fff0a0 60%, #e0a000); border: 2px solid #fff8d8; } .sim-lc--SR .sim-lc__art { background: radial-gradient(circle, #fff5b8, #ffb300); }
+.sim-lc--UR .sim-lc__front { background: conic-gradient(from 30deg, #ff7ad9, #ffe680, #7af0ff, #b98cff, #ff7ad9); border: 2px solid #fff; } .sim-lc--UR .sim-lc__art { background: radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,.2)); }
+.sim-lc--SR .sim-lc__front::after, .sim-lc--UR .sim-lc__front::after { content: ''; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.75) 45%, transparent 60%); background-size: 250% 100%; animation: sim-lc-shine 2.4s ease-in-out infinite; mix-blend-mode: overlay; }
+@keyframes sim-lc-shine { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+.sim-lc__tc.is-flipped .sim-lc__back { animation: none; }
+.sim-lc__get { position: absolute; left: -6px; right: -6px; top: 34%; z-index: 3; transform: rotate(-14deg); text-align: center; font-size: 14px; font-weight: 900; color: #fff; background: #e8322d; border: 2px solid #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,.4); }
+.sim-lc__get.is-pop { animation: sim-lc-stamp .5s cubic-bezier(.2,1.8,.4,1) both; }
+@keyframes sim-lc-stamp { from { transform: rotate(-14deg) scale(2.6); opacity: 0; } to { transform: rotate(-14deg) scale(1); opacity: 1; } }
+.sim-login__odds { margin: 6px 0 0; padding: 7px 9px; border-radius: 8px; background: rgba(255,255,255,.07); color: #f6e3a1; font-size: 10.5px; font-weight: 800; }
+.sim-login__odds span { display: flex; gap: 4px; margin-top: 5px; }
+.sim-login__odds i { flex: 1; padding: 3px 0; border-radius: 5px; text-align: center; font-style: normal; font-size: 10px; line-height: 1.25; color: var(--ds-color-text); }
+.sim-login__odds i b { display: block; font-size: 11px; }
+.sim-login__odds .sim-lc--N { background: linear-gradient(#f3f4f7, #c9ced9); } .sim-login__odds .sim-lc--R { background: linear-gradient(#e6f1ff, #7fb2ff); }
+.sim-login__odds .sim-lc--SR { background: linear-gradient(135deg, #fff7c2, #ffc400); } .sim-login__odds .sim-lc--UR { background: conic-gradient(#ff7ad9, #ffe680, #7af0ff, #b98cff, #ff7ad9); }
+.sim-login__got { margin: 8px 0 0; text-align: center; font-size: 30px; font-weight: 900; line-height: 1.15; color: var(--ds-color-sim-btn-yellow); text-shadow: 0 3px 0 #7a3c00; }
+.sim-login__got[hidden] { display: none; }
+.sim-login__got > small:first-child { display: block; font-size: 12px; color: #fff; text-shadow: none; }
+.sim-login__got > small:last-child { margin-left: 2px; font-size: 14px; color: #fff; text-shadow: none; }
+.sim-login__got .sim-coin { margin-right: 4px; font-size: 16px; vertical-align: 4px; text-shadow: none; }
+.sim-login__notes { margin: 6px 0 0; padding: 7px 10px; border-radius: 8px; background: #fff8e6; color: var(--ds-color-text); font-size: 10.5px; line-height: 1.6; font-family: var(--ds-font-body, inherit); }
+.sim-login__notes b { color: #e8322d; }
+.sim-login__help { margin: 8px 0 10px; }
+.sim-login__help > summary { list-style: none; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 0; border-radius: 8px; background: rgba(255,255,255,.07); color: #f6e3a1; font-size: 11.5px; font-weight: 800; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.sim-login__help > summary::-webkit-details-marker { display: none; }
+.sim-login__help > summary::after { content: '▼'; font-size: 9px; transition: transform .2s; }
+.sim-login__help[open] > summary::after { transform: rotate(180deg); }
+.sim-login__help > summary:focus { outline: none; }
+.sim-login__help > summary:focus-visible { outline: 2px solid #f6d77a; outline-offset: 1px; }
+.sim-login__help > summary:active { background: rgba(255,255,255,.16); }
+.sim-login__btn { display: block; width: 100%; padding: 12px; border: 2px solid #f6d77a; border-radius: 999px; background: linear-gradient(#3ecf6a, #138a3a); color: #fff; font: 900 16px var(--ds-font-pop); box-shadow: 0 3px 0 #0b5a24; cursor: pointer; transition: opacity .3s; }
+.sim-login__btn:disabled { opacity: .4; cursor: default; }
+.sim-login.is-ur .sim-login__frame { animation: sim-lc-ur 1.4s ease-out; }
+@keyframes sim-lc-ur { 0% { box-shadow: 0 0 0 2px #5a3a08, 0 0 0 0 #ff9be6; } 30% { box-shadow: 0 0 0 2px #5a3a08, 0 0 0 30px rgba(255,155,230,.0), 0 0 60px 30px #ff9be6; } 100% { box-shadow: 0 0 0 2px #5a3a08, 0 12px 34px rgba(0,0,0,.55); } }
+@media (prefers-reduced-motion: reduce) { .sim-lc__back, .sim-lc__front::after, .sim-login.is-ur .sim-login__frame { animation: none !important; } .sim-lc__tc { transition: none; } }
