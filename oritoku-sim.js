@@ -35,7 +35,29 @@
     name: function () { return ['sim_name_set', {}]; },
     entry: function () { return ['sim_entry', {}]; }
   };
+  // GitHub Pages等の静的ホスティングでは元サイトAPIのCORSに依存しない。
+  // 状態・ルーレットだけは端末内で処理し、レベル制度（level/next/title）は維持する。
+  var LOCAL_GAME = true;
+  function localDay() { return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); }
+  function localWalletSnapshot() {
+    var w = (typeof wallet !== 'undefined' && wallet) ? wallet : { pt: 0, spent: 0, cash: 0, rolled: false, week: localDay() };
+    var score = Math.max(0, w.best || w.pt || 0), levels = cfg.levels || [], level = null, next = null;
+    levels.forEach(function (L) { if (score >= (+L.min || 0)) level = L; });
+    levels.forEach(function (L) { if (!next && level && (+L.min || 0) > (+level.min || 0)) next = L; });
+    return { pt: w.pt || 0, spent: w.spent || 0, cash: w.cash || 0, day: w.week || localDay(), rolled: !!w.rolled,
+      revived: !!w.rev, done: !!w.done, level: level || w.level || null, next: next || w.next || null, best: score,
+      survive: w.survive || 0, title: w.title || 'beginner', login: w.login || null };
+  }
   function api(action, data) {
+    if (LOCAL_GAME && action === 'state') {
+      return Promise.resolve({ ok: true, boxes: {}, recent: [], ranking: [], ranking_month: [], missions: [], wallet: localWalletSnapshot() });
+    }
+    if (LOCAL_GAME && action === 'roll') {
+      var pi = pickPlan();
+      var sw = localWalletSnapshot();
+      sw.pt += PLANS[pi].pt; sw.rolled = true; sw.revived = false;
+      return Promise.resolve({ ok: true, plan: pi, wallet: sw });
+    }
     var body = new URLSearchParams(Object.assign({ action: action, token: cfg.token, client: client }, data || {}));
     return fetch(cfg.api, { method: 'POST', body: body, credentials: 'same-origin', headers: { Accept: 'application/json' } })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
