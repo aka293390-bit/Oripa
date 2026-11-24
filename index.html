@@ -11781,7 +11781,7 @@ button.sim-status__days { padding: 0; border: 0; background: none; color: inheri
     <p class="sim-charge__msg" data-sim-charge-msg aria-live="polite"></p>
     <div class="sim-charge__actions">
       <button type="button" class="sim-btn" data-sim-charge-spin>ルーレットを回す</button>
-      <button type="button" class="sim-btn sim-btn--x" data-sim-charge-share hidden><svg class="sim-xicon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>復活キーで復活</button>
+      <button type="button" class="sim-btn" data-sim-charge-share hidden>復活キーで復活</button>
       <button type="button" class="sim-btn sim-btn--plain" data-sim-charge-close hidden>閉じる</button>
     </div>
         <form class="sim-sharebox" data-sim-share-form hidden novalidate>
@@ -15150,7 +15150,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return '<li class="sim-plan is-heat-' + i + '" data-sim-plan="' + i + '"><span class="sim-plan__pt"><span class="sim-coin" aria-hidden="true">P</span>' + fmt(p.pt) + '<small>pt</small></span>' + (tag ? '<span class="sim-plan__tag">' + tag + '</span>' : '') + '</li>';
   }).join('');
 
-  // ---- ポイントが尽きたらゲームオーバー。Xでシェアすると1日1回だけルーレットをもう1回回せる（復活） ----
+  // ---- ポイントが尽きたらゲームオーバー。復活キーで1日1回だけルーレットをもう1回回せる（復活） ----
   var shareBtn = dlg && dlg.querySelector('[data-sim-charge-share]');
   var closeBtn = dlg && dlg.querySelector('[data-sim-charge-close]');
   var chargeTitle = dlg && dlg.querySelector('#sim-charge-title');
@@ -15180,7 +15180,7 @@ document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(plansEl.children, function (li) { li.classList.remove('is-on', 'is-hit'); });
     showDlg();
   }
-  // Xの投稿画面（#オリ得シミュレーター 付き。サーバーはこのタグ入りの24時間以内の投稿だけ認める）
+  // 復活キー入力（X投稿は使用しない）
   // x.com/intent/post だと Web のログイン画面に飛ぶことがあるので twitter.com の intent を使う（アプリにも渡る）。
   // 付ける URL は、自分の成績のシェア画像が出るページ（サーバーが署名して返す）。取れなければシミュレーターの URL
   function intentUrl(text, url) {
@@ -15199,9 +15199,9 @@ document.addEventListener('DOMContentLoaded', function () {
     shareForm.hidden = false; chargeMsg.textContent = ''; // 押してもシェアのボタンは消さない（投稿し直せるように）
     setTimeout(function () { shareInput.focus(); }, 50);
   }
-  if (shareBtn) shareBtn.addEventListener('click', function () { openShare(shareText()); showShareForm(); });
+  if (shareBtn) shareBtn.addEventListener('click', function () { showShareForm(); });
   if (shareForm) {
-    dlg.querySelector('[data-sim-share-again]').addEventListener('click', function () { openShare(shareText()); });
+    dlg.querySelector('[data-sim-share-again]').addEventListener('click', function () { showShareForm(); });
     shareForm.addEventListener('submit', function (e) {
       e.preventDefault();
       var url = shareInput.value.trim();
