@@ -14224,7 +14224,14 @@ document.addEventListener('DOMContentLoaded', function () {
       var tierPt = 0;
       res.hits.forEach(function (h) { var t = current.gacha.tiers[h[0]]; if (t.pt != null) tierPt += t.pt * h[1]; });
       if (play === 'game') {
-        walletFrom(res.wallet); // 持ちポイントはサーバーが計算済み（1口×口数を引いて、ハズレの pt だけ戻る）
+        if (current.local) {
+          var localSw = localWalletSnapshot();
+          localSw.pt = Math.max(0, (wallet.pt || 0) - res.cost + (res.pt || 0));
+          localSw.spent = (wallet.spent || 0) + res.cost;
+          localSw.rolled = true;
+          localSw.best = Math.max(wallet.best || 0, localSw.pt);
+          walletFrom(localSw);
+        } else walletFrom(res.wallet); // サーバー版はサーバー計算値を使用
         var newKeys = invAdd(current.gacha, res, current.local);
         checkOver();
       }
@@ -15436,7 +15443,11 @@ document.addEventListener('DOMContentLoaded', function () {
       if (value > 0) nudgeWant = nudgeWant || 'ship';
       return value;
     };
-    if (x.local || !x.pull) return Promise.resolve(0); // ゲームの当たりはすべてサーバーの記録つき。記録の無いものは数えない
+    if (x.local) {
+      var localValue = ((x.m != null ? x.m : (x.pt || 0)) * (x.cnt || 1));
+      return Promise.resolve(done(localValue));
+    }
+    if (!x.pull) return Promise.resolve(0);
     return api('ship', { pull: x.pull, idx: x.idx, cnt: x.cnt }).then(function (j) { return done(j.value); }, function (err) {
       if (err.code === 'bad_ship') return 0; // サーバーが知らない（前の日・交換済み等）当たりは捨てる。止まらないように 0 で先へ
       throw err;
@@ -15444,7 +15455,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   // pt に交換（サーバーが当たりを確かめて持ちポイントに足す）
   function doTrade(x) {
-    if (x.local || !x.pull || x.pt == null) return Promise.resolve(0);
+    if (x.local) {
+      if (x.pt == null) return Promise.resolve(0);
+      var localPt = (x.pt || 0) * (x.cnt || 1), beforePt = wallet.pt || 0;
+      wallet.pt = beforePt + localPt; walletSave(); walletRender(); checkOver();
+      return Promise.resolve(localPt);
+    }
+    if (!x.pull || x.pt == null) return Promise.resolve(0);
     return api('trade', { pull: x.pull, idx: x.idx, cnt: x.cnt }).then(function (j) { walletFrom(j.wallet); checkOver(); return j.pt; }, function (err) {
       if (err.code === 'bad_trade') return 0;
       throw err;
