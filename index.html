@@ -15075,7 +15075,7 @@ document.addEventListener('DOMContentLoaded', function () {
     wallet = { pt: sw.pt, spent: sw.spent, cash: sw.cash, week: sw.day, rolled: !!sw.rolled, rev: sw.revived ? sw.day : '', done: !!sw.done, ranked: sameDay && !!wallet.ranked,
       level: sw.level || null, next: sw.next || null, best: sw.best || sw.pt || 0, survive: sw.survive || 0, title: sw.title || 'beginner', login: sw.login || null };
     renderStatus();
-    if (!sw.rolled) { inv = []; invSave(); } // 今日まだ回していない＝前の日の獲得商品は持ち越さない
+    // コレクションは状態更新や再読み込みでは削除しない。交換・発送した時だけ invTake() で減らす。
     walletSave(); walletRender(); renderStatus(); markStarted();
   }
 
