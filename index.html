@@ -14187,7 +14187,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (current.stats) { current.stats.n += res.n; current.stats.cost += res.cost; current.stats.pt += res.pt; current.stats.mkt += res.mkt; } else { current.stats = { n: res.n, cost: res.cost, pt: res.pt, mkt: res.mkt, players: 1 }; }
       updateBoxView();
       renderResult(res, n);
-      if (play === 'game' && !current.local) { playInner.querySelector('[data-sim-result]').hidden = true; openRpop(newKeys || [], res, n); }
+      if (play === 'game') { playInner.querySelector('[data-sim-result]').hidden = true; openRpop(newKeys || [], res, n); }
       if (res.me) renderMe(res.me);
       finishPull();
       if (!current.local) refreshState();
