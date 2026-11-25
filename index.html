@@ -14187,7 +14187,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (current.stats) { current.stats.n += res.n; current.stats.cost += res.cost; current.stats.pt += res.pt; current.stats.mkt += res.mkt; } else { current.stats = { n: res.n, cost: res.cost, pt: res.pt, mkt: res.mkt, players: 1 }; }
       updateBoxView();
       renderResult(res, n);
-      if (play === 'game') { playInner.querySelector('[data-sim-result]').hidden = true; openRpop(newKeys || [], res, n); }
+      if (play === 'game' && !current.local) { playInner.querySelector('[data-sim-result]').hidden = true; openRpop(newKeys || [], res, n); }
       if (res.me) renderMe(res.me);
       finishPull();
       if (!current.local) refreshState();
@@ -15354,9 +15354,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     // ハズレもカード（ノーマルカード）として獲得商品に入れる。番号は賞の後ろ。交換か発送を自分で選ぶ（2026-10-31 岸田「ハズレで勝手に処理させないで」）
     var hz = res.n - res.hits.reduce(function (a, h) { return a + h[1]; }, 0);
-    if (!local && hz > 0 && g.hz && g.hz.pt) {
+    if (hz > 0 && g.hz && g.hz.pt) {
       keys.push(Date.now().toString(36) + Math.random().toString(36).slice(2, 7) + 'h');
-      inv.push({ k: keys[keys.length - 1], local: false, gid: g.id, gt: g.t, site: g.site_name, pull: res.pull_id || 0, idx: g.tiers.length, rl: 'ハズレ', n: 'ノーマルカード', pt: g.hz.pt, m: null, link: null, img: null, cnt: hz, lose: true });
+      inv.push({ k: keys[keys.length - 1], local: !!local, gid: g.id, gt: g.t, site: g.site_name, pull: res.pull_id || 0, idx: g.tiers.length, rl: 'ハズレ', n: 'ノーマルカード', pt: g.hz.pt, m: null, link: null, img: null, cnt: hz, lose: true });
     }
     invSave(); invRender();
     return keys;
