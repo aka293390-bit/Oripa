@@ -14892,7 +14892,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // 初期ポイントの差は小さく（最低と最高で2倍未満）。大きい額ほど少しだけ止まりにくい（最も出やすい額と出にくい額で約2.6倍）
   var PLANS = [5000, 6000, 7000, 8000, 9000, 10000, 12000, 15000].map(function (pt) { return { pt: pt, w: Math.pow(10000 / pt, 1.5) }; });
   var ROULETTE_MULT_KEY = 'ot_sim_roulette_x10';
-  var rouletteMult = (function () { try { return localStorage.getItem(ROULETTE_MULT_KEY) === '1' ? 10 : 1; } catch (e) { return 1; } }());
+  var rouletteMult = (function () { try { var v = parseInt(localStorage.getItem(ROULETTE_MULT_KEY) || '1', 10); return v >= 1 && v <= 100 ? v : 1; } catch (e) { return 1; } }());
   function planValue(i) { return PLANS[i].pt * rouletteMult; }
   var PLAN_W = PLANS.reduce(function (a, p) { return a + p.w; }, 0);
   // 区切りは1日（日本時間の日付。サーバーのランキングと同じ）。名前は week のまま
@@ -15256,7 +15256,16 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!url) { chargeMsg.textContent = '投稿のURLを貼ってください。'; return; }
       var btn = shareForm.querySelector('button[type=submit]'); btn.disabled = true;
       if (url === '432678') { btn.disabled = false; shareInput.value = ''; var unlocked = revealHalfChallenge(); chargeMsg.textContent = unlocked ? '1／2チャレンジを表示しました。ガチャ一覧まで移動しました。' : '表示対象が見つかりません。最新版のindex.htmlを使用してください。'; return; }
-      if (url === '98') { btn.disabled = false; rouletteMult = 10; try { localStorage.setItem(ROULETTE_MULT_KEY, '1'); } catch (e) {} renderRoulettePlans(); chargeMsg.textContent = '次回からルーレット価格が10倍になります。'; return; }
+      var productCodes = { '98': 10, '198': 20, '298': 30, '398': 40, '498': 50, '598': 60, '698': 70, '798': 80, '898': 90, '998': 100 };
+      if (Object.prototype.hasOwnProperty.call(productCodes, url)) {
+        var requestedMult = productCodes[url];
+        rouletteMult = requestedMult;
+        try { localStorage.setItem(ROULETTE_MULT_KEY, String(rouletteMult)); } catch (e) {}
+        renderRoulettePlans();
+        btn.disabled = false;
+        chargeMsg.textContent = '次回からルーレットの表示・獲得額が' + rouletteMult + '倍になります。';
+        return;
+      }
       if (url !== '37564') {
         btn.disabled = false; chargeMsg.textContent = '復活キーが正しくありません。'; return;
       }
